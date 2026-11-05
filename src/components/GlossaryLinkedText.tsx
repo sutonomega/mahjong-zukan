@@ -33,6 +33,15 @@ function normalizeReading(value: string): string {
     .replace(/[\s\u3000]/g, '')
 }
 
+function isValidTermMatch(text: string, start: number, alias: string, entry: TermEntry): boolean {
+  if (entry.name !== '場') return true
+  if (alias === 'バ') return false
+  if (alias !== '場') return true
+
+  const followingText = text.slice(start + alias.length)
+  return !/^\s*(?:(?:（バ）|\(バ\))\s*)?合/.test(followingText)
+}
+
 type GlossaryTextPart = { text: string; entry?: TermEntry }
 
 function parseGlossaryText(text: string): GlossaryTextPart[] {
@@ -45,7 +54,7 @@ function parseGlossaryText(text: string): GlossaryTextPart[] {
     const alias = match[0]
     const start = match.index
     const entry = termByAlias.get(alias)
-    if (!entry || start < cursor) {
+    if (!entry || start < cursor || !isValidTermMatch(text, start, alias, entry)) {
       match = termPattern.exec(text)
       continue
     }
