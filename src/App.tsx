@@ -121,21 +121,22 @@ function App() {
   }
 
   function renderEntryCard(entry: Entry) {
-    return <button className="entry-card" key={entry.id} onClick={() => openEntry(entry)}>
+    return <article className="entry-card" key={entry.id}>
       <div className="entry-card-top"><span className={`type-pill type-${entry.type}`}>{entry.type}</span><span className="entry-category">{getCategory(entry)}</span></div>
       <div className="entry-illustration">
         {entry.type === '役'
           ? <YakuArtwork number={entry.source.No} han={entry.source['翻数（ハンスウ）']} />
           : <TermArtwork number={entry.source.No} category={entry.source.カテゴリ} />}
       </div>
-      <h3>{getDisplayName(entry)}</h3>
+      <h3><button className="entry-title-button" onClick={() => openEntry(entry)}>{getDisplayName(entry)}</button></h3>
       <p className="entry-reading">{entry.reading}</p>
-      <p className="entry-summary">{entry.explanation || 'Excelに説明の記載はありません。'}</p>
+      <p className="entry-summary"><GlossaryLinkedText text={entry.explanation || 'Excelに説明の記載はありません。'} onOpen={openEntry} /></p>
       {entry.type === '役' && <p className="entry-yaku-meta">{entry.source['翻数（ハンスウ）']} ・ 鳴き {entry.source.鳴き || '記載なし'}</p>}
       <div className="entry-card-bottom">
-        {learned.includes(entry.id) ? <span className="learned-label"><Check size={14} />習得済み</span> : <span className="details-link">くわしく <ChevronRight size={15} /></span>}
+        {learned.includes(entry.id) && <span className="learned-label"><Check size={14} />習得済み</span>}
+        <button className="details-link" onClick={() => openEntry(entry)}>くわしく <ChevronRight size={15} /></button>
       </div>
-    </button>
+    </article>
   }
 
   const progress = entries.length ? Math.round((learnedCount / entries.length) * 100) : 0
