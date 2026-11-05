@@ -73,6 +73,7 @@ const termDisplayNames: Record<string, string> = {
 
 const termDisplayReadings: Record<string, string> = {
   'term-066': 'パイ／ハイ',
+  'term-052': 'ファン／ハン',
 }
 
 const termDisplayExplanations: Record<string, string> = {
