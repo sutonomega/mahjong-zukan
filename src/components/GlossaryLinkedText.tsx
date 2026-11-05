@@ -1,4 +1,4 @@
-import { entries, getDisplayName, getEntryExplanation, type TermEntry } from '../data/entries'
+import { entries, getDisplayLabel, getEntryExplanation, type TermEntry } from '../data/entries'
 
 type GlossaryLinkedTextProps = {
   text: string
@@ -71,7 +71,7 @@ function parseGlossaryText(text: string): GlossaryTextPart[] {
       end += readingSuffix[0].length
     }
 
-    parts.push({ text: `${getDisplayName(entry)}（${entry.reading}）`, entry })
+    parts.push({ text: getDisplayLabel(entry), entry })
     cursor = end
     termPattern.lastIndex = end
     match = termPattern.exec(text)
@@ -93,16 +93,16 @@ export default function GlossaryLinkedText({ text, onOpen }: GlossaryLinkedTextP
       if (!part.entry) return <span key={index}>{part.text}</span>
 
       const entry = part.entry
-      const displayName = getDisplayName(entry)
+      const displayLabel = getDisplayLabel(entry)
       const tooltip = formatGlossaryText(getEntryExplanation(entry))
       return <button
-        aria-label={`${displayName}（${entry.reading}）。説明: ${tooltip}。クリックで用語詳細を開く`}
+        aria-label={`${displayLabel}。説明: ${tooltip}。クリックで用語詳細を開く`}
         className="glossary-term-link"
         data-tooltip={tooltip}
         key={index}
         onClick={() => onOpen(entry)}
         type="button"
-      >{part.text}</button>
+      >{displayLabel}</button>
     })}
   </>
 }

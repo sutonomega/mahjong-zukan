@@ -71,6 +71,10 @@ const termDisplayReadings: Record<string, string> = {
   'term-066': 'パイ／ハイ',
 }
 
+const termDisplayExplanations: Record<string, string> = {
+  'term-110': 'アガった場合に、ドラを持っていれば1枚で1翻（ファン、ハン）加算される特別な牌。一般的に懸賞牌とも言う。役は付かない。',
+}
+
 const roles: RoleEntry[] = importedData.roles.map((record) => ({
   id: record.id,
   type: '役',
@@ -101,8 +105,14 @@ export function getDisplayName(entry: Entry): string {
   return entry.type === '役' ? entry.name : entry.displayName
 }
 
+export function getDisplayLabel(entry: Entry): string {
+  const name = getDisplayName(entry)
+  return name.normalize('NFKC') === entry.reading.normalize('NFKC') ? name : `${name}（${entry.reading}）`
+}
+
 export function getEntryExplanation(entry: Entry): string {
-  return entry.explanation || 'Excelに説明の記載はありません。'
+  const explanation = entry.type === '用語' ? termDisplayExplanations[entry.id] ?? entry.explanation : entry.explanation
+  return explanation || 'Excelに説明の記載はありません。'
 }
 
 function normalizeSearchText(value: string): string {
