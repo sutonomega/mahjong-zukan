@@ -100,8 +100,9 @@ function App() {
                 {learned.includes(selected.id) ? '習得済み' : '覚えた！'}
               </button>
             </div>
+            <div className="detail-category-block">{getCategory(selected)}</div>
             <section className="detail-section source-description">
-              <h2>Excelの説明（原文）</h2>
+              <h2>説明</h2>
               <p><GlossaryLinkedText text={getEntryExplanation(selected)} onOpen={openEntry} /></p>
             </section>
             {selected.type === '用語' && selected.id === 'term-052' && <section className="detail-section han-levels-section">
@@ -115,18 +116,8 @@ function App() {
                   </tr>)}</tbody>
                 </table>
               </div>
-              <p className="han-table-note">この表は補足情報として追加したものです。Excel原文の説明とは分けて表示しています。</p>
+              <p className="han-table-note">この表は初期データの説明とは分けて表示しています。</p>
             </section>}
-            <section className="detail-section">
-              <h2>Excelの項目</h2>
-              <div className="metadata-row"><span>カテゴリ</span><span>{getCategory(selected)}</span></div>
-              {selected.type === '役' && <>
-                <div className="metadata-row"><span>翻数（ハンスウ）</span><span>{selected.source['翻数（ハンスウ）'] || '記載なし'}</span></div>
-                <div className="metadata-row"><span>鳴き</span><span>{selected.source.鳴き || '記載なし'}</span></div>
-              </>}
-              <div className="metadata-row"><span>ExcelのNo</span><span>{selected.source.No}</span></div>
-            </section>
-            <p className="source-note">説明は初期データの記載をそのまま表示しています。ルール確認や補足は今後、元データと分けて追加します。</p>
           </article>
         </main>
         <footer className="footer"><span>麻雀図鑑</span><span>少しずつ覚えていこう。</span></footer>
