@@ -7,12 +7,14 @@ import GlossaryLinkedText from './components/GlossaryLinkedText'
 
 const typeFilters = ['すべて', '役', '用語'] as const
 type TypeFilter = typeof typeFilters[number]
+type EntryHistoryLocation = { id: string; scrollY: number }
 
 function App() {
   const [query, setQuery] = useState('')
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('すべて')
   const [categoryFilter, setCategoryFilter] = useState('すべて')
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [entryHistory, setEntryHistory] = useState<EntryHistoryLocation[]>([])
   const [learned, setLearned] = useState<string[]>(() => {
     try {
       return JSON.parse(localStorage.getItem('mahjong-zukan-learned') ?? '[]') as string[]
@@ -48,8 +50,23 @@ function App() {
   }
 
   function openEntry(entry: Entry) {
+    if (selectedId && selectedId !== entry.id) {
+      setEntryHistory((history) => [...history, { id: selectedId, scrollY: window.scrollY }])
+    }
     setSelectedId(entry.id)
     window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  function backFromEntry() {
+    const previous = entryHistory[entryHistory.length - 1]
+    if (!previous) {
+      setSelectedId(null)
+      return
+    }
+
+    setEntryHistory((history) => history.slice(0, -1))
+    setSelectedId(previous.id)
+    window.requestAnimationFrame(() => window.scrollTo({ top: previous.scrollY, behavior: 'auto' }))
   }
 
   function resetFilters() {
@@ -62,14 +79,14 @@ function App() {
     return (
       <div className="app-shell">
         <header className="topbar">
-          <button className="brand-button" onClick={() => setSelectedId(null)} aria-label="図鑑の一覧へ戻る">
+          <button className="brand-button" onClick={() => { setSelectedId(null); setEntryHistory([]) }} aria-label="図鑑の一覧へ戻る">
             <span className="brand-mark"><BookOpen size={21} /></span>
             <span>麻雀図鑑</span>
           </button>
           <span className="topbar-note">はじめての麻雀を、もっとわかりやすく。</span>
         </header>
         <main className="detail-layout">
-          <button className="back-link" onClick={() => setSelectedId(null)}><ArrowLeft size={16} /> 図鑑一覧へ戻る</button>
+          <button className="back-link" onClick={backFromEntry}><ArrowLeft size={16} /> {entryHistory.length > 0 ? '前の説明へ戻る' : '図鑑一覧へ戻る'}</button>
           <article className="detail-card">
             <div className="detail-kicker"><span className={`type-pill type-${selected.type}`}>{selected.type}</span></div>
             <div className="detail-title-row">
