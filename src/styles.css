@@ -107,10 +107,10 @@ main { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
 .entry-title-button { padding: 0; border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
 .entry-title-button:hover { color: #47734e; }
 .entry-reading { margin: 2px 0 8px; color: #9ba59c; font-size: 10px; }
-.entry-summary { min-height: 60px; margin: 0; color: #67766d; font-size: 11px; line-height: 1.8; }
+.entry-summary { min-height: 60px; margin: 0; color: #67766d; font-size: 11px; line-height: 1.8; white-space: pre-line; }
 .glossary-term-link { position: relative; color: #376b50; text-decoration: underline; text-decoration-color: #91b39a; text-decoration-style: dotted; text-underline-offset: 3px; }
 .glossary-term-link { padding: 0; border: 0; background: none; font: inherit; cursor: pointer; }
-.glossary-term-link::after { position: absolute; z-index: 20; left: 50%; bottom: calc(100% + 9px); width: max-content; max-width: min(280px, 75vw); padding: 9px 11px; border: 1px solid #dce6da; border-radius: 9px; background: #fff; box-shadow: 0 7px 22px #203a2b1c; color: #42564a; content: attr(data-tooltip); font-size: 11px; font-weight: 400; line-height: 1.65; text-align: left; white-space: normal; opacity: 0; pointer-events: none; transform: translate(-50%, 4px); transition: opacity .15s, transform .15s; }
+.glossary-term-link::after { position: absolute; z-index: 20; left: 50%; bottom: calc(100% + 9px); width: max-content; max-width: min(280px, 75vw); padding: 9px 11px; border: 1px solid #dce6da; border-radius: 9px; background: #fff; box-shadow: 0 7px 22px #203a2b1c; color: #42564a; content: attr(data-tooltip); font-size: 11px; font-weight: 400; line-height: 1.65; text-align: left; white-space: pre-line; opacity: 0; pointer-events: none; transform: translate(-50%, 4px); transition: opacity .15s, transform .15s; }
 .glossary-term-link:hover::after, .glossary-term-link:focus-visible::after { opacity: 1; transform: translate(-50%, 0); }
 .glossary-term-link:focus-visible { outline: 2px solid #7da68a; outline-offset: 3px; border-radius: 2px; }
 .entry-yaku-meta { margin: 8px 0 0; color: #9b6b2c; font-size: 10px; }

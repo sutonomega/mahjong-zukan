@@ -1,4 +1,3 @@
-import type { ReactNode } from 'react'
 import { entries, getDisplayName, getEntryExplanation, type TermEntry } from '../data/entries'
 
 type GlossaryLinkedTextProps = {
@@ -28,10 +27,11 @@ function normalizeReading(value: string): string {
     .replace(/[\s\u3000]/g, '')
 }
 
-export default function GlossaryLinkedText({ text, onOpen }: GlossaryLinkedTextProps) {
-  const parts: ReactNode[] = []
+type GlossaryTextPart = { text: string; entry?: TermEntry }
+
+function parseGlossaryText(text: string): GlossaryTextPart[] {
+  const parts: GlossaryTextPart[] = []
   let cursor = 0
-  let index = 0
   termPattern.lastIndex = 0
   let match = termPattern.exec(text)
 
@@ -44,7 +44,7 @@ export default function GlossaryLinkedText({ text, onOpen }: GlossaryLinkedTextP
       continue
     }
 
-    if (start > cursor) parts.push(text.slice(cursor, start))
+    if (start > cursor) parts.push({ text: text.slice(cursor, start) })
 
     let end = start + alias.length
     while (true) {
@@ -54,22 +54,38 @@ export default function GlossaryLinkedText({ text, onOpen }: GlossaryLinkedTextP
       end += readingSuffix[0].length
     }
 
-    const displayName = getDisplayName(entry)
-    const tooltip = getEntryExplanation(entry)
-    parts.push(<button
-      aria-label={`${displayName}（${entry.reading}）。説明: ${tooltip}。クリックで用語詳細を開く`}
-      className="glossary-term-link"
-      data-tooltip={tooltip}
-      key={index}
-      onClick={() => onOpen(entry)}
-      type="button"
-    >{displayName}（{entry.reading}）</button>)
-    index += 1
+    parts.push({ text: `${getDisplayName(entry)}（${entry.reading}）`, entry })
     cursor = end
     termPattern.lastIndex = end
     match = termPattern.exec(text)
   }
 
-  if (cursor < text.length) parts.push(text.slice(cursor))
-  return <>{parts}</>
+  if (cursor < text.length) parts.push({ text: text.slice(cursor) })
+  return parts
+}
+
+export function formatGlossaryText(text: string): string {
+  return parseGlossaryText(text).map((part) => part.text).join('')
+}
+
+export default function GlossaryLinkedText({ text, onOpen }: GlossaryLinkedTextProps) {
+  const parts = parseGlossaryText(text)
+
+  return <>
+    {parts.map((part, index) => {
+      if (!part.entry) return <span key={index}>{part.text}</span>
+
+      const entry = part.entry
+      const displayName = getDisplayName(entry)
+      const tooltip = formatGlossaryText(getEntryExplanation(entry))
+      return <button
+        aria-label={`${displayName}（${entry.reading}）。説明: ${tooltip}。クリックで用語詳細を開く`}
+        className="glossary-term-link"
+        data-tooltip={tooltip}
+        key={index}
+        onClick={() => onOpen(entry)}
+        type="button"
+      >{part.text}</button>
+    })}
+  </>
 }
