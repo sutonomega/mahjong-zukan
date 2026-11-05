@@ -1,17 +1,22 @@
 import { useMemo, useState } from 'react'
 import { BookOpen, Search, X, ChevronRight, Check, Sparkles, CircleHelp, ArrowLeft, BookmarkCheck } from 'lucide-react'
-import { entries, getCategory, classifyEntryQuery, references, type Entry } from './data/entries'
+import { entries, getCategory, getDisplayName, getEntryExplanation, classifyEntryQuery, references, type Entry } from './data/entries'
 import YakuArtwork from './components/YakuArtwork'
 import TermArtwork from './components/TermArtwork'
+import GlossaryLinkedText from './components/GlossaryLinkedText'
+import { hanLevels } from './data/hanLevels'
+import { suitedTileReadings } from './data/suitedTileReadings'
 
 const typeFilters = ['すべて', '役', '用語'] as const
 type TypeFilter = typeof typeFilters[number]
+type EntryHistoryLocation = { id: string; scrollY: number }
 
 function App() {
   const [query, setQuery] = useState('')
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('すべて')
   const [categoryFilter, setCategoryFilter] = useState('すべて')
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [entryHistory, setEntryHistory] = useState<EntryHistoryLocation[]>([])
   const [learned, setLearned] = useState<string[]>(() => {
     try {
       return JSON.parse(localStorage.getItem('mahjong-zukan-learned') ?? '[]') as string[]
@@ -47,8 +52,23 @@ function App() {
   }
 
   function openEntry(entry: Entry) {
+    if (selectedId && selectedId !== entry.id) {
+      setEntryHistory((history) => [...history, { id: selectedId, scrollY: window.scrollY }])
+    }
     setSelectedId(entry.id)
     window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  function backFromEntry() {
+    const previous = entryHistory[entryHistory.length - 1]
+    if (!previous) {
+      setSelectedId(null)
+      return
+    }
+
+    setEntryHistory((history) => history.slice(0, -1))
+    setSelectedId(previous.id)
+    window.requestAnimationFrame(() => window.scrollTo({ top: previous.scrollY, behavior: 'auto' }))
   }
 
   function resetFilters() {
@@ -61,19 +81,19 @@ function App() {
     return (
       <div className="app-shell">
         <header className="topbar">
-          <button className="brand-button" onClick={() => setSelectedId(null)} aria-label="図鑑の一覧へ戻る">
+          <button className="brand-button" onClick={() => { setSelectedId(null); setEntryHistory([]) }} aria-label="図鑑の一覧へ戻る">
             <span className="brand-mark"><BookOpen size={21} /></span>
             <span>麻雀図鑑</span>
           </button>
           <span className="topbar-note">はじめての麻雀を、もっとわかりやすく。</span>
         </header>
         <main className="detail-layout">
-          <button className="back-link" onClick={() => setSelectedId(null)}><ArrowLeft size={16} /> 図鑑一覧へ戻る</button>
+          <button className="back-link" onClick={backFromEntry}><ArrowLeft size={16} /> {entryHistory.length > 0 ? '前の説明へ戻る' : '図鑑一覧へ戻る'}</button>
           <article className="detail-card">
             <div className="detail-kicker"><span className={`type-pill type-${selected.type}`}>{selected.type}</span></div>
             <div className="detail-title-row">
               <div>
-                <h1>{selected.name}</h1>
+                <h1>{getDisplayName(selected)}</h1>
                 <p className="reading">{selected.reading}</p>
               </div>
               <button className={`learn-button ${learned.includes(selected.id) ? 'is-learned' : ''}`} onClick={() => toggleLearned(selected.id)}>
@@ -81,20 +101,37 @@ function App() {
                 {learned.includes(selected.id) ? '習得済み' : '覚えた！'}
               </button>
             </div>
+            <div className="detail-category-block">{getCategory(selected)}</div>
             <section className="detail-section source-description">
-              <h2>Excelの説明（原文）</h2>
-              <p>{selected.explanation || 'Excelに説明の記載はありません。'}</p>
+              <h2>説明</h2>
+              <p><GlossaryLinkedText text={getEntryExplanation(selected)} onOpen={openEntry} /></p>
             </section>
-            <section className="detail-section">
-              <h2>Excelの項目</h2>
-              <div className="metadata-row"><span>カテゴリ</span><span>{getCategory(selected)}</span></div>
-              {selected.type === '役' && <>
-                <div className="metadata-row"><span>翻数（ハンスウ）</span><span>{selected.source['翻数（ハンスウ）'] || '記載なし'}</span></div>
-                <div className="metadata-row"><span>鳴き</span><span>{selected.source.鳴き || '記載なし'}</span></div>
-              </>}
-              <div className="metadata-row"><span>ExcelのNo</span><span>{selected.source.No}</span></div>
-            </section>
-            <p className="source-note">説明は初期データの記載をそのまま表示しています。ルール確認や補足は今後、元データと分けて追加します。</p>
+            {selected.type === '用語' && selected.id === 'term-052' && <section className="detail-section han-levels-section">
+              <h2>翻数の区分（補足）</h2>
+              <div className="han-table-wrap">
+                <table className="han-table">
+                  <thead><tr><th scope="col">翻数の区分</th><th scope="col">補足</th></tr></thead>
+                  <tbody>{hanLevels.map((level) => <tr key={level.label}>
+                    <th scope="row">{level.label}</th>
+                    <td>{'note' in level ? level.note : ''}</td>
+                  </tr>)}</tbody>
+                </table>
+              </div>
+              <p className="han-table-note">この表は初期データの説明とは分けて表示しています。</p>
+            </section>}
+            {selected.type === '用語' && suitedTileReadings[selected.id] && <section className="detail-section suited-tile-readings-section">
+              <h2>{suitedTileReadings[selected.id].title}（補足）</h2>
+              <div className="han-table-wrap">
+                <table className="han-table">
+                  <thead><tr><th scope="col">牌</th><th scope="col">読み方</th></tr></thead>
+                  <tbody>{suitedTileReadings[selected.id].tiles.map((tile) => <tr key={tile.tile}>
+                    <th scope="row">{tile.tile}</th>
+                    <td>{tile.reading}</td>
+                  </tr>)}</tbody>
+                </table>
+              </div>
+              <p className="han-table-note">この表は初期データの説明とは分けて表示しています。</p>
+            </section>}
           </article>
         </main>
         <footer className="footer"><span>麻雀図鑑</span><span>少しずつ覚えていこう。</span></footer>
@@ -103,21 +140,22 @@ function App() {
   }
 
   function renderEntryCard(entry: Entry) {
-    return <button className="entry-card" key={entry.id} onClick={() => openEntry(entry)}>
+    return <article className="entry-card" key={entry.id}>
       <div className="entry-card-top"><span className={`type-pill type-${entry.type}`}>{entry.type}</span><span className="entry-category">{getCategory(entry)}</span></div>
       <div className="entry-illustration">
         {entry.type === '役'
           ? <YakuArtwork number={entry.source.No} han={entry.source['翻数（ハンスウ）']} />
           : <TermArtwork number={entry.source.No} category={entry.source.カテゴリ} />}
       </div>
-      <h3>{entry.name}</h3>
+      <h3><button className="entry-title-button" onClick={() => openEntry(entry)}>{getDisplayName(entry)}</button></h3>
       <p className="entry-reading">{entry.reading}</p>
-      <p className="entry-summary">{entry.explanation || 'Excelに説明の記載はありません。'}</p>
+      <p className="entry-summary"><GlossaryLinkedText text={getEntryExplanation(entry)} onOpen={openEntry} /></p>
       {entry.type === '役' && <p className="entry-yaku-meta">{entry.source['翻数（ハンスウ）']} ・ 鳴き {entry.source.鳴き || '記載なし'}</p>}
       <div className="entry-card-bottom">
-        {learned.includes(entry.id) ? <span className="learned-label"><Check size={14} />習得済み</span> : <span className="details-link">くわしく <ChevronRight size={15} /></span>}
+        {learned.includes(entry.id) && <span className="learned-label"><Check size={14} />習得済み</span>}
+        <button className="details-link" onClick={() => openEntry(entry)}>くわしく <ChevronRight size={15} /></button>
       </div>
-    </button>
+    </article>
   }
 
   const progress = entries.length ? Math.round((learnedCount / entries.length) * 100) : 0

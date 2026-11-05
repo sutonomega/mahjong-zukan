@@ -1,4 +1,5 @@
 import importedData from './mahjongData.json'
+import { supplementalTerms } from './supplementalTerms'
 
 type RoleSource = {
   No: number
@@ -20,6 +21,7 @@ type TermSource = {
 export type RoleEntry = {
   id: string
   type: '役'
+  origin: 'excel'
   source: RoleSource
   name: string
   reading: string
@@ -29,17 +31,62 @@ export type RoleEntry = {
 export type TermEntry = {
   id: string
   type: '用語'
+  origin: 'excel' | 'supplemental'
   source: TermSource
   name: string
+  displayName: string
   reading: string
   explanation: string
 }
 
 export type Entry = RoleEntry | TermEntry
 
+// Display overrides for imported and supplemental entries; original values remain in `source`.
+const termDisplayNames: Record<string, string> = {
+  'term-078': '和了牌',
+  'term-094': '客風',
+  'term-095': '客風牌',
+  'term-114': '槓裏',
+  'term-119': '自摸切り',
+  'term-120': '碰',
+  'term-121': '吃',
+  'term-122': '明槓（行為）',
+  'term-123': '暗槓（行為）',
+  'term-126': '空槓',
+  'term-127': '錯碰',
+  'term-128': '錯吃',
+  'term-129': '錯槓',
+  'term-136': '門前役',
+  'term-140': '喰い断么九',
+  'term-170': '栄和',
+  'term-183': '延べ単騎',
+  'term-191': '即立直',
+  'term-198': '空聴',
+  'term-199': '吃聴',
+  'term-206': '筋を追う',
+  'term-207': '降りる',
+  'term-209': '突っ張る',
+  'term-213': '筋追い',
+  'term-225': '四暗刻単騎',
+  'term-supplement-kan': '槓',
+}
+
+const termDisplayReadings: Record<string, string> = {
+  'term-066': 'パイ／ハイ',
+  'term-052': 'ファン／ハン',
+}
+
+const termDisplayExplanations: Record<string, string> = {
+  'term-110': 'アガった場合に、ドラを持っていれば1枚で1翻（ファン、ハン）加算される特別な牌。一般的に懸賞牌とも言う。役は付かない。',
+  'term-028': '東1局のことを東発（とんぱつ）と呼ぶ。麻雀では、最初に親を決めて東1局が始まる。',
+  'term-065': '点数計算のルール。通常は満貫（マンガン）以上から翻数により点数を加算するが、青天井の場合は満貫以上でも正式な点数計算を行う。結果、非常に高い点数になることがある。',
+  'term-071': '各局のゲーム開始時、各プレイヤーが2段17枚で積んだ卓上の牌のこと。牌山とも言う。王牌（ワンパイ）を除く。',
+}
+
 const roles: RoleEntry[] = importedData.roles.map((record) => ({
   id: record.id,
   type: '役',
+  origin: 'excel',
   source: record.source,
   name: record.source.役名,
   reading: record.source.読み方,
@@ -49,17 +96,49 @@ const roles: RoleEntry[] = importedData.roles.map((record) => ({
 const terms: TermEntry[] = importedData.terms.map((record) => ({
   id: record.id,
   type: '用語',
+  origin: 'excel',
   source: record.source,
   name: record.source.用語,
+  displayName: termDisplayNames[record.id] ?? record.source.用語,
+  reading: termDisplayReadings[record.id] ?? record.source.読み方,
+  explanation: record.source.説明,
+}))
+
+const addedTerms: TermEntry[] = supplementalTerms.map((record) => ({
+  id: record.id,
+  type: '用語',
+  origin: 'supplemental',
+  source: record.source,
+  name: record.source.用語,
+  displayName: termDisplayNames[record.id] ?? record.source.用語,
   reading: record.source.読み方,
   explanation: record.source.説明,
 }))
 
-export const entries: Entry[] = [...roles, ...terms]
+export const entries: Entry[] = [...roles, ...terms, ...addedTerms]
 export const references = importedData.provenance.references
 
 export function getCategory(entry: Entry): string {
   return entry.type === '役' ? '役' : entry.source.カテゴリ
+}
+
+export function getDisplayName(entry: Entry): string {
+  return entry.type === '役' ? entry.name : entry.displayName
+}
+
+export function getDisplayLabel(entry: Entry): string {
+  const name = getDisplayName(entry)
+  return name.normalize('NFKC') === entry.reading.normalize('NFKC') ? name : `${name}（${entry.reading}）`
+}
+
+export function getEntryReadingVariants(entry: Entry): string[] {
+  const readingTexts = [entry.reading, entry.source.読み方]
+  return [...new Set(readingTexts.flatMap((reading) => [reading, ...reading.split(/[／/]/)].map((variant) => variant.trim()).filter(Boolean)))]
+}
+
+export function getEntryExplanation(entry: Entry): string {
+  const explanation = entry.type === '用語' ? termDisplayExplanations[entry.id] ?? entry.explanation : entry.explanation
+  return explanation || 'Excelに説明の記載はありません。'
 }
 
 function normalizeSearchText(value: string): string {
@@ -119,7 +198,7 @@ export function classifyEntryQuery(entry: Entry, rawQuery: string): EntrySearchM
   const query = normalizeSearchText(rawQuery)
   if (!query) return null
 
-  const titleFields = [entry.name, entry.reading].map(normalizeSearchText)
+  const titleFields = [entry.name, getDisplayName(entry), ...getEntryReadingVariants(entry)].map(normalizeSearchText)
   if (titleFields.some((field) => field === query)) return 'exact-title'
 
   const titleContainsQuery = titleFields.some((field) => field.includes(query))
