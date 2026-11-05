@@ -1,4 +1,5 @@
 import importedData from './mahjongData.json'
+import { supplementalTerms } from './supplementalTerms'
 
 type RoleSource = {
   No: number
@@ -20,6 +21,7 @@ type TermSource = {
 export type RoleEntry = {
   id: string
   type: '役'
+  origin: 'excel'
   source: RoleSource
   name: string
   reading: string
@@ -29,6 +31,7 @@ export type RoleEntry = {
 export type TermEntry = {
   id: string
   type: '用語'
+  origin: 'excel' | 'supplemental'
   source: TermSource
   name: string
   displayName: string
@@ -38,7 +41,7 @@ export type TermEntry = {
 
 export type Entry = RoleEntry | TermEntry
 
-// Canonical kanji spellings used in the UI; imported Excel values remain intact in `source`.
+// Display overrides for imported and supplemental entries; original values remain in `source`.
 const termDisplayNames: Record<string, string> = {
   'term-078': '和了牌',
   'term-094': '客風',
@@ -65,6 +68,7 @@ const termDisplayNames: Record<string, string> = {
   'term-209': '突っ張る',
   'term-213': '筋追い',
   'term-225': '四暗刻単騎',
+  'term-supplement-kan': '槓',
 }
 
 const termDisplayReadings: Record<string, string> = {
@@ -78,6 +82,7 @@ const termDisplayExplanations: Record<string, string> = {
 const roles: RoleEntry[] = importedData.roles.map((record) => ({
   id: record.id,
   type: '役',
+  origin: 'excel',
   source: record.source,
   name: record.source.役名,
   reading: record.source.読み方,
@@ -87,6 +92,7 @@ const roles: RoleEntry[] = importedData.roles.map((record) => ({
 const terms: TermEntry[] = importedData.terms.map((record) => ({
   id: record.id,
   type: '用語',
+  origin: 'excel',
   source: record.source,
   name: record.source.用語,
   displayName: termDisplayNames[record.id] ?? record.source.用語,
@@ -94,7 +100,18 @@ const terms: TermEntry[] = importedData.terms.map((record) => ({
   explanation: record.source.説明,
 }))
 
-export const entries: Entry[] = [...roles, ...terms]
+const addedTerms: TermEntry[] = supplementalTerms.map((record) => ({
+  id: record.id,
+  type: '用語',
+  origin: 'supplemental',
+  source: record.source,
+  name: record.source.用語,
+  displayName: termDisplayNames[record.id] ?? record.source.用語,
+  reading: record.source.読み方,
+  explanation: record.source.説明,
+}))
+
+export const entries: Entry[] = [...roles, ...terms, ...addedTerms]
 export const references = importedData.provenance.references
 
 export function getCategory(entry: Entry): string {
