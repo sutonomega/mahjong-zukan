@@ -84,6 +84,8 @@ main { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
 .active-filter-note { display: flex; align-items: center; justify-content: space-between; padding: 10px 13px; margin: -6px 0 16px; border-radius: 9px; background: #e8f0e6; color: #446c52; font-size: 11px; }
 .active-filter-note button { border: 0; background: none; color: inherit; text-decoration: underline; }
 .entry-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.search-result-group { margin-top: 24px; }
+.search-result-group > h3 { margin: 0 0 12px; color: #30483a; font: 700 17px 'Noto Serif JP', serif; }
 .entry-card { display: flex; flex-direction: column; min-width: 0; text-align: left; padding: 15px; border: 1px solid var(--line); border-radius: 15px; background: #fff; color: #263b33; transition: transform .18s, box-shadow .18s, border-color .18s; }
 .entry-card:hover { transform: translateY(-3px); box-shadow: 0 9px 25px #1b352010; border-color: #bdcfc1; }
 .entry-card-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
