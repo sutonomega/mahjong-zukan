@@ -94,6 +94,7 @@ main { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
 .entry-step { color: #9aa49d; font-size: 9px; }
 .entry-category { overflow: hidden; color: #849187; font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
 .entry-illustration { height: 93px; display: grid; place-items: center; margin: 9px 0 4px; border-radius: 10px; background: #f6f7f1; overflow: hidden; }
+.yaku-artwork { display: block; width: 100%; height: 100%; }
 .mini-tiles { display: flex; gap: 5px; align-items: center; }
 .mini-tiles span { width: 31px; height: 45px; display: grid; place-items: center; border: 1px solid #d5d9ce; border-radius: 4px; background: linear-gradient(135deg, #fffef9, #e7e8dc); color: #285747; font: 700 23px 'Noto Serif JP', serif; box-shadow: 0 2px 3px #1a2c2010; }
 .mini-tiles span:nth-child(3n+1) { color: #a83d38; }

@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { BookOpen, Search, X, ChevronRight, Check, Sparkles, CircleHelp, ArrowLeft, BookmarkCheck } from 'lucide-react'
 import { entries, getCategory, getSearchableText, references, type Entry } from './data/entries'
+import YakuArtwork from './components/YakuArtwork'
 
 const typeFilters = ['すべて', '役', '用語'] as const
 type TypeFilter = typeof typeFilters[number]
@@ -152,7 +153,11 @@ function App() {
           {visibleEntries.length > 0 ? <div className="entry-grid">
             {visibleEntries.map((entry) => <button className="entry-card" key={entry.id} onClick={() => openEntry(entry)}>
               <div className="entry-card-top"><span className={`type-pill type-${entry.type}`}>{entry.type}</span><span className="entry-category">{getCategory(entry)}</span></div>
-              <div className="entry-illustration"><div className="generic-symbol">{entry.type === '役' ? '役' : '語'}</div></div>
+              <div className="entry-illustration">
+                {entry.type === '役'
+                  ? <YakuArtwork number={entry.source.No} han={entry.source['翻数（ハンスウ）']} />
+                  : <div className="generic-symbol">語</div>}
+              </div>
               <h3>{entry.name}</h3>
               <p className="entry-reading">{entry.reading}</p>
               <p className="entry-summary">{entry.explanation || 'Excelに説明の記載はありません。'}</p>
