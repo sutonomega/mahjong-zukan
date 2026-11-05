@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { BookOpen, Search, X, ChevronRight, Check, Sparkles, CircleHelp, ArrowLeft, BookmarkCheck } from 'lucide-react'
 import { entries, getCategory, getSearchableText, references, type Entry } from './data/entries'
 import YakuArtwork from './components/YakuArtwork'
+import TermArtwork from './components/TermArtwork'
 
 const typeFilters = ['すべて', '役', '用語'] as const
 type TypeFilter = typeof typeFilters[number]
@@ -156,7 +157,7 @@ function App() {
               <div className="entry-illustration">
                 {entry.type === '役'
                   ? <YakuArtwork number={entry.source.No} han={entry.source['翻数（ハンスウ）']} />
-                  : <div className="generic-symbol">語</div>}
+                  : <TermArtwork number={entry.source.No} category={entry.source.カテゴリ} />}
               </div>
               <h3>{entry.name}</h3>
               <p className="entry-reading">{entry.reading}</p>

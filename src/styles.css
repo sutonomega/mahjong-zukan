@@ -95,12 +95,12 @@ main { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
 .entry-category { overflow: hidden; color: #849187; font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
 .entry-illustration { height: 93px; display: grid; place-items: center; margin: 9px 0 4px; border-radius: 10px; background: #f6f7f1; overflow: hidden; }
 .yaku-artwork { display: block; width: 100%; height: 100%; }
+.term-artwork { display: block; width: 100%; height: 100%; }
 .mini-tiles { display: flex; gap: 5px; align-items: center; }
 .mini-tiles span { width: 31px; height: 45px; display: grid; place-items: center; border: 1px solid #d5d9ce; border-radius: 4px; background: linear-gradient(135deg, #fffef9, #e7e8dc); color: #285747; font: 700 23px 'Noto Serif JP', serif; box-shadow: 0 2px 3px #1a2c2010; }
 .mini-tiles span:nth-child(3n+1) { color: #a83d38; }
 .mini-tiles .tile-gap { color: #b9a77e; background: #f8f4e9; border-style: dashed; }
 .mini-tiles .tile-faint { color: #aeb8ad; border-style: dashed; background: #f8f9f4; }
-.generic-symbol { color: #6d8e76; font: 700 35px 'Noto Serif JP', serif; }
 .entry-card h3 { margin: 6px 0 0; font: 700 17px 'Noto Serif JP', serif; }
 .entry-reading { margin: 2px 0 8px; color: #9ba59c; font-size: 10px; }
 .entry-summary { min-height: 60px; margin: 0; color: #67766d; font-size: 11px; line-height: 1.8; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
