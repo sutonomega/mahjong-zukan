@@ -77,6 +77,9 @@ const termDisplayReadings: Record<string, string> = {
 
 const termDisplayExplanations: Record<string, string> = {
   'term-110': 'アガった場合に、ドラを持っていれば1枚で1翻（ファン、ハン）加算される特別な牌。一般的に懸賞牌とも言う。役は付かない。',
+  'term-028': '東1局のことを東発（とんぱつ）と呼ぶ。麻雀では、最初に親を決めて東1局が始まる。',
+  'term-065': '点数計算のルール。通常は満貫（マンガン）以上から翻数により点数を加算するが、青天井の場合は満貫以上でも正式な点数計算を行う。結果、非常に高い点数になることがある。',
+  'term-071': '各局のゲーム開始時、各プレイヤーが2段17枚で積んだ卓上の牌のこと。牌山とも言う。王牌（ワンパイ）を除く。',
 }
 
 const roles: RoleEntry[] = importedData.roles.map((record) => ({
