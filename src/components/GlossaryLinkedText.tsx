@@ -15,7 +15,13 @@ const addAliases = (getAlias: (entry: TermEntry) => string) => glossaryTerms.for
 })
 addAliases((entry) => entry.displayName)
 addAliases((entry) => entry.name)
-addAliases((entry) => entry.reading)
+glossaryTerms.forEach((entry) => {
+  const readings = [entry.reading, entry.source.読み方, ...entry.reading.split(/[／/]/)]
+  readings.forEach((reading) => {
+    const alias = reading.trim()
+    if (alias && !termByAlias.has(alias)) termByAlias.set(alias, entry)
+  })
+})
 
 const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 const termPattern = new RegExp(`(${[...termByAlias.keys()].sort((left, right) => right.length - left.length).map(escapeRegExp).join('|')})`, 'g')
@@ -50,7 +56,9 @@ function parseGlossaryText(text: string): GlossaryTextPart[] {
     while (true) {
       const readingSuffix = text.slice(end).match(/^\s*(?:（([^（）]+)）|\(([^()]+)\))/)
       const suffixReading = readingSuffix?.[1] ?? readingSuffix?.[2]
-      if (!readingSuffix || !suffixReading || normalizeReading(suffixReading) !== normalizeReading(entry.reading)) break
+      const readingVariants = [entry.reading, entry.source.読み方, ...entry.reading.split(/[／/]/)]
+      const matchesReading = suffixReading && readingVariants.some((reading) => normalizeReading(suffixReading) === normalizeReading(reading))
+      if (!readingSuffix || !suffixReading || !matchesReading) break
       end += readingSuffix[0].length
     }
 

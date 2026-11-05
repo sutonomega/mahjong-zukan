@@ -67,6 +67,10 @@ const termDisplayNames: Record<string, string> = {
   'term-225': '四暗刻単騎',
 }
 
+const termDisplayReadings: Record<string, string> = {
+  'term-066': 'パイ／ハイ',
+}
+
 const roles: RoleEntry[] = importedData.roles.map((record) => ({
   id: record.id,
   type: '役',
@@ -82,7 +86,7 @@ const terms: TermEntry[] = importedData.terms.map((record) => ({
   source: record.source,
   name: record.source.用語,
   displayName: termDisplayNames[record.id] ?? record.source.用語,
-  reading: record.source.読み方,
+  reading: termDisplayReadings[record.id] ?? record.source.読み方,
   explanation: record.source.説明,
 }))
 
