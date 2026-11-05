@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { BookOpen, Search, X, ChevronRight, Check, Sparkles, CircleHelp, ArrowLeft, BookmarkCheck } from 'lucide-react'
-import { entries, getCategory, getSearchableText, references, type Entry } from './data/entries'
+import { entries, getCategory, matchesEntryQuery, references, type Entry } from './data/entries'
 import YakuArtwork from './components/YakuArtwork'
 import TermArtwork from './components/TermArtwork'
 
@@ -24,9 +24,8 @@ function App() {
   const selected = entries.find((entry) => entry.id === selectedId) ?? null
   const learnedCount = entries.filter((entry) => learned.includes(entry.id)).length
   const visibleEntries = useMemo(() => {
-    const normalized = query.trim().toLocaleLowerCase()
     return entries.filter((entry) => {
-      const matchesQuery = !normalized || getSearchableText(entry).toLocaleLowerCase().includes(normalized)
+      const matchesQuery = matchesEntryQuery(entry, query)
       const matchesType = typeFilter === 'すべて' || entry.type === typeFilter
       const matchesCategory = categoryFilter === 'すべて' || getCategory(entry) === categoryFilter
       return matchesQuery && matchesType && matchesCategory
@@ -139,7 +138,7 @@ function App() {
           </div>
           <div className="search-box">
             <Search size={19} />
-            <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="名前・読み方・説明・カテゴリから検索…" aria-label="図鑑を検索" />
+            <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="名前・読み方・説明・カテゴリで検索（ひらがな・カタカナ対応）…" aria-label="図鑑を検索" />
             {query && <button className="clear-search" onClick={() => setQuery('')} aria-label="検索をクリア"><X size={17} /></button>}
           </div>
           <div className="filter-row">
