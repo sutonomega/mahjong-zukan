@@ -3,6 +3,7 @@ import { BookOpen, Search, X, ChevronRight, Check, Sparkles, CircleHelp, ArrowLe
 import { entries, getCategory, classifyEntryQuery, references, type Entry } from './data/entries'
 import YakuArtwork from './components/YakuArtwork'
 import TermArtwork from './components/TermArtwork'
+import GlossaryLinkedText from './components/GlossaryLinkedText'
 
 const typeFilters = ['すべて', '役', '用語'] as const
 type TypeFilter = typeof typeFilters[number]
@@ -83,7 +84,7 @@ function App() {
             </div>
             <section className="detail-section source-description">
               <h2>Excelの説明（原文）</h2>
-              <p>{selected.explanation || 'Excelに説明の記載はありません。'}</p>
+              <p><GlossaryLinkedText text={selected.explanation || 'Excelに説明の記載はありません。'} onOpen={openEntry} /></p>
             </section>
             <section className="detail-section">
               <h2>Excelの項目</h2>
