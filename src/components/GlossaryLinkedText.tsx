@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { entries, type TermEntry } from '../data/entries'
+import { entries, getDisplayName, getEntryExplanation, type TermEntry } from '../data/entries'
 
 type GlossaryLinkedTextProps = {
   text: string
@@ -47,21 +47,23 @@ export default function GlossaryLinkedText({ text, onOpen }: GlossaryLinkedTextP
     if (start > cursor) parts.push(text.slice(cursor, start))
 
     let end = start + alias.length
-    const readingSuffix = text.slice(end).match(/^\s*(?:（([^（）]+)）|\(([^()]+)\))/)
-    const suffixReading = readingSuffix?.[1] ?? readingSuffix?.[2]
-    if (readingSuffix && suffixReading && normalizeReading(suffixReading) === normalizeReading(entry.reading)) {
+    while (true) {
+      const readingSuffix = text.slice(end).match(/^\s*(?:（([^（）]+)）|\(([^()]+)\))/)
+      const suffixReading = readingSuffix?.[1] ?? readingSuffix?.[2]
+      if (!readingSuffix || !suffixReading || normalizeReading(suffixReading) !== normalizeReading(entry.reading)) break
       end += readingSuffix[0].length
     }
 
-    const tooltip = entry.explanation || `${entry.displayName}（${entry.reading}）`
+    const displayName = getDisplayName(entry)
+    const tooltip = getEntryExplanation(entry)
     parts.push(<button
-      aria-label={`${entry.displayName}（${entry.reading}）。説明: ${tooltip}。クリックで用語詳細を開く`}
+      aria-label={`${displayName}（${entry.reading}）。説明: ${tooltip}。クリックで用語詳細を開く`}
       className="glossary-term-link"
       data-tooltip={tooltip}
       key={index}
       onClick={() => onOpen(entry)}
       type="button"
-    >{entry.displayName}（{entry.reading}）</button>)
+    >{displayName}（{entry.reading}）</button>)
     index += 1
     cursor = end
     termPattern.lastIndex = end

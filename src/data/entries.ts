@@ -55,7 +55,7 @@ const termDisplayNames: Record<string, string> = {
   'term-129': '錯槓',
   'term-136': '門前役',
   'term-140': '喰い断么九',
-  'term-170': '栄和（ロン）',
+  'term-170': '栄和',
   'term-183': '延べ単騎',
   'term-191': '即立直',
   'term-198': '空聴',
@@ -95,6 +95,10 @@ export function getCategory(entry: Entry): string {
 
 export function getDisplayName(entry: Entry): string {
   return entry.type === '役' ? entry.name : entry.displayName
+}
+
+export function getEntryExplanation(entry: Entry): string {
+  return entry.explanation || 'Excelに説明の記載はありません。'
 }
 
 function normalizeSearchText(value: string): string {

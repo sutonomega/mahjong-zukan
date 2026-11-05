@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { BookOpen, Search, X, ChevronRight, Check, Sparkles, CircleHelp, ArrowLeft, BookmarkCheck } from 'lucide-react'
-import { entries, getCategory, getDisplayName, classifyEntryQuery, references, type Entry } from './data/entries'
+import { entries, getCategory, getDisplayName, getEntryExplanation, classifyEntryQuery, references, type Entry } from './data/entries'
 import YakuArtwork from './components/YakuArtwork'
 import TermArtwork from './components/TermArtwork'
 import GlossaryLinkedText from './components/GlossaryLinkedText'
@@ -101,7 +101,7 @@ function App() {
             </div>
             <section className="detail-section source-description">
               <h2>Excelの説明（原文）</h2>
-              <p><GlossaryLinkedText text={selected.explanation || 'Excelに説明の記載はありません。'} onOpen={openEntry} /></p>
+              <p><GlossaryLinkedText text={getEntryExplanation(selected)} onOpen={openEntry} /></p>
             </section>
             <section className="detail-section">
               <h2>Excelの項目</h2>
@@ -130,7 +130,7 @@ function App() {
       </div>
       <h3><button className="entry-title-button" onClick={() => openEntry(entry)}>{getDisplayName(entry)}</button></h3>
       <p className="entry-reading">{entry.reading}</p>
-      <p className="entry-summary"><GlossaryLinkedText text={entry.explanation || 'Excelに説明の記載はありません。'} onOpen={openEntry} /></p>
+      <p className="entry-summary"><GlossaryLinkedText text={getEntryExplanation(entry)} onOpen={openEntry} /></p>
       {entry.type === '役' && <p className="entry-yaku-meta">{entry.source['翻数（ハンスウ）']} ・ 鳴き {entry.source.鳴き || '記載なし'}</p>}
       <div className="entry-card-bottom">
         {learned.includes(entry.id) && <span className="learned-label"><Check size={14} />習得済み</span>}
