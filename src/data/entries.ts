@@ -113,22 +113,20 @@ function containsOneEditMatch(query: string, text: string): boolean {
   return false
 }
 
-export function matchesEntryQuery(entry: Entry, rawQuery: string): boolean {
+export type EntrySearchMatch = 'exact-title' | 'suggested-title' | 'related-description' | null
+
+export function classifyEntryQuery(entry: Entry, rawQuery: string): EntrySearchMatch {
   const query = normalizeSearchText(rawQuery)
-  if (!query) return true
+  if (!query) return null
 
-  const searchableFields = entry.type === '役'
-    ? [entry.name, entry.reading, entry.explanation, entry.source['翻数（ハンスウ）'], entry.source.鳴き]
-    : [entry.name, entry.reading, entry.explanation, entry.source.カテゴリ]
-  const normalizedFields = searchableFields.map(normalizeSearchText)
+  const titleFields = [entry.name, entry.reading].map(normalizeSearchText)
+  if (titleFields.some((field) => field === query)) return 'exact-title'
 
-  if (normalizedFields.some((field) => field.includes(query))) return true
+  const titleContainsQuery = titleFields.some((field) => field.includes(query))
+  const titleIsClose = query.length >= 3 && query.length <= 12
+    && titleFields.some((field) => containsOneEditMatch(query, field))
+  if (titleContainsQuery || titleIsClose) return 'suggested-title'
 
-  if (query.length < 3 || query.length > 12) return false
-
-  const fuzzyFields = entry.type === '役'
-    ? [entry.name, entry.reading]
-    : [entry.name, entry.reading, entry.source.カテゴリ]
-
-  return fuzzyFields.some((field) => containsOneEditMatch(query, normalizeSearchText(field)))
+  if (normalizeSearchText(entry.explanation).includes(query)) return 'related-description'
+  return null
 }
