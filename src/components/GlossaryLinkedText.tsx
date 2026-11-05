@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { entries, type TermEntry } from '../data/entries'
 
 type GlossaryLinkedTextProps = {
@@ -20,23 +21,53 @@ addAliases((entry) => entry.reading)
 const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 const termPattern = new RegExp(`(${[...termByAlias.keys()].sort((left, right) => right.length - left.length).map(escapeRegExp).join('|')})`, 'g')
 
+function normalizeReading(value: string): string {
+  return value
+    .normalize('NFKC')
+    .replace(/[\u30a1-\u30f6]/g, (character) => String.fromCharCode(character.charCodeAt(0) - 0x60))
+    .replace(/[\s\u3000]/g, '')
+}
+
 export default function GlossaryLinkedText({ text, onOpen }: GlossaryLinkedTextProps) {
-  const parts = text.split(termPattern)
+  const parts: ReactNode[] = []
+  let cursor = 0
+  let index = 0
+  termPattern.lastIndex = 0
+  let match = termPattern.exec(text)
 
-  return <>
-    {parts.map((part, index) => {
-      const entry = termByAlias.get(part)
-      if (!entry) return <span key={index}>{part}</span>
+  while (match) {
+    const alias = match[0]
+    const start = match.index
+    const entry = termByAlias.get(alias)
+    if (!entry || start < cursor) {
+      match = termPattern.exec(text)
+      continue
+    }
 
-      const tooltip = entry.explanation || `${entry.displayName}（${entry.reading}）`
-      return <button
-        aria-label={`${entry.displayName}（${entry.reading}）。説明: ${tooltip}。クリックで用語詳細を開く`}
-        className="glossary-term-link"
-        data-tooltip={tooltip}
-        key={index}
-        onClick={() => onOpen(entry)}
-        type="button"
-      >{entry.displayName}（{entry.reading}）</button>
-    })}
-  </>
+    if (start > cursor) parts.push(text.slice(cursor, start))
+
+    let end = start + alias.length
+    const readingSuffix = text.slice(end).match(/^\s*(?:（([^（）]+)）|\(([^()]+)\))/)
+    const suffixReading = readingSuffix?.[1] ?? readingSuffix?.[2]
+    if (readingSuffix && suffixReading && normalizeReading(suffixReading) === normalizeReading(entry.reading)) {
+      end += readingSuffix[0].length
+    }
+
+    const tooltip = entry.explanation || `${entry.displayName}（${entry.reading}）`
+    parts.push(<button
+      aria-label={`${entry.displayName}（${entry.reading}）。説明: ${tooltip}。クリックで用語詳細を開く`}
+      className="glossary-term-link"
+      data-tooltip={tooltip}
+      key={index}
+      onClick={() => onOpen(entry)}
+      type="button"
+    >{entry.displayName}（{entry.reading}）</button>)
+    index += 1
+    cursor = end
+    termPattern.lastIndex = end
+    match = termPattern.exec(text)
+  }
+
+  if (cursor < text.length) parts.push(text.slice(cursor))
+  return <>{parts}</>
 }
