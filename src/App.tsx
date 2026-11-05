@@ -5,6 +5,7 @@ import YakuArtwork from './components/YakuArtwork'
 import TermArtwork from './components/TermArtwork'
 import GlossaryLinkedText from './components/GlossaryLinkedText'
 import { hanLevels } from './data/hanLevels'
+import { suitedTileReadings } from './data/suitedTileReadings'
 
 const typeFilters = ['すべて', '役', '用語'] as const
 type TypeFilter = typeof typeFilters[number]
@@ -113,6 +114,19 @@ function App() {
                   <tbody>{hanLevels.map((level) => <tr key={level.label}>
                     <th scope="row">{level.label}</th>
                     <td>{'note' in level ? level.note : ''}</td>
+                  </tr>)}</tbody>
+                </table>
+              </div>
+              <p className="han-table-note">この表は初期データの説明とは分けて表示しています。</p>
+            </section>}
+            {selected.type === '用語' && suitedTileReadings[selected.id] && <section className="detail-section suited-tile-readings-section">
+              <h2>{suitedTileReadings[selected.id].title}（補足）</h2>
+              <div className="han-table-wrap">
+                <table className="han-table">
+                  <thead><tr><th scope="col">牌</th><th scope="col">読み方</th></tr></thead>
+                  <tbody>{suitedTileReadings[selected.id].tiles.map((tile) => <tr key={tile.tile}>
+                    <th scope="row">{tile.tile}</th>
+                    <td>{tile.reading}</td>
                   </tr>)}</tbody>
                 </table>
               </div>

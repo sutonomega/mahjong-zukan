@@ -33,6 +33,7 @@ src/
     entries.ts                    型、データ統合、表示補正、検索判定
     supplementalTerms.ts          Excelにない補足用語
     hanLevels.ts                  「翻」詳細に出す補足表
+    suitedTileReadings.ts         萬子・筒子・索子の読み方表
 doc/
   design.md                       サイトの設計と振る舞い
   implementation.md               この実装書
@@ -80,6 +81,10 @@ Excelにない用語は `src/data/supplementalTerms.ts` に追加する。
 ### 翻数表
 
 「翻」の詳細ページに出る表データは `src/data/hanLevels.ts` に置く。行の追加・文言変更はここで行い、`App.tsx` に値を直書きしない。表はExcelデータとは別の補足情報として表示する。
+
+### 数牌の読み方表
+
+萬子・筒子・索子の詳細ページに出す読み方表は `src/data/suitedTileReadings.ts` に置く。データは用語ID（term-089、term-088、term-090）で参照し、各表に牌名と読み方を9組登録する。表示条件や表のレイアウトは `App.tsx`、共通テーブルの見た目は `src/styles.css` が担当する。読みの追加・修正はデータファイルで行い、Excel原文は変更しない。
 
 ## 4. 検索の実装
 
