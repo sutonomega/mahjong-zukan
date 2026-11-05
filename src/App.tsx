@@ -4,6 +4,7 @@ import { entries, getCategory, getDisplayName, getEntryExplanation, classifyEntr
 import YakuArtwork from './components/YakuArtwork'
 import TermArtwork from './components/TermArtwork'
 import GlossaryLinkedText from './components/GlossaryLinkedText'
+import { hanLevels } from './data/hanLevels'
 
 const typeFilters = ['すべて', '役', '用語'] as const
 type TypeFilter = typeof typeFilters[number]
@@ -103,6 +104,19 @@ function App() {
               <h2>Excelの説明（原文）</h2>
               <p><GlossaryLinkedText text={getEntryExplanation(selected)} onOpen={openEntry} /></p>
             </section>
+            {selected.type === '用語' && selected.id === 'term-052' && <section className="detail-section han-levels-section">
+              <h2>翻数の区分（補足）</h2>
+              <div className="han-table-wrap">
+                <table className="han-table">
+                  <thead><tr><th scope="col">翻数の区分</th><th scope="col">補足</th></tr></thead>
+                  <tbody>{hanLevels.map((level) => <tr key={level.label}>
+                    <th scope="row">{level.label}</th>
+                    <td>{'note' in level ? level.note : ''}</td>
+                  </tr>)}</tbody>
+                </table>
+              </div>
+              <p className="han-table-note">この表は補足情報として追加したものです。Excel原文の説明とは分けて表示しています。</p>
+            </section>}
             <section className="detail-section">
               <h2>Excelの項目</h2>
               <div className="metadata-row"><span>カテゴリ</span><span>{getCategory(selected)}</span></div>
