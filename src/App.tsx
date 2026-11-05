@@ -160,7 +160,7 @@ function App() {
         <section className="catalog-section">
           <div className="section-heading catalog-heading">
             <div><span className="section-eyebrow">THE ENCYCLOPEDIA</span><h2>図鑑をひらく</h2></div>
-            <span className="result-count">{query.trim() ? `${(searchGroups.exact.length || searchGroups.suggested.length) + searchGroups.related.length} 件の項目` : `${searchGroups.all.length} 件の項目`}</span>
+            <span className="result-count">{query.trim() ? `${searchGroups.exact.length + searchGroups.suggested.length + searchGroups.related.length} 件の項目` : `${searchGroups.all.length} 件の項目`}</span>
           </div>
           <div className="search-box">
             <Search size={19} />
@@ -178,7 +178,7 @@ function App() {
           </div>
           {query.trim() ? <>
             {searchGroups.exact.length > 0 && <section className="search-result-group"><h3>検索結果</h3><div className="entry-grid">{searchGroups.exact.map(renderEntryCard)}</div></section>}
-            {searchGroups.exact.length === 0 && searchGroups.suggested.length > 0 && <section className="search-result-group"><h3>もしかして？</h3><div className="entry-grid">{searchGroups.suggested.map(renderEntryCard)}</div></section>}
+            {searchGroups.suggested.length > 0 && <section className="search-result-group"><h3>もしかして？</h3><div className="entry-grid">{searchGroups.suggested.map(renderEntryCard)}</div></section>}
             {searchGroups.related.length > 0 && <section className="search-result-group"><h3>関連する項目（説明文に含まれています）</h3><div className="entry-grid">{searchGroups.related.map(renderEntryCard)}</div></section>}
             {searchGroups.exact.length + searchGroups.suggested.length + searchGroups.related.length === 0 && <div className="empty-state"><CircleHelp size={30} /><h3>見つからなかったよ</h3><p>別の言葉で検索するか、絞り込みを解除してみてね。</p><button className="primary-button" onClick={resetFilters}>すべての項目を見る</button></div>}
           </> : <div className="entry-grid">{searchGroups.all.map(renderEntryCard)}</div>}
