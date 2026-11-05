@@ -31,11 +31,41 @@ export type TermEntry = {
   type: '用語'
   source: TermSource
   name: string
+  displayName: string
   reading: string
   explanation: string
 }
 
 export type Entry = RoleEntry | TermEntry
+
+// Canonical kanji spellings used in the UI; imported Excel values remain intact in `source`.
+const termDisplayNames: Record<string, string> = {
+  'term-078': '和了牌',
+  'term-094': '客風',
+  'term-095': '客風牌',
+  'term-114': '槓裏',
+  'term-119': '自摸切り',
+  'term-120': '碰',
+  'term-121': '吃',
+  'term-122': '明槓（行為）',
+  'term-123': '暗槓（行為）',
+  'term-126': '空槓',
+  'term-127': '錯碰',
+  'term-128': '錯吃',
+  'term-129': '錯槓',
+  'term-136': '門前役',
+  'term-140': '喰い断么九',
+  'term-170': '栄和（ロン）',
+  'term-183': '延べ単騎',
+  'term-191': '即立直',
+  'term-198': '空聴',
+  'term-199': '吃聴',
+  'term-206': '筋を追う',
+  'term-207': '降りる',
+  'term-209': '突っ張る',
+  'term-213': '筋追い',
+  'term-225': '四暗刻単騎',
+}
 
 const roles: RoleEntry[] = importedData.roles.map((record) => ({
   id: record.id,
@@ -51,6 +81,7 @@ const terms: TermEntry[] = importedData.terms.map((record) => ({
   type: '用語',
   source: record.source,
   name: record.source.用語,
+  displayName: termDisplayNames[record.id] ?? record.source.用語,
   reading: record.source.読み方,
   explanation: record.source.説明,
 }))
@@ -60,6 +91,10 @@ export const references = importedData.provenance.references
 
 export function getCategory(entry: Entry): string {
   return entry.type === '役' ? '役' : entry.source.カテゴリ
+}
+
+export function getDisplayName(entry: Entry): string {
+  return entry.type === '役' ? entry.name : entry.displayName
 }
 
 function normalizeSearchText(value: string): string {
@@ -119,7 +154,7 @@ export function classifyEntryQuery(entry: Entry, rawQuery: string): EntrySearchM
   const query = normalizeSearchText(rawQuery)
   if (!query) return null
 
-  const titleFields = [entry.name, entry.reading].map(normalizeSearchText)
+  const titleFields = [entry.name, entry.type === '用語' ? entry.displayName : entry.name, entry.reading].map(normalizeSearchText)
   if (titleFields.some((field) => field === query)) return 'exact-title'
 
   const titleContainsQuery = titleFields.some((field) => field.includes(query))

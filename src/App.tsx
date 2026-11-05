@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { BookOpen, Search, X, ChevronRight, Check, Sparkles, CircleHelp, ArrowLeft, BookmarkCheck } from 'lucide-react'
-import { entries, getCategory, classifyEntryQuery, references, type Entry } from './data/entries'
+import { entries, getCategory, getDisplayName, classifyEntryQuery, references, type Entry } from './data/entries'
 import YakuArtwork from './components/YakuArtwork'
 import TermArtwork from './components/TermArtwork'
 import GlossaryLinkedText from './components/GlossaryLinkedText'
@@ -74,7 +74,7 @@ function App() {
             <div className="detail-kicker"><span className={`type-pill type-${selected.type}`}>{selected.type}</span></div>
             <div className="detail-title-row">
               <div>
-                <h1>{selected.name}</h1>
+                <h1>{getDisplayName(selected)}</h1>
                 <p className="reading">{selected.reading}</p>
               </div>
               <button className={`learn-button ${learned.includes(selected.id) ? 'is-learned' : ''}`} onClick={() => toggleLearned(selected.id)}>
@@ -111,7 +111,7 @@ function App() {
           ? <YakuArtwork number={entry.source.No} han={entry.source['翻数（ハンスウ）']} />
           : <TermArtwork number={entry.source.No} category={entry.source.カテゴリ} />}
       </div>
-      <h3>{entry.name}</h3>
+      <h3>{getDisplayName(entry)}</h3>
       <p className="entry-reading">{entry.reading}</p>
       <p className="entry-summary">{entry.explanation || 'Excelに説明の記載はありません。'}</p>
       {entry.type === '役' && <p className="entry-yaku-meta">{entry.source['翻数（ハンスウ）']} ・ 鳴き {entry.source.鳴き || '記載なし'}</p>}

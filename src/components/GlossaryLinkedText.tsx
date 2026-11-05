@@ -7,25 +7,28 @@ type GlossaryLinkedTextProps = {
 
 const glossaryTerms = entries
   .filter((entry): entry is TermEntry => entry.type === '用語' && Boolean(entry.name.trim()))
-  .sort((left, right) => right.name.length - left.name.length)
 
-const termByName = new Map<string, TermEntry>()
-glossaryTerms.forEach((entry) => {
-  if (!termByName.has(entry.name)) termByName.set(entry.name, entry)
+const termByAlias = new Map<string, TermEntry>()
+const addAliases = (getAlias: (entry: TermEntry) => string) => glossaryTerms.forEach((entry) => {
+  const alias = getAlias(entry).trim()
+  if (alias && !termByAlias.has(alias)) termByAlias.set(alias, entry)
 })
+addAliases((entry) => entry.displayName)
+addAliases((entry) => entry.name)
+addAliases((entry) => entry.reading)
 
 const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-const termPattern = new RegExp(`(${[...termByName.keys()].map(escapeRegExp).join('|')})`, 'g')
+const termPattern = new RegExp(`(${[...termByAlias.keys()].sort((left, right) => right.length - left.length).map(escapeRegExp).join('|')})`, 'g')
 
 export default function GlossaryLinkedText({ text, onOpen }: GlossaryLinkedTextProps) {
   const parts = text.split(termPattern)
 
   return <>
     {parts.map((part, index) => {
-      const entry = termByName.get(part)
+      const entry = termByAlias.get(part)
       if (!entry) return <span key={index}>{part}</span>
 
-      const tooltip = entry.explanation || `${entry.name}（${entry.reading}）`
+      const tooltip = entry.explanation || `${entry.displayName}（${entry.reading}）`
       return <button
         aria-label={`${part}。説明: ${tooltip}。クリックで用語詳細を開く`}
         className="glossary-term-link"
