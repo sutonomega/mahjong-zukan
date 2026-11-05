@@ -1,4 +1,4 @@
-import { entries, getDisplayLabel, getEntryExplanation, type TermEntry } from '../data/entries'
+import { entries, getDisplayLabel, getEntryExplanation, getEntryReadingVariants, type TermEntry } from '../data/entries'
 
 type GlossaryLinkedTextProps = {
   text: string
@@ -16,8 +16,7 @@ const addAliases = (getAlias: (entry: TermEntry) => string) => glossaryTerms.for
 addAliases((entry) => entry.displayName)
 addAliases((entry) => entry.name)
 glossaryTerms.forEach((entry) => {
-  const readings = [entry.reading, entry.source.読み方, ...entry.reading.split(/[／/]/)]
-  readings.forEach((reading) => {
+  getEntryReadingVariants(entry).forEach((reading) => {
     const alias = reading.trim()
     if (alias && !termByAlias.has(alias)) termByAlias.set(alias, entry)
   })
@@ -65,7 +64,7 @@ function parseGlossaryText(text: string): GlossaryTextPart[] {
     while (true) {
       const readingSuffix = text.slice(end).match(/^\s*(?:（([^（）]+)）|\(([^()]+)\))/)
       const suffixReading = readingSuffix?.[1] ?? readingSuffix?.[2]
-      const readingVariants = [entry.reading, entry.source.読み方, ...entry.reading.split(/[／/]/)]
+      const readingVariants = getEntryReadingVariants(entry)
       const matchesReading = suffixReading && readingVariants.some((reading) => normalizeReading(suffixReading) === normalizeReading(reading))
       if (!readingSuffix || !suffixReading || !matchesReading) break
       end += readingSuffix[0].length

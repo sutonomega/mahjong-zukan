@@ -130,6 +130,11 @@ export function getDisplayLabel(entry: Entry): string {
   return name.normalize('NFKC') === entry.reading.normalize('NFKC') ? name : `${name}（${entry.reading}）`
 }
 
+export function getEntryReadingVariants(entry: Entry): string[] {
+  const readingTexts = [entry.reading, entry.source.読み方]
+  return [...new Set(readingTexts.flatMap((reading) => [reading, ...reading.split(/[／/]/)].map((variant) => variant.trim()).filter(Boolean)))]
+}
+
 export function getEntryExplanation(entry: Entry): string {
   const explanation = entry.type === '用語' ? termDisplayExplanations[entry.id] ?? entry.explanation : entry.explanation
   return explanation || 'Excelに説明の記載はありません。'
@@ -192,7 +197,7 @@ export function classifyEntryQuery(entry: Entry, rawQuery: string): EntrySearchM
   const query = normalizeSearchText(rawQuery)
   if (!query) return null
 
-  const titleFields = [entry.name, entry.type === '用語' ? entry.displayName : entry.name, entry.reading].map(normalizeSearchText)
+  const titleFields = [entry.name, getDisplayName(entry), ...getEntryReadingVariants(entry)].map(normalizeSearchText)
   if (titleFields.some((field) => field === query)) return 'exact-title'
 
   const titleContainsQuery = titleFields.some((field) => field.includes(query))
