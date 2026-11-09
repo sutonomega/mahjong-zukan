@@ -11,13 +11,13 @@ const typeFilters = ['すべて', '役', '用語'] as const
 type TypeFilter = typeof typeFilters[number]
 const learningLevels: LearningLevel[] = ['初級', '中級', '上級']
 const learningTracks: { level: LearningLevel; summary: string; categories: { name: string; title?: string; description: string }[] }[] = [
-  { level: '初級', summary: '麻雀の基本を、身近な役やゲームの流れから学ぶ。', categories: [
-    { name: '基本の役', description: 'まず覚えておきたい基本的な役。' },
+  { level: '初級', summary: 'ゲームの流れや牌の基本を学び、役とアガリのしくみにつなげる。', categories: [
     { name: 'ゲームの進行', description: '局の始まりから終わりまでの流れ。' },
     { name: '場とプレイヤー', description: '自分や他の人、場の呼び方。' },
     { name: '牌の基本', description: '牌の種類や手牌、牌山の基本。' },
     { name: '基本の組み合わせ', description: '雀頭や順子など、牌の組み合わせ。' },
-    { name: 'アガリの基礎', description: 'ツモやロンなど、アガリに関する基本。' },
+    { name: '基本の役', description: 'まず覚えておきたい基本的な役。' },
+    { name: 'アガリの基礎', title: 'アガリ方の基本', description: '和了、ロン、ツモなどアガリ方の基本。' },
     { name: '鳴きと門前', description: '鳴きと門前の基本を知る。' },
   ] },
   { level: '中級', summary: '待ちや役のしくみを知り、ルールを理解する。', categories: [
