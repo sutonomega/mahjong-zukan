@@ -10,7 +10,7 @@ import { suitedTileReadings } from './data/suitedTileReadings'
 const typeFilters = ['すべて', '役', '用語'] as const
 type TypeFilter = typeof typeFilters[number]
 const learningLevels: LearningLevel[] = ['初級', '中級', '上級']
-const learningTracks: { level: LearningLevel; summary: string; categories: { name: string; description: string }[] }[] = [
+const learningTracks: { level: LearningLevel; summary: string; categories: { name: string; title?: string; description: string }[] }[] = [
   { level: '初級', summary: '麻雀の基本を、身近な役やゲームの流れから学ぶ。', categories: [
     { name: '基本の役', description: 'まず覚えておきたい基本的な役。' },
     { name: 'ゲームの進行', description: '局の始まりから終わりまでの流れ。' },
@@ -22,8 +22,8 @@ const learningTracks: { level: LearningLevel; summary: string; categories: { nam
   ] },
   { level: '中級', summary: '待ちや役のしくみを知り、ルールを理解する。', categories: [
     { name: 'ゲームルール', description: '対局で使われるルールや取り決め。' },
-    { name: '基本の組み合わせ', description: '少し複雑な面子や槓子の形。' },
-    { name: '鳴きと門前', description: '鳴きの種類や、鳴いたときの扱い。' },
+    { name: '基本の組み合わせ', title: '面子と槓子', description: '少し複雑な面子や槓子の形。' },
+    { name: '鳴きと門前', title: '鳴きの応用', description: '鳴きの種類や、鳴いたときの扱い。' },
     { name: '待ちとテンパイ', description: 'テンパイや待ちの形を理解する。' },
     { name: 'ドラとボーナス', description: 'ドラやボーナス牌の種類と扱い。' },
     { name: '役と翻数', description: '役の組み合わせと翻数のしくみ。' },
@@ -33,9 +33,9 @@ const learningTracks: { level: LearningLevel; summary: string; categories: { nam
     { name: '特殊な役・用語', description: '珍しい役や専門的な用語。' },
     { name: '点数計算', description: '符や点棒など、点数計算に関する知識。' },
     { name: '反則とペナルティ', description: '反則や罰則に関する用語。' },
-    { name: '戦術と安全牌', description: '状況に応じた守備や戦術。' },
+    { name: '戦術と安全牌', title: '高度な守備', description: '状況に応じた守備や戦術。' },
     { name: 'スジ読み', description: 'スジに関する考え方や用語。' },
-    { name: '待ちとテンパイ', description: '複雑な待ちや特殊なテンパイ。' },
+    { name: '待ちとテンパイ', title: '複雑な待ち', description: '複雑な待ちや特殊なテンパイ。' },
   ] },
 ]
 type EntryHistoryLocation = { id: string; scrollY: number }
@@ -262,7 +262,7 @@ function App() {
                     if (!count) return null
                     return <button className="learning-unit-card" key={unit.name} onClick={() => openLearningCategory(track.level, unit.name)}>
                       <span className="learning-unit-step">STEP {String(track.categories.indexOf(unit) + 1).padStart(2, '0')}</span>
-                      <strong>{unit.name}</strong>
+                      <strong>{unit.title ?? unit.name}</strong>
                       <span className="learning-unit-description">{unit.description}</span>
                       <span className="learning-card-count">{count}項目 <ChevronRight size={14} /></span>
                     </button>
