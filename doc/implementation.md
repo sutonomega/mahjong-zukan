@@ -29,9 +29,7 @@ src/
     TermArtwork.tsx               用語カード用ローカルSVG
     YakuArtwork.tsx               役カード用ローカルSVG
   data/
-    mahjongData.json              Excel取り込みデータ（役45件、用語228件、参考URL）
-    entries.ts                    型、データ統合、表示補正、検索判定
-    supplementalTerms.ts          Excelにない補足用語
+    entries.ts                    型、全役・用語データ、出典原文、レベル・カテゴリ、検索判定
     hanLevels.ts                  「翻」詳細に出す補足表
     suitedTileReadings.ts         萬子・筒子・索子の読み方表
 doc/
@@ -43,38 +41,23 @@ vite.config.ts                     Vite設定
 
 ## 3. データモデルとデータの扱い
 
-### Excel取り込みデータ
+### 統合項目データ
 
-`src/data/mahjongData.json` がワークブックのスナップショット。元の日本語列名と値を保持する。`src/data/entries.ts` が画面で使いやすい形にマッピングする。
+`src/data/entries.ts` の `entries` 配列を役・用語の唯一のデータ元として使う。全276件が同じファイルにあり、表示内容と学習分類を項目ごとに編集できる。
 
-主な型は次のとおり。
-
-- `RoleEntry`: `役名`、`読み方`、`説明`、`翻数（ハンスウ）`、`鳴き`を持つ役。
-- `TermEntry`: `カテゴリ`、`用語`、`読み方`、`説明`を持つ用語。`origin` は `excel` または `supplemental`。
-- `Entry`: `RoleEntry` と `TermEntry` の共用型。
+各項目は `id`、`type`、`origin`、`name`、`displayName`、`reading`、`explanation`、`level`、`category`、`sourceCategory`、`source` を持つ。`level` は初級・中級・上級、`category` はレベルに沿った学習カテゴリ。`sourceCategory` と `source` はExcel原文の確認用。補足用語は `origin: 'supplemental'` とする。
 
 各項目の `id` は一意の識別子として使う。表示名は重複する場合や表示補正があるため、進捗保存やリンクの識別子には使わない。
 
-### 表示用補正
-
-`entries.ts` 内の設定は、元データを変更せず画面上の表示だけを変える。
-
-- `termDisplayNames`: 用語の漢字表記などの表示名。
-- `termDisplayReadings`: 読み方の表示補正。「牌」は「パイ／ハイ」。
-- `termDisplayExplanations`: 表示用の説明文補正。現在はドラの表記修正と、です・ます調だった3件の常体化など。
-
-表示値を取得するときは `getDisplayName`、`getDisplayLabel`、`getEntryExplanation` を使う。画面ごとに別の表示規則を書かないことで、カード・詳細・検索リンク・吹き出しの表記をそろえる。
-
-説明文の補正が必要な場合は、Excel JSONを書き換えず `termDisplayExplanations` にIDと表示文を追加する。これによりExcel由来の値は `entry.source` に残る。
+画面は `getDisplayName`、`getDisplayLabel`、`getEntryExplanation` を使って同じ項目データを参照する。表示名・読み方・説明を直す場合は、対象項目のフィールドを編集し、Excel原文の `source` は保持する。
 
 ### 補足用語の追加
 
-Excelにない用語は `src/data/supplementalTerms.ts` に追加する。
+Excelにない用語も `src/data/entries.ts` の `entries` 配列に追加する。
 
 1. 重複しないIDを決める。
-2. `source` に `No`、`カテゴリ`、`用語`、`読み方`、`説明`を記入する。
-3. 必要なら `entries.ts` の `termDisplayNames` に表示名を設定する。
-4. `entries.ts` が `origin: 'supplemental'` を付けて、Excel項目と合わせて `entries` に登録する。
+2. 表示名、読み方、説明、学習レベル、学習カテゴリを直接記入する。
+3. Excel原文がない場合もカード表示用の `source` 情報を持たせ、`origin: 'supplemental'` を設定する。
 
 補足用語の `No` はカードイラスト用の連番で、ExcelのNoではない。現在の補足用語は229〜231を使っている。用語名や読み方が既存項目と重なる場合は、検索・用語リンクの候補が意図した項目を指すか確認する。
 
@@ -94,7 +77,7 @@ Excelにない用語は `src/data/supplementalTerms.ts` に追加する。
 2. タイトルまたは読み方の部分一致、または検索語3〜12文字で1文字分だけ異なる曖昧一致。
 3. 説明文内の部分一致。
 
-各項目には最優先の分類一つだけを返す。`App.tsx` 側で型・カテゴリのフィルターを適用し、「検索結果」「もしかして？」「関連する項目」を描画する。
+各項目には最優先の分類一つだけを返す。`App.tsx` 側でレベル・学習カテゴリ・項目種類のフィルターを適用し、「検索結果」「もしかして？」「関連する項目」を描画する。
 
 `getEntryReadingVariants` は表示読み・元データの読みを取得し、スラッシュで区切られた各読みを個別候補にする。検索処理と用語リンク処理で共通利用する。`normalizeSearchText` はNFKC、小文字化、カタカナからひらがなへの変換、空白と一般的な句読点の除去を行う。変更時は漢字名・かな表記・説明文検索への影響を確認する。
 
@@ -145,9 +128,9 @@ npm run build -- --base=/${GITHUB_REPOSITORY#*/}
 
 ## 9. 変更時の確認手順
 
-1. 変更する情報がExcel原文、補足データ、表示補正のどれに当たるか決める。
-2. Excel由来の値を直す必要がある場合は、元Excelを根拠にJSONを再生成する。表示上の修正だけならoverrideを使う。
-3. 用語追加は `supplementalTerms.ts`、翻数表は `hanLevels.ts` に追加する。
+1. `entries.ts` の対象項目を更新する。学習レベルとカテゴリも同じ項目で管理する。
+2. Excel由来項目の表示値を修正する場合は `source` 内の原文を保持する。
+3. 用語追加は同じ `entries.ts` に記録する。翻数表は `hanLevels.ts`、数牌の読み方表は `suitedTileReadings.ts` に追加する。
 4. 表示処理は共通ヘルパー・`GlossaryLinkedText` を使い、カード・詳細・吹き出しを別実装にしない。
 5. 検索を変える場合は、完全一致・部分一致・説明文一致・カテゴリ絞り込みを確認する。
 6. カード・表・吹き出しを変える場合は、スマートフォン幅も確認する。

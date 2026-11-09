@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { BookOpen, Search, X, ChevronRight, Check, Sparkles, CircleHelp, ArrowLeft, BookmarkCheck } from 'lucide-react'
-import { entries, getCategory, getDisplayName, getEntryExplanation, classifyEntryQuery, references, type Entry } from './data/entries'
+import { entries, getCategory, getDisplayName, getEntryExplanation, classifyEntryQuery, references, type Entry, type LearningLevel } from './data/entries'
 import YakuArtwork from './components/YakuArtwork'
 import TermArtwork from './components/TermArtwork'
 import GlossaryLinkedText from './components/GlossaryLinkedText'
@@ -9,12 +9,14 @@ import { suitedTileReadings } from './data/suitedTileReadings'
 
 const typeFilters = ['すべて', '役', '用語'] as const
 type TypeFilter = typeof typeFilters[number]
+const learningLevels: LearningLevel[] = ['初級', '中級', '上級']
 type EntryHistoryLocation = { id: string; scrollY: number }
 
 function App() {
   const [query, setQuery] = useState('')
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('すべて')
   const [categoryFilter, setCategoryFilter] = useState('すべて')
+  const [levelFilter, setLevelFilter] = useState<'すべて' | LearningLevel>('すべて')
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [entryHistory, setEntryHistory] = useState<EntryHistoryLocation[]>([])
   const [learned, setLearned] = useState<string[]>(() => {
@@ -25,11 +27,12 @@ function App() {
     }
   })
 
-  const categories = useMemo(() => [...new Set(entries.filter((entry) => entry.type === '用語').map(getCategory))], [])
+  const categories = useMemo(() => [...new Set(entries.filter((entry) => levelFilter === 'すべて' || entry.level === levelFilter).map(getCategory))], [levelFilter])
   const selected = entries.find((entry) => entry.id === selectedId) ?? null
   const learnedCount = entries.filter((entry) => learned.includes(entry.id)).length
   const searchGroups = useMemo(() => {
     const matchesFilters = (entry: Entry) => (typeFilter === 'すべて' || entry.type === typeFilter)
+      && (levelFilter === 'すべて' || entry.level === levelFilter)
       && (categoryFilter === 'すべて' || getCategory(entry) === categoryFilter)
     if (!query.trim()) return { exact: [], suggested: [], related: [], all: entries.filter(matchesFilters) }
 
@@ -43,7 +46,7 @@ function App() {
       else if (match === 'related-description') related.push(entry)
     })
     return { exact, suggested, related, all: [] }
-  }, [query, typeFilter, categoryFilter])
+  }, [query, typeFilter, categoryFilter, levelFilter])
 
   function toggleLearned(id: string) {
     const next = learned.includes(id) ? learned.filter((item) => item !== id) : [...learned, id]
@@ -75,6 +78,7 @@ function App() {
     setQuery('')
     setTypeFilter('すべて')
     setCategoryFilter('すべて')
+    setLevelFilter('すべて')
   }
 
   if (selected) {
@@ -90,7 +94,7 @@ function App() {
         <main className="detail-layout">
           <button className="back-link" onClick={backFromEntry}><ArrowLeft size={16} /> {entryHistory.length > 0 ? '前の説明へ戻る' : '図鑑一覧へ戻る'}</button>
           <article className="detail-card">
-            <div className="detail-kicker"><span className={`type-pill type-${selected.type}`}>{selected.type}</span></div>
+            <div className="detail-kicker"><span className={`type-pill level-${selected.level}`}>{selected.level}</span><span className={`type-pill type-${selected.type}`}>{selected.type}</span></div>
             <div className="detail-title-row">
               <div>
                 <h1>{getDisplayName(selected)}</h1>
@@ -141,16 +145,16 @@ function App() {
 
   function renderEntryCard(entry: Entry) {
     return <article className="entry-card" key={entry.id}>
-      <div className="entry-card-top"><span className={`type-pill type-${entry.type}`}>{entry.type}</span><span className="entry-category">{getCategory(entry)}</span></div>
+      <div className="entry-card-top"><span className={`type-pill level-${entry.level}`}>{entry.level}</span><span className="entry-category">{getCategory(entry)}</span></div>
       <div className="entry-illustration">
         {entry.type === '役'
-          ? <YakuArtwork number={entry.source.No} han={entry.source['翻数（ハンスウ）']} />
-          : <TermArtwork number={entry.source.No} category={entry.source.カテゴリ} />}
+          ? <YakuArtwork number={Number(entry.source['No'])} han={String(entry.source['翻数（ハンスウ）'] ?? '')} />
+          : <TermArtwork number={Number(entry.source['No'])} category={entry.sourceCategory} />}
       </div>
       <h3><button className="entry-title-button" onClick={() => openEntry(entry)}>{getDisplayName(entry)}</button></h3>
       <p className="entry-reading">{entry.reading}</p>
       <p className="entry-summary"><GlossaryLinkedText text={getEntryExplanation(entry)} onOpen={openEntry} /></p>
-      {entry.type === '役' && <p className="entry-yaku-meta">{entry.source['翻数（ハンスウ）']} ・ 鳴き {entry.source.鳴き || '記載なし'}</p>}
+      {entry.type === '役' && <p className="entry-yaku-meta">{entry.source['翻数（ハンスウ）']} ・ 鳴き {entry.source['鳴き'] || '記載なし'}</p>}
       <div className="entry-card-bottom">
         {learned.includes(entry.id) && <span className="learned-label"><Check size={14} />習得済み</span>}
         <button className="details-link" onClick={() => openEntry(entry)}>くわしく <ChevronRight size={15} /></button>
@@ -159,7 +163,7 @@ function App() {
   }
 
   const progress = entries.length ? Math.round((learnedCount / entries.length) * 100) : 0
-  const hasFilters = categoryFilter !== 'すべて' || typeFilter !== 'すべて' || query
+  const hasFilters = categoryFilter !== 'すべて' || typeFilter !== 'すべて' || levelFilter !== 'すべて' || query
 
   return (
     <div className="app-shell">
@@ -206,12 +210,15 @@ function App() {
             {query && <button className="clear-search" onClick={() => setQuery('')} aria-label="検索をクリア"><X size={17} /></button>}
           </div>
           <div className="filter-row">
-            <div className="filter-pills" role="group" aria-label="種類">
-              {typeFilters.map((filter) => <button key={filter} className={`filter-pill ${typeFilter === filter ? 'selected' : ''}`} onClick={() => setTypeFilter(filter)}>{filter}</button>)}
+            <div className="filter-pills" role="group" aria-label="学習レベル">
+              {(['すべて', ...learningLevels] as const).map((level) => <button key={level} className={`filter-pill ${levelFilter === level ? 'selected' : ''}`} onClick={() => { setLevelFilter(level); setCategoryFilter('すべて') }}>{level}</button>)}
             </div>
             {hasFilters && <button className="reset-button" onClick={resetFilters}>条件をリセット</button>}
           </div>
-          <div className="filter-pills category-pills" role="group" aria-label="カテゴリ">
+          <div className="filter-row type-filter-row"><div className="filter-pills" role="group" aria-label="項目の種類">
+              {typeFilters.map((filter) => <button key={filter} className={`filter-pill ${typeFilter === filter ? 'selected' : ''}`} onClick={() => setTypeFilter(filter)}>{filter}</button>)}
+            </div></div>
+          <div className="filter-pills category-pills" role="group" aria-label="学習カテゴリ">
             {['すべて', ...categories].map((category) => <button key={category} className={`filter-pill ${categoryFilter === category ? 'selected' : ''}`} onClick={() => setCategoryFilter(category)}>{category}</button>)}
           </div>
           {query.trim() ? <>
@@ -219,7 +226,15 @@ function App() {
             {searchGroups.suggested.length > 0 && <section className="search-result-group"><h3>もしかして？</h3><div className="entry-grid">{searchGroups.suggested.map(renderEntryCard)}</div></section>}
             {searchGroups.related.length > 0 && <section className="search-result-group"><h3>関連する項目（説明文に含まれています）</h3><div className="entry-grid">{searchGroups.related.map(renderEntryCard)}</div></section>}
             {searchGroups.exact.length + searchGroups.suggested.length + searchGroups.related.length === 0 && <div className="empty-state"><CircleHelp size={30} /><h3>見つからなかったよ</h3><p>別の言葉で検索するか、絞り込みを解除してみてね。</p><button className="primary-button" onClick={resetFilters}>すべての項目を見る</button></div>}
-          </> : <div className="entry-grid">{searchGroups.all.map(renderEntryCard)}</div>}
+          </> : levelFilter === 'すべて' && categoryFilter === 'すべて'
+            ? learningLevels.map((level) => {
+              const levelEntries = searchGroups.all.filter((entry) => entry.level === level)
+              return <section className={`search-result-group learning-level-group level-group-${level}`} key={level}>
+                <div className="learning-level-heading"><h3>{level}</h3><span>{levelEntries.length} 項目</span></div>
+                {levelEntries.length > 0 ? <div className="entry-grid">{levelEntries.map(renderEntryCard)}</div> : <p className="empty-level">このレベルの項目はありません。</p>}
+              </section>
+            })
+            : <div className="entry-grid">{searchGroups.all.map(renderEntryCard)}</div>}
         </section>
 
         <section className="reference-section">
