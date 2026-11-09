@@ -3,7 +3,7 @@ import { BookOpen, Search, X, ChevronRight, Check, Sparkles, CircleHelp, ArrowLe
 import { entries, getCategory, getDisplayName, getEntryExplanation, classifyEntryQuery, references, type Entry, type LearningLevel } from './data/entries'
 import YakuArtwork from './components/YakuArtwork'
 import TermArtwork from './components/TermArtwork'
-import GlossaryLinkedText from './components/GlossaryLinkedText'
+import GlossaryLinkedText, { getGlossaryEntries } from './components/GlossaryLinkedText'
 import { hanLevels } from './data/hanLevels'
 import { suitedTileReadings } from './data/suitedTileReadings'
 
@@ -57,6 +57,9 @@ function App() {
 
   const categories = useMemo(() => [...new Set(entries.filter((entry) => levelFilter === 'すべて' || entry.level === levelFilter).map(getCategory))], [levelFilter])
   const selected = entries.find((entry) => entry.id === selectedId) ?? null
+  const selectedRelatedEntries = selected
+    ? getGlossaryEntries(getEntryExplanation(selected)).filter((entry) => entry.id !== selected.id)
+    : []
   const learnedCount = entries.filter((entry) => learned.includes(entry.id)).length
   const searchGroups = useMemo(() => {
     const matchesFilters = (entry: Entry) => (typeFilter === 'すべて' || entry.type === typeFilter)
@@ -150,17 +153,16 @@ function App() {
               </button>
             </div>
             <div className="detail-category-block">{getCategory(selected)}</div>
-            {selected.type === '役' && <section className="detail-section role-details-section">
-              <h2>翻数・鳴き</h2>
-              <dl className="role-details-grid">
-                <div><dt>翻数</dt><dd>{String(selected.source['翻数（ハンスウ）'] ?? '記載なし')}</dd></div>
-                <div><dt>鳴き</dt><dd>{String(selected.source['鳴き'] ?? '記載なし')}</dd></div>
-              </dl>
-            </section>}
             <section className="detail-section source-description">
-              <h2>説明</h2>
+              <h2>意味</h2>
               <p><GlossaryLinkedText text={getEntryExplanation(selected)} onOpen={openEntry} /></p>
             </section>
+            {selectedRelatedEntries.length > 0 && <section className="detail-section related-words-section">
+              <h2>関連ワード</h2>
+              <div className="related-words">
+                {selectedRelatedEntries.map((entry) => <button className="related-word" key={entry.id} onClick={() => openEntry(entry)}>{getDisplayName(entry)}<ChevronRight size={13} /></button>)}
+              </div>
+            </section>}
             {selected.type === '用語' && selected.id === 'term-052' && <section className="detail-section han-levels-section">
               <h2>翻数の区分（補足）</h2>
               <div className="han-table-wrap">

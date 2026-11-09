@@ -84,6 +84,14 @@ export function formatGlossaryText(text: string): string {
   return parseGlossaryText(text).map((part) => part.text).join('')
 }
 
+export function getGlossaryEntries(text: string): TermEntry[] {
+  const related = new Map<string, TermEntry>()
+  parseGlossaryText(text).forEach((part) => {
+    if (part.entry) related.set(part.entry.id, part.entry)
+  })
+  return [...related.values()]
+}
+
 export default function GlossaryLinkedText({ text, onOpen }: GlossaryLinkedTextProps) {
   const parts = parseGlossaryText(text)
 
