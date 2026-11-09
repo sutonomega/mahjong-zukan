@@ -10,11 +10,34 @@ import { suitedTileReadings } from './data/suitedTileReadings'
 const typeFilters = ['すべて', '役', '用語'] as const
 type TypeFilter = typeof typeFilters[number]
 const learningLevels: LearningLevel[] = ['初級', '中級', '上級']
-const learningLevelDescriptions: Record<LearningLevel, string> = {
-  初級: '牌の種類やゲームの流れ、基本の組み合わせと役から学ぶ。',
-  中級: '待ちやテンパイ、鳴き、役と翻数の知識を身につける。',
-  上級: '点数計算や戦術、特殊な役と用語をじっくり学ぶ。',
-}
+const learningTracks: { level: LearningLevel; summary: string; categories: { name: string; description: string }[] }[] = [
+  { level: '初級', summary: '麻雀の基本を、身近な役やゲームの流れから学ぶ。', categories: [
+    { name: '基本の役', description: 'まず覚えておきたい基本的な役。' },
+    { name: 'ゲームの進行', description: '局の始まりから終わりまでの流れ。' },
+    { name: '場とプレイヤー', description: '自分や他の人、場の呼び方。' },
+    { name: '牌の基本', description: '牌の種類や手牌、牌山の基本。' },
+    { name: '基本の組み合わせ', description: '雀頭や順子など、牌の組み合わせ。' },
+    { name: 'アガリの基礎', description: 'ツモやロンなど、アガリに関する基本。' },
+    { name: '鳴きと門前', description: '鳴きと門前の基本を知る。' },
+  ] },
+  { level: '中級', summary: '待ちや役のしくみを知り、ルールを理解する。', categories: [
+    { name: 'ゲームルール', description: '対局で使われるルールや取り決め。' },
+    { name: '基本の組み合わせ', description: '少し複雑な面子や槓子の形。' },
+    { name: '鳴きと門前', description: '鳴きの種類や、鳴いたときの扱い。' },
+    { name: '待ちとテンパイ', description: 'テンパイや待ちの形を理解する。' },
+    { name: 'ドラとボーナス', description: 'ドラやボーナス牌の種類と扱い。' },
+    { name: '役と翻数', description: '役の組み合わせと翻数のしくみ。' },
+    { name: '戦術と安全牌', description: '安全牌や基本的な打ち方の考え方。' },
+  ] },
+  { level: '上級', summary: '点数計算や戦術、特殊な役や用語を学ぶ。', categories: [
+    { name: '特殊な役・用語', description: '珍しい役や専門的な用語。' },
+    { name: '点数計算', description: '符や点棒など、点数計算に関する知識。' },
+    { name: '反則とペナルティ', description: '反則や罰則に関する用語。' },
+    { name: '戦術と安全牌', description: '状況に応じた守備や戦術。' },
+    { name: 'スジ読み', description: 'スジに関する考え方や用語。' },
+    { name: '待ちとテンパイ', description: '複雑な待ちや特殊なテンパイ。' },
+  ] },
+]
 type EntryHistoryLocation = { id: string; scrollY: number }
 
 function App() {
@@ -84,6 +107,14 @@ function App() {
     setTypeFilter('すべて')
     setCategoryFilter('すべて')
     setLevelFilter('すべて')
+  }
+
+  function openLearningCategory(level: LearningLevel, category: string) {
+    setQuery('')
+    setTypeFilter('すべて')
+    setCategoryFilter(category)
+    setLevelFilter(level)
+    document.querySelector('#catalog')?.scrollIntoView({ behavior: 'smooth' })
   }
 
   function openLearningLevel(level: LearningLevel) {
@@ -214,19 +245,30 @@ function App() {
 
         <section className="learning-section" aria-labelledby="learning-title">
           <div className="section-heading">
-            <div><span className="section-eyebrow">LEARNING ROADMAP</span><h2 id="learning-title">レベル別に学ぶ</h2></div>
-            <p className="section-caption">自分に合ったところから始めよう。</p>
+            <div><span className="section-eyebrow">LEARNING ROADMAP</span><h2 id="learning-title">学習コース</h2></div>
+            <p className="section-caption">初級から上級へ、順番に学べる。</p>
           </div>
-          <div className="learning-level-cards">
-            {learningLevels.map((level, index) => {
-              const count = entries.filter((entry) => entry.level === level).length
-              const mastered = entries.filter((entry) => entry.level === level && learned.includes(entry.id)).length
-              return <button className={`learning-level-card learning-level-card-${level}`} key={level} onClick={() => openLearningLevel(level)}>
-                <span className="learning-card-top"><span className="learning-card-number">LEVEL 0{index + 1}</span><ChevronRight size={17} /></span>
-                <strong>{level}編</strong>
-                <span className="learning-card-description">{learningLevelDescriptions[level]}</span>
-                <span className="learning-card-count">{count}項目 <i>·</i> 習得 {mastered}/{count}</span>
-              </button>
+          <div className="learning-tracks">
+            {learningTracks.map((track, trackIndex) => {
+              const levelEntries = entries.filter((entry) => entry.level === track.level)
+              return <section className={`learning-track learning-track-${track.level}`} key={track.level}>
+                <div className="learning-track-heading">
+                  <div><span className="learning-card-number">COURSE 0{trackIndex + 1}</span><h3>{track.level}編</h3><p>{track.summary}</p></div>
+                  <button className="track-all-button" onClick={() => openLearningLevel(track.level)}>この編をすべて見る <ChevronRight size={14} /></button>
+                </div>
+                <div className="learning-unit-grid">
+                  {track.categories.map((unit) => {
+                    const count = levelEntries.filter((entry) => entry.category === unit.name).length
+                    if (!count) return null
+                    return <button className="learning-unit-card" key={unit.name} onClick={() => openLearningCategory(track.level, unit.name)}>
+                      <span className="learning-unit-step">STEP {String(track.categories.indexOf(unit) + 1).padStart(2, '0')}</span>
+                      <strong>{unit.name}</strong>
+                      <span className="learning-unit-description">{unit.description}</span>
+                      <span className="learning-card-count">{count}項目 <ChevronRight size={14} /></span>
+                    </button>
+                  })}
+                </div>
+              </section>
             })}
           </div>
         </section>

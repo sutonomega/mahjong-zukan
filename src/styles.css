@@ -69,18 +69,21 @@ main { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
 .step-card strong { font-size: 14px; margin-top: 4px; }
 .step-description { color: var(--muted); font-size: 10px; margin-top: 5px; line-height: 1.7; }
 .step-bottom { display: flex; justify-content: space-between; align-items: center; color: #71877a; font-size: 10px; margin-top: auto; padding-top: 12px; width: 100%; }
-.learning-level-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
-.learning-level-card { min-height: 178px; padding: 19px; display: flex; flex-direction: column; align-items: flex-start; gap: 10px; border: 1px solid var(--line); border-radius: 16px; background: #fff; color: #263b33; text-align: left; transition: transform .18s, box-shadow .18s, border-color .18s; }
-.learning-level-card:hover, .learning-level-card:focus-visible { transform: translateY(-3px); box-shadow: 0 9px 24px #1b35200d; }
-.learning-level-card-初級:hover { border-color: #a9c9a7; }
-.learning-level-card-中級:hover { border-color: #a9bcde; }
-.learning-level-card-上級:hover { border-color: #dab3a4; }
-.learning-card-top { width: 100%; display: flex; justify-content: space-between; align-items: center; color: #849187; }
+.learning-tracks { display: flex; flex-direction: column; gap: 22px; }
+.learning-track { padding: 20px; border: 1px solid var(--line); border-radius: 17px; background: #fff; }
+.learning-track-heading { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 17px; }
+.learning-track-heading h3 { margin: 4px 0 3px; color: #233b32; font: 700 21px 'Noto Serif JP', serif; }
+.learning-track-heading p { margin: 0; color: #748278; font-size: 11px; }
+.track-all-button { display: inline-flex; align-items: center; gap: 3px; padding: 8px 10px; border: 1px solid #dce7da; border-radius: 8px; background: #f8faf6; color: #52745c; font-size: 10px; white-space: nowrap; }
+.learning-unit-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.learning-unit-card { min-height: 145px; padding: 13px; display: flex; flex-direction: column; align-items: flex-start; gap: 7px; border: 1px solid #e7ebe4; border-radius: 12px; background: #fcfdfb; color: #263b33; text-align: left; transition: transform .18s, border-color .18s, box-shadow .18s; }
+.learning-unit-card:hover, .learning-unit-card:focus-visible { transform: translateY(-2px); border-color: #b9cfc0; box-shadow: 0 7px 18px #1b35200c; }
+.learning-unit-step { color: #89998e; font-size: 8px; font-weight: 700; letter-spacing: .1em; }
+.learning-unit-card strong { color: #30483a; font-size: 12px; }
+.learning-unit-description { color: #748278; font-size: 10px; line-height: 1.65; }
+.learning-unit-card .learning-card-count { width: 100%; display: flex; justify-content: space-between; align-items: center; margin-top: auto; }
 .learning-card-number { font-size: 9px; font-weight: 700; letter-spacing: .12em; }
-.learning-level-card strong { color: #233b32; font: 700 21px 'Noto Serif JP', serif; }
-.learning-card-description { color: #748278; font-size: 11px; line-height: 1.8; }
-.learning-card-count { margin-top: auto; color: #63806e; font-size: 10px; }
-.learning-card-count i { padding: 0 5px; color: #b7c0b8; font-style: normal; }
+.learning-card-count { color: #63806e; font-size: 10px; }
 .catalog-section { margin-bottom: 64px; }
 .catalog-heading { margin-bottom: 18px; }
 .search-box { display: flex; align-items: center; gap: 12px; height: 52px; padding: 0 16px; border: 1px solid #dfe5dc; border-radius: 13px; background: #fff; color: #7b8c80; }
@@ -189,8 +192,7 @@ main { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
   .hero-art { transform: scale(.9); transform-origin: center; }
   .entry-grid { grid-template-columns: repeat(3, 1fr); }
   .step-grid { grid-template-columns: repeat(2, 1fr); }
-  .learning-level-cards { gap: 10px; }
-  .learning-level-card { padding: 14px; min-height: 180px; }
+  .learning-unit-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 620px) {
   .topbar { height: 62px; padding: 0 17px; }
@@ -219,8 +221,12 @@ main { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
   .section-caption { font-size: 10px; }
   .step-grid { gap: 9px; }
   .step-card { padding: 13px; min-height: 165px; border-radius: 13px; }
-  .learning-level-cards { grid-template-columns: 1fr; }
-  .learning-level-card { min-height: 148px; }
+  .learning-track { padding: 14px; }
+  .learning-track-heading { align-items: flex-start; }
+  .learning-track-heading h3 { font-size: 19px; }
+  .track-all-button { font-size: 9px; }
+  .learning-unit-grid { gap: 8px; }
+  .learning-unit-card { padding: 10px; min-height: 140px; }
   .step-icon { width: 33px; height: 33px; margin-bottom: 10px; }
   .step-card strong { font-size: 12px; }
   .step-description { font-size: 10px; }
