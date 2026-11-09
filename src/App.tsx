@@ -10,6 +10,11 @@ import { suitedTileReadings } from './data/suitedTileReadings'
 const typeFilters = ['すべて', '役', '用語'] as const
 type TypeFilter = typeof typeFilters[number]
 const learningLevels: LearningLevel[] = ['初級', '中級', '上級']
+const learningLevelDescriptions: Record<LearningLevel, string> = {
+  初級: '牌の種類やゲームの流れ、基本の組み合わせと役から学ぶ。',
+  中級: '待ちやテンパイ、鳴き、役と翻数の知識を身につける。',
+  上級: '点数計算や戦術、特殊な役と用語をじっくり学ぶ。',
+}
 type EntryHistoryLocation = { id: string; scrollY: number }
 
 function App() {
@@ -79,6 +84,14 @@ function App() {
     setTypeFilter('すべて')
     setCategoryFilter('すべて')
     setLevelFilter('すべて')
+  }
+
+  function openLearningLevel(level: LearningLevel) {
+    setQuery('')
+    setTypeFilter('すべて')
+    setCategoryFilter('すべて')
+    setLevelFilter(level)
+    document.querySelector('#catalog')?.scrollIntoView({ behavior: 'smooth' })
   }
 
   if (selected) {
@@ -199,7 +212,26 @@ function App() {
           </div>
         </section>
 
-        <section className="catalog-section">
+        <section className="learning-section" aria-labelledby="learning-title">
+          <div className="section-heading">
+            <div><span className="section-eyebrow">LEARNING ROADMAP</span><h2 id="learning-title">レベル別に学ぶ</h2></div>
+            <p className="section-caption">自分に合ったところから始めよう。</p>
+          </div>
+          <div className="learning-level-cards">
+            {learningLevels.map((level, index) => {
+              const count = entries.filter((entry) => entry.level === level).length
+              const mastered = entries.filter((entry) => entry.level === level && learned.includes(entry.id)).length
+              return <button className={`learning-level-card learning-level-card-${level}`} key={level} onClick={() => openLearningLevel(level)}>
+                <span className="learning-card-top"><span className="learning-card-number">LEVEL 0{index + 1}</span><ChevronRight size={17} /></span>
+                <strong>{level}編</strong>
+                <span className="learning-card-description">{learningLevelDescriptions[level]}</span>
+                <span className="learning-card-count">{count}項目 <i>·</i> 習得 {mastered}/{count}</span>
+              </button>
+            })}
+          </div>
+        </section>
+
+        <section className="catalog-section" id="catalog">
           <div className="section-heading catalog-heading">
             <div><span className="section-eyebrow">THE ENCYCLOPEDIA</span><h2>図鑑をひらく</h2></div>
             <span className="result-count">{query.trim() ? `${searchGroups.exact.length + searchGroups.suggested.length + searchGroups.related.length} 件の項目` : `${searchGroups.all.length} 件の項目`}</span>

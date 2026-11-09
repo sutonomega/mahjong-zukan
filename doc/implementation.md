@@ -21,7 +21,7 @@ npm run preview
 
 ```text
 src/
-  App.tsx                         一覧、検索、フィルター、詳細、進捗、画面遷移
+  App.tsx                         レベル案内カード、一覧、検索、フィルター、詳細、進捗、画面遷移
   main.tsx                        Reactの起動点
   styles.css                      共通CSS、吹き出し、レスポンシブ表示
   components/
@@ -101,7 +101,7 @@ Excelにない用語も `src/data/entries.ts` の `entries` 配列に追加す�
 
 画面状態は `App.tsx` で管理する。
 
-- `query`、`typeFilter`、`categoryFilter`: 検索・絞り込み。
+- `query`、`typeFilter`、`categoryFilter`、`levelFilter`: 検索・絞り込み。レベル案内カードを選ぶと `levelFilter` を設定して一覧へスクロールする。
 - `selectedId`: 詳細を開いている項目。
 - `entryHistory`: 詳細画面間のIDとスクロール位置。
 - `learned`: 習得済みの項目ID一覧。
