@@ -154,7 +154,9 @@ main { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
 .detail-title-row { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-top: 18px; }
 .detail-title-row h1 { margin: 0; font: 800 34px 'Noto Serif JP', serif; color: #203c31; }
 .reading { margin: 5px 0 0; color: #96a198; font-size: 12px; }
-.detail-category-block { width: fit-content; margin-top: 20px; padding: 7px 12px; border: 1px solid #dce7da; border-radius: 6px; background: #f1f6ee; color: #4d6d55; font-size: 11px; font-weight: 700; }
+.detail-tag-row { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 20px; }
+.detail-category-block, .detail-metadata-tag { width: fit-content; padding: 7px 12px; border: 1px solid #dce7da; border-radius: 6px; background: #f1f6ee; color: #4d6d55; font-size: 11px; font-weight: 700; }
+.detail-metadata-tag { border-color: #ead9bd; background: #fbf3e6; color: #89683c; }
 .source-description { margin-top: 18px; }
 .learn-button { display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; padding: 10px 14px; border: 1px solid #d9e4d9; border-radius: 10px; background: #f8faf6; color: #52745c; font-size: 12px; }
 .learn-button.is-learned { background: #e2f0e2; border-color: #c7dfc9; color: #377047; }

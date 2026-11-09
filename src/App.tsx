@@ -152,7 +152,13 @@ function App() {
                 {learned.includes(selected.id) ? '習得済み' : '覚えた！'}
               </button>
             </div>
-            <div className="detail-category-block">{getCategory(selected)}</div>
+            <div className="detail-tag-row">
+              <span className="detail-category-block">{getCategory(selected)}</span>
+              {selected.type === '役' && <>
+                <span className="detail-metadata-tag">翻数：{String(selected.source['翻数（ハンスウ）'] ?? '記載なし')}</span>
+                <span className="detail-metadata-tag">鳴き：{String(selected.source['鳴き'] ?? '記載なし')}</span>
+              </>}
+            </div>
             <section className="detail-section source-description">
               <h2>意味</h2>
               <p><GlossaryLinkedText text={getEntryExplanation(selected)} onOpen={openEntry} /></p>
