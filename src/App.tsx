@@ -150,6 +150,13 @@ function App() {
               </button>
             </div>
             <div className="detail-category-block">{getCategory(selected)}</div>
+            {selected.type === '役' && <section className="detail-section role-details-section">
+              <h2>翻数・鳴き</h2>
+              <dl className="role-details-grid">
+                <div><dt>翻数</dt><dd>{String(selected.source['翻数（ハンスウ）'] ?? '記載なし')}</dd></div>
+                <div><dt>鳴き</dt><dd>{String(selected.source['鳴き'] ?? '記載なし')}</dd></div>
+              </dl>
+            </section>}
             <section className="detail-section source-description">
               <h2>説明</h2>
               <p><GlossaryLinkedText text={getEntryExplanation(selected)} onOpen={openEntry} /></p>
