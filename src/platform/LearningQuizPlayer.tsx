@@ -64,7 +64,7 @@ export default function LearningQuizPlayer({ quiz, onOpenLesson, onOpenTerm }: L
         const isCorrect = selectedOptionId === question.correctOptionId
 
         return <section className="course-quiz-question" key={question.id} aria-labelledby={'quiz-question-' + question.id}>
-          <h3 id={'quiz-question-' + question.id}><span>Q{index + 1}</span><QuizSegments segments={question.prompt} onOpenTerm={onOpenTerm} /></h3>
+          <h3 id={'quiz-question-' + question.id}><span className="course-quiz-question-number">Q{index + 1}</span><span className="course-quiz-prompt"><QuizSegments segments={question.prompt} onOpenTerm={onOpenTerm} /></span></h3>
           <div className="course-quiz-options" role="group" aria-label={'問題' + (index + 1) + 'の回答'}>
             {question.options.map((option) => {
               const isSelected = option.id === selectedOptionId
