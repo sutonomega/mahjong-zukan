@@ -18,9 +18,15 @@ export type LessonExtension = {
   payload: JsonValue
 }
 
+export type LessonStep = {
+  title: string
+  segments: LessonSegment[]
+}
+
 export type LessonBlock =
   | { type: 'paragraph'; segments: LessonSegment[] }
   | { type: 'callout'; title: string; segments: LessonSegment[] }
+  | { type: 'steps'; steps: LessonStep[] }
   | ({ type: 'extension' } & LessonExtension)
 
 export type LearningLesson = {
