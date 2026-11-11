@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { ArrowLeft, ArrowRight, BookOpen, Check, RotateCcw } from 'lucide-react'
-import type { LearningCourse, LearningLesson, LearningPack, LessonSegment, GlossaryReference } from '../platform/contracts'
+import type { LearningCourse, LearningLesson, LearningPack, LessonSegment, GlossaryReference, LessonExtension } from '../platform/contracts'
 
 type SavedProgress = {
   completedLessonIds: string[]
@@ -12,10 +12,12 @@ type CoursePlayerProps = {
   course: LearningCourse
   onOpenTerm: (reference: GlossaryReference) => void
   renderExtension?: (extension: LessonExtension) => ReactNode
+  initialLessonId?: string
 }
 
-function readProgress(key: string, course: LearningCourse): SavedProgress {
-  const fallback = { completedLessonIds: [], activeLessonId: course.lessons[0]?.id ?? '' }
+function readProgress(key: string, course: LearningCourse, initialLessonId?: string): SavedProgress {
+  const preferredLessonId = course.lessons.some((lesson) => lesson.id === initialLessonId) ? initialLessonId as string : undefined
+  const fallback = { completedLessonIds: [], activeLessonId: preferredLessonId ?? course.lessons[0]?.id ?? '' }
   try {
     const saved = JSON.parse(localStorage.getItem(key) ?? 'null') as Partial<SavedProgress> | null
     if (!saved) return fallback
@@ -23,9 +25,9 @@ function readProgress(key: string, course: LearningCourse): SavedProgress {
       completedLessonIds: Array.isArray(saved.completedLessonIds)
         ? saved.completedLessonIds.filter((id): id is string => course.lessons.some((lesson) => lesson.id === id))
         : [],
-      activeLessonId: course.lessons.some((lesson) => lesson.id === saved.activeLessonId)
+      activeLessonId: preferredLessonId ?? (course.lessons.some((lesson) => lesson.id === saved.activeLessonId)
         ? saved.activeLessonId as string
-        : fallback.activeLessonId,
+        : fallback.activeLessonId),
     }
   } catch {
     return fallback
@@ -45,14 +47,20 @@ function LessonSegments({ segments, onOpenTerm }: { segments: LessonSegment[]; o
       >{segment.reference.label}</button>)}</>
 }
 
-export default function CoursePlayer({ pack, course, onOpenTerm, renderExtension }: CoursePlayerProps) {
+export default function CoursePlayer({ pack, course, onOpenTerm, renderExtension, initialLessonId }: CoursePlayerProps) {
   const progressKey = 'learning-platform:' + pack.packId + ':' + course.id + ':v1'
-  const [progress, setProgress] = useState(() => readProgress(progressKey, course))
+  const [progress, setProgress] = useState(() => readProgress(progressKey, course, initialLessonId))
   const lessons = course.lessons
   const activeIndex = Math.max(0, lessons.findIndex((lesson) => lesson.id === progress.activeLessonId))
   const activeLesson = lessons[activeIndex]
   const completedCount = progress.completedLessonIds.length
   const percentage = lessons.length ? Math.round(completedCount / lessons.length * 100) : 0
+
+  useEffect(() => {
+    if (initialLessonId && lessons.some((lesson) => lesson.id === initialLessonId)) {
+      setProgress((current) => ({ ...current, activeLessonId: initialLessonId }))
+    }
+  }, [initialLessonId, lessons])
 
   useEffect(() => {
     try {

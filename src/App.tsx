@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { BookOpen, Search, X, ChevronRight, Check, Sparkles, CircleHelp, ArrowLeft, BookmarkCheck } from 'lucide-react'
-import { entries, getCategory, getDisplayName, getEntryExplanation, classifyEntryQuery, references, type Entry, type LearningLevel } from './data/entries'
+import { entries, getCategory, getDisplayName, getEntryExplanation, references, getEntryReadingVariants, type Entry, type LearningLevel } from './data/entries'
 import YakuArtwork from './components/YakuArtwork'
 import TermArtwork from './components/TermArtwork'
 import GlossaryLinkedText, { getGlossaryEntries } from './components/GlossaryLinkedText'
@@ -10,6 +10,7 @@ import CoursePlayer from './platform/CoursePlayer'
 import { mahjongBeginnerPack } from './content-packs/mahjong/beginner-course'
 import { resolveMahjongGlossaryEntryId } from './content-packs/mahjong/glossaryAdapter'
 import { mahjongExtensionRenderers } from './content-packs/mahjong/extensionRenderers'
+import { learningPackToSearchPack, searchContentPacks, type SearchResult, type SearchablePack } from './platform/search'
 
 const typeFilters = ['すべて', '役', '用語'] as const
 type TypeFilter = typeof typeFilters[number]
@@ -44,6 +45,27 @@ const learningTracks: { level: LearningLevel; summary: string; categories: { nam
     { name: '待ちとテンパイ', title: '複雑な待ち', description: '複雑な待ちや特殊なテンパイ。' },
   ] },
 ]
+const mahjongSearchPack: SearchablePack = (() => {
+  const lessons = learningPackToSearchPack(mahjongBeginnerPack)
+  return {
+    ...lessons,
+    items: [
+      ...lessons.items,
+      ...entries.map((entry) => ({
+        id: entry.id,
+        kind: 'glossary',
+        title: getDisplayName(entry),
+        aliases: [entry.name],
+        readings: getEntryReadingVariants(entry),
+        category: getCategory(entry),
+        description: getEntryExplanation(entry),
+        keywords: [entry.sourceCategory],
+        facets: { type: entry.type, level: entry.level },
+      })),
+    ],
+  }
+})()
+
 type EntryHistoryLocation = { id: string; scrollY: number }
 
 function App() {
@@ -52,6 +74,7 @@ function App() {
   const [categoryFilter, setCategoryFilter] = useState('すべて')
   const [levelFilter, setLevelFilter] = useState<'すべて' | LearningLevel>('すべて')
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [lessonToOpen, setLessonToOpen] = useState<string | undefined>(undefined)
   const [activeView, setActiveView] = useState<'course' | 'glossary'>('course')
   const [entryReturnView, setEntryReturnView] = useState<'course' | 'glossary'>('course')
   const [entryReturnScroll, setEntryReturnScroll] = useState(0)
@@ -70,23 +93,62 @@ function App() {
     ? getGlossaryEntries(getEntryExplanation(selected)).filter((entry) => entry.id !== selected.id)
     : []
   const learnedCount = entries.filter((entry) => learned.includes(entry.id)).length
+  const contentSearchResults = useMemo(
+    () => searchContentPacks([mahjongSearchPack], query, { packIds: [mahjongBeginnerPack.packId] }),
+    [query],
+  )
+  const lessonSearchResults = contentSearchResults.filter((result) => result.item.kind === 'lesson')
   const searchGroups = useMemo(() => {
     const matchesFilters = (entry: Entry) => (typeFilter === 'すべて' || entry.type === typeFilter)
       && (levelFilter === 'すべて' || entry.level === levelFilter)
       && (categoryFilter === 'すべて' || getCategory(entry) === categoryFilter)
     if (!query.trim()) return { exact: [], suggested: [], related: [], all: entries.filter(matchesFilters) }
 
-    const exact: Entry[] = []
-    const suggested: Entry[] = []
-    const related: Entry[] = []
-    entries.filter(matchesFilters).forEach((entry) => {
-      const match = classifyEntryQuery(entry, query)
-      if (match === 'exact-title') exact.push(entry)
-      else if (match === 'suggested-title') suggested.push(entry)
-      else if (match === 'related-description') related.push(entry)
-    })
-    return { exact, suggested, related, all: [] }
-  }, [query, typeFilter, categoryFilter, levelFilter])
+    const glossaryHits = contentSearchResults.filter((result) => result.item.kind === 'glossary')
+    const entriesFor = (match: SearchResult['match']) => glossaryHits
+      .filter((result) => result.match === match)
+      .map((result) => entries.find((entry) => entry.id === result.item.id))
+      .filter((entry): entry is Entry => Boolean(entry))
+      .filter(matchesFilters)
+    return {
+      exact: entriesFor('exact-title'),
+      suggested: entriesFor('exact-metadata'),
+      related: entriesFor('exact-description'),
+      all: [],
+    }
+  }, [query, typeFilter, categoryFilter, levelFilter, contentSearchResults])
+
+  function openSearchResult(result: SearchResult) {
+    if (result.item.kind === 'lesson') {
+      setSelectedId(null)
+      setEntryHistory([])
+      setLessonToOpen(result.item.id)
+      setActiveView('course')
+      setQuery('')
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+      return
+    }
+    const entry = entries.find((item) => item.id === result.item.id)
+    if (entry) openEntry(entry)
+  }
+
+  function renderSearchResult(result: SearchResult) {
+    const isLesson = result.item.kind === 'lesson'
+    return <button
+      className="content-search-result"
+      key={result.packId + ':' + result.item.kind + ':' + result.item.id}
+      onClick={() => openSearchResult(result)}
+      type="button"
+    >
+      <span className={`content-search-kind ${isLesson ? 'lesson' : 'glossary'}`}>{isLesson ? '学習記事' : '図鑑'}</span>
+      <span className="content-search-copy">
+        <strong>{result.item.title}</strong>
+        <small>{[result.item.category, result.item.kind === 'glossary' ? result.item.facets?.type : ''].filter(Boolean).join(' · ')}</small>
+        {result.item.description && <small>{result.item.description.slice(0, 100)}{result.item.description.length > 100 ? '…' : ''}</small>}
+      </span>
+      <ChevronRight size={17} />
+    </button>
+  }
 
   function toggleLearned(id: string) {
     const next = learned.includes(id) ? learned.filter((item) => item !== id) : [...learned, id]
@@ -225,9 +287,21 @@ function App() {
           <span>麻雀図鑑</span>
         </button>
         <span className="topbar-note">はじめての麻雀を、もっとわかりやすく。</span>
-        <button className="topbar-nav-button" onClick={() => setActiveView('glossary')} type="button">図鑑・学習ガイドを見る</button>
+        <div className="search-box topbar-search-box">
+          <Search size={17} />
+          <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="学習記事や用語を検索" aria-label="学習記事と図鑑を検索" />
+          {query && <button className="clear-search" onClick={() => setQuery('')} aria-label="検索をクリア"><X size={17} /></button>}
+        </div>
+        <button className="topbar-nav-button" onClick={() => setActiveView('glossary')} type="button">図鑑へ</button>
       </header>
+      {query.trim() && <section className="content-search-results" aria-live="polite" aria-label="学習記事と図鑑の検索結果">
+        <div className="content-search-heading"><h2>検索結果</h2><span>{contentSearchResults.length} 件</span></div>
+        {contentSearchResults.length > 0
+          ? <div className="content-search-list">{contentSearchResults.map(renderSearchResult)}</div>
+          : <div className="empty-state"><CircleHelp size={26} /><h3>見つからなかったよ</h3><p>記事のタイトル、役や用語を別の言葉でも検索してみてね。</p></div>}
+      </section>}
       <CoursePlayer
+        initialLessonId={lessonToOpen}
         pack={mahjongBeginnerPack}
         course={mahjongBeginnerPack.courses[0]}
         renderExtension={(extension) => mahjongExtensionRenderers[extension.rendererId]?.(extension)}
@@ -331,11 +405,11 @@ function App() {
         <section className="catalog-section" id="catalog">
           <div className="section-heading catalog-heading">
             <div><span className="section-eyebrow">THE ENCYCLOPEDIA</span><h2>図鑑をひらく</h2></div>
-            <span className="result-count">{query.trim() ? `${searchGroups.exact.length + searchGroups.suggested.length + searchGroups.related.length} 件の項目` : `${searchGroups.all.length} 件の項目`}</span>
+            <span className="result-count">{query.trim() ? `${searchGroups.exact.length + searchGroups.suggested.length + searchGroups.related.length + lessonSearchResults.length} 件の検索結果` : `${searchGroups.all.length} 件の項目`}</span>
           </div>
           <div className="search-box">
             <Search size={19} />
-            <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="名前・読み方・説明・カテゴリで検索（ひらがな・カタカナ対応）…" aria-label="図鑑を検索" />
+            <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="記事・名前・読み方・説明・カテゴリで検索…" aria-label="学習記事と図鑑を検索" />
             {query && <button className="clear-search" onClick={() => setQuery('')} aria-label="検索をクリア"><X size={17} /></button>}
           </div>
           <div className="filter-row">
@@ -350,11 +424,12 @@ function App() {
           <div className="filter-pills category-pills" role="group" aria-label="学習カテゴリ">
             {['すべて', ...categories].map((category) => <button key={category} className={`filter-pill ${categoryFilter === category ? 'selected' : ''}`} onClick={() => setCategoryFilter(category)}>{category}</button>)}
           </div>
+          {query.trim() && lessonSearchResults.length > 0 && <section className="search-result-group lesson-search-group"><h3>学習記事</h3><div className="content-search-list">{lessonSearchResults.map(renderSearchResult)}</div></section>}
           {query.trim() ? <>
             {searchGroups.exact.length > 0 && <section className="search-result-group"><h3>検索結果</h3><div className="entry-grid">{searchGroups.exact.map(renderEntryCard)}</div></section>}
-            {searchGroups.suggested.length > 0 && <section className="search-result-group"><h3>もしかして？</h3><div className="entry-grid">{searchGroups.suggested.map(renderEntryCard)}</div></section>}
-            {searchGroups.related.length > 0 && <section className="search-result-group"><h3>関連する項目（説明文に含まれています）</h3><div className="entry-grid">{searchGroups.related.map(renderEntryCard)}</div></section>}
-            {searchGroups.exact.length + searchGroups.suggested.length + searchGroups.related.length === 0 && <div className="empty-state"><CircleHelp size={30} /><h3>見つからなかったよ</h3><p>別の言葉で検索するか、絞り込みを解除してみてね。</p><button className="primary-button" onClick={resetFilters}>すべての項目を見る</button></div>}
+            {searchGroups.suggested.length > 0 && <section className="search-result-group"><h3>カテゴリ・関連語で一致</h3><div className="entry-grid">{searchGroups.suggested.map(renderEntryCard)}</div></section>}
+            {searchGroups.related.length > 0 && <section className="search-result-group"><h3>説明文で一致</h3><div className="entry-grid">{searchGroups.related.map(renderEntryCard)}</div></section>}
+            {searchGroups.exact.length + searchGroups.suggested.length + searchGroups.related.length + lessonSearchResults.length === 0 && <div className="empty-state"><CircleHelp size={30} /><h3>見つからなかったよ</h3><p>別の言葉で検索するか、絞り込みを解除してみてね。</p><button className="primary-button" onClick={resetFilters}>すべての項目を見る</button></div>}
           </> : levelFilter === 'すべて' && categoryFilter === 'すべて'
             ? learningLevels.map((level) => {
               const levelEntries = searchGroups.all.filter((entry) => entry.level === level)
