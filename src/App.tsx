@@ -49,7 +49,7 @@ function App() {
   const [categoryFilter, setCategoryFilter] = useState('すべて')
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [lessonToOpen, setLessonToOpen] = useState<string | undefined>(undefined)
-  const [activeView, setActiveView] = useState<'course' | 'glossary'>('course')
+  const [activeView, setActiveView] = useState<'course' | 'glossary'>('glossary')
   const [entryReturnView, setEntryReturnView] = useState<'course' | 'glossary'>('course')
   const [entryReturnScroll, setEntryReturnScroll] = useState(0)
   const [entryHistory, setEntryHistory] = useState<EntryHistoryLocation[]>([])
