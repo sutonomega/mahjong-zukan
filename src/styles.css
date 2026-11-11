@@ -451,3 +451,5 @@ main { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
   .course-quiz-question { padding: 12px 10px; }
   .course-quiz-option { padding: 9px; font-size: 10px; }
 }
+
+.course-quiz-outline-item.is-active { border-color: #a7c2a5; background: #edf5e9; box-shadow: inset 3px 0 #6d946e; }
