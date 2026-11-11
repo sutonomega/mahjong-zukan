@@ -9,9 +9,19 @@ export type LessonSegment =
   | { type: 'text'; text: string }
   | { type: 'term'; reference: GlossaryReference }
 
+export type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue }
+
+export type LessonExtension = {
+  rendererId: string
+  schemaVersion: number
+  altText: string
+  payload: JsonValue
+}
+
 export type LessonBlock =
   | { type: 'paragraph'; segments: LessonSegment[] }
   | { type: 'callout'; title: string; segments: LessonSegment[] }
+  | ({ type: 'extension' } & LessonExtension)
 
 export type LearningLesson = {
   id: string
