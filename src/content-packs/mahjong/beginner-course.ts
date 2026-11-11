@@ -319,7 +319,7 @@ export const mahjongBeginnerPack: LearningPack = {
             type: 'extension',
             rendererId: 'mahjong.yaku-hands',
             schemaVersion: 1,
-            altText: '立直の成立例です。順子3組、白の刻子、二筒の雀頭でできた手牌。',
+            altText: '立直の成立例です。順子3組、白の刻子、二筒の雀頭でできた手牌です。',
             payload: { examples: [{
               title: '立直の成立例',
               groups: [

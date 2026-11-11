@@ -35,7 +35,7 @@ src/
   platform/
     CoursePlayer.tsx               共通コース表示、レッスン進捗
     progressStorage.ts             バージョン付きのコース進捗保存・復元
-doc/
+docs/
   design.md                       サイトの設計と振る舞い
   implementation.md               この実装書
 .github/workflows/deploy.yml       GitHub Pagesのビルド・デプロイ
