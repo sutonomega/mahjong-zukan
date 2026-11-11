@@ -26,6 +26,7 @@ const learningTracks: { level: LearningLevel; summary: string; categories: { nam
   ] },
   { level: '中級', summary: '待ちや役のしくみを知り、ルールを理解する。', categories: [
     { name: 'ゲームルール', description: '対局で使われるルールや取り決め。' },
+    { name: '牌の基本', title: '牌と卓の追加知識', description: '壁牌や王牌、特殊な牌と不正な枚数など、対局の細部。' },
     { name: '基本の組み合わせ', title: '面子と槓子', description: '少し複雑な面子や槓子の形。' },
     { name: '鳴きと門前', title: '鳴きの応用', description: '鳴きの種類や、鳴いたときの扱い。' },
     { name: '待ちとテンパイ', description: 'テンパイや待ちの形を理解する。' },
