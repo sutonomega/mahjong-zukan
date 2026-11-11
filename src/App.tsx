@@ -20,8 +20,8 @@ const learningTracks: { level: LearningLevel; summary: string; categories: { nam
     { name: '場とプレイヤー', description: '自分や他の人、場の呼び方。' },
     { name: '牌の基本', description: '牌の種類や手牌、牌山の基本。' },
     { name: '基本の組み合わせ', description: '雀頭や順子など、牌の組み合わせ。' },
-    { name: '基本の役', description: 'まず覚えておきたい基本的な役。' },
     { name: 'アガリの基礎', title: 'アガリ方の基本', description: '和了、ロン、ツモなどアガリ方の基本。' },
+    { name: '基本の役', description: 'まず覚えておきたい基本的な役。' },
     { name: '鳴きと門前', description: '鳴きと門前の基本を知る。' },
   ] },
   { level: '中級', summary: '待ちや役のしくみを知り、ルールを理解する。', categories: [
@@ -29,6 +29,7 @@ const learningTracks: { level: LearningLevel; summary: string; categories: { nam
     { name: '基本の組み合わせ', title: '面子と槓子', description: '少し複雑な面子や槓子の形。' },
     { name: '鳴きと門前', title: '鳴きの応用', description: '鳴きの種類や、鳴いたときの扱い。' },
     { name: '待ちとテンパイ', description: 'テンパイや待ちの形を理解する。' },
+    { name: 'アガリの基礎', title: 'アガリの表記と関連語', description: 'アガリを表す言葉や別表記を確認する。' },
     { name: 'ドラとボーナス', description: 'ドラやボーナス牌の種類と扱い。' },
     { name: '役と翻数', description: '役の組み合わせと翻数のしくみ。' },
     { name: '戦術と安全牌', description: '安全牌や基本的な打ち方の考え方。' },
