@@ -43,11 +43,11 @@ export const mahjongBeginnerPack: LearningPack = {
           options: [
             { id: 'four-groups-pair', segments: [{ type: 'text', text: '3枚組を4つと、同じ牌2枚の組を1つ' }] },
             { id: 'three-groups-two-pairs', segments: [{ type: 'text', text: '3枚組を3つと、同じ牌2枚の組を2つ' }] },
-            { id: 'seven-pairs', segments: [{ type: 'text', text: '同じ牌2枚の組を7つ' }] },
+            { id: 'seven-pairs', segments: [{ type: 'text', text: '七対子：同じ牌2枚の組を7つ' }] },
           ],
           correctOptionId: 'four-groups-pair',
           explanation: [
-            { type: 'text', text: '一般的な形は、3枚組を4つと雀頭を1つ作る形です。同じ牌2枚を7組そろえる七対子など、例外の形もあります。' },
+            { type: 'text', text: '七対子は、同じ牌2枚の組を7つそろえて役としてアガれる正式な形です。ただし、3枚組を4つと雀頭を1つ作る一般的な基本形とは別の形です。' },
           ],
           reviewLessonId: 'winning-shape',
           sources: [{
