@@ -11,6 +11,107 @@ export const mahjongBeginnerPack: LearningPack = {
     id: 'first-steps',
     title: 'はじめての麻雀',
     description: 'まずは麻雀の全体像をつかみましょう。全4レッスン、いつでも自分のペースで進められます。',
+    quizzes: [{
+      id: 'beginner-check',
+      title: 'はじめての麻雀 理解度チェック',
+      description: '牌の種類、アガリの形、1局の流れ、基本役を確認します。選択肢を選ぶと、答えと理由を確認できます。',
+      questions: [
+        {
+          id: 'tile-families',
+          prompt: [{ type: 'text', text: '次のうち、字牌はどれですか？' }],
+          options: [
+            { id: 'east', segments: [{ type: 'text', text: '東' }] },
+            { id: 'five-dots', segments: [{ type: 'text', text: '五筒' }] },
+            { id: 'two-bamboo', segments: [{ type: 'text', text: '二索' }] },
+          ],
+          correctOptionId: 'east',
+          explanation: [
+            { type: 'text', text: '東は字牌です。五筒と二索は、数字が書かれた数牌です。' },
+            { type: 'term', reference: { id: 'mahjong:term-081', label: '字牌', shortDefinition: '東南西北と白發中の牌です。' } },
+          ],
+          reviewLessonId: 'tiles-and-hand',
+          sources: [{
+            id: 'jannyumon-tile-types',
+            title: '雀入門 牌の種類と呼び方',
+            url: 'https://www.jannyumon.jp/rule/pai/',
+            accessedOn: '2026-11-11',
+          }],
+        },
+        {
+          id: 'winning-shape',
+          prompt: [{ type: 'text', text: '一般的なアガリの基本形はどれですか？' }],
+          options: [
+            { id: 'four-groups-pair', segments: [{ type: 'text', text: '3枚組を4つと、同じ牌2枚の組を1つ' }] },
+            { id: 'three-groups-two-pairs', segments: [{ type: 'text', text: '3枚組を3つと、同じ牌2枚の組を2つ' }] },
+            { id: 'seven-pairs', segments: [{ type: 'text', text: '同じ牌2枚の組を7つ' }] },
+          ],
+          correctOptionId: 'four-groups-pair',
+          explanation: [
+            { type: 'text', text: '一般的な形は、3枚組を4つと雀頭を1つ作る形です。同じ牌2枚を7組そろえる七対子など、例外の形もあります。' },
+          ],
+          reviewLessonId: 'winning-shape',
+          sources: [{
+            id: 'jannyumon-hand-shape',
+            title: '雀入門 手牌の種類',
+            url: 'https://www.jannyumon.jp/rule/tehai/',
+            accessedOn: '2026-11-11',
+          }],
+        },
+        {
+          id: 'turn-actions',
+          prompt: [{ type: 'text', text: '配牌のあと、通常の自分の番で繰り返すことは何ですか？' }],
+          options: [
+            { id: 'draw-discard', segments: [{ type: 'text', text: '牌を1枚引き、手牌から1枚捨てる' }] },
+            { id: 'discard-draw', segments: [{ type: 'text', text: '手牌から1枚捨ててから、牌を2枚引く' }] },
+            { id: 'draw-two', segments: [{ type: 'text', text: '牌を2枚引いて、そのまま次の人に渡す' }] },
+          ],
+          correctOptionId: 'draw-discard',
+          explanation: [
+            { type: 'text', text: '通常は牌山から1枚引くツモのあと、手牌から1枚選んで捨てます。親の最初の打牌など、局の始まりには特別な順序があります。' },
+            { type: 'term', reference: { id: 'mahjong:term-116', label: 'ツモ', shortDefinition: '自分の番に牌を1枚引くことです。' } },
+            { type: 'text', text: 'と' },
+            { type: 'term', reference: { id: 'mahjong:term-117', label: '打牌', shortDefinition: '手牌から1枚選んで捨てることです。' } },
+            { type: 'text', text: 'を順番に行います。' },
+          ],
+          reviewLessonId: 'turns-and-discard',
+          sources: [{
+            id: 'jannyumon-game-flow',
+            title: '雀入門 麻雀の基本の流れ',
+            url: 'https://www.jannyumon.jp/howto/flow/',
+            accessedOn: '2026-11-11',
+          }],
+        },
+        {
+          id: 'tanyao-condition',
+          prompt: [{ type: 'text', text: '断幺九（タンヤオ）の条件はどれですか？' }],
+          options: [
+            { id: 'middle-number-tiles', segments: [{ type: 'text', text: '2〜8の数牌だけで手牌を作る' }] },
+            { id: 'terminals-and-honors', segments: [{ type: 'text', text: '1・9の数牌と字牌だけで手牌を作る' }] },
+            { id: 'honors-in-triplets', segments: [{ type: 'text', text: '東南西北をそれぞれ3枚ずつそろえる' }] },
+          ],
+          correctOptionId: 'middle-number-tiles',
+          explanation: [
+            { type: 'text', text: '断幺九は、2〜8の数牌だけで手牌を作る役です。1・9や字牌が含まれると成立しません。' },
+            { type: 'term', reference: { id: 'mahjong:yaku-004', label: '断幺九', shortDefinition: '2〜8の数牌だけで手牌を作る役です。' } },
+          ],
+          reviewLessonId: 'first-yaku',
+          sources: [
+            {
+              id: 'jannyumon-yaku-introduction',
+              title: '雀入門 麻雀のおもしろさ',
+              url: 'https://www.jannyumon.jp/about/',
+              accessedOn: '2026-11-11',
+            },
+            {
+              id: 'saikouisen-riichi-regulation',
+              title: '最高位戦日本プロ麻雀協会 競技規定',
+              url: 'https://saikouisen.com/pdf/saikouisen_regulation_250825.pdf.pdf',
+              accessedOn: '2026-11-11',
+            },
+          ],
+        },
+      ],
+    }],
     lessons: [
       {
         id: 'tiles-and-hand',
