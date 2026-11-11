@@ -394,7 +394,7 @@ Issue [#19](https://github.com/sutonomega/mahjong-zukan/issues/19) の作業記�
 
 確認済み用語：187件から190件へ。未確認用語：44件から41件へ。
 
-根拠：[麻雀豆腐：点箱](https://majandofu.com/mahjong-glossary-tenbako)、[麻雀カレッジ：箱・箱点](https://mahjongcollege.com/term/6376/)、[麻雀カレッジ：青天井](https://mahjongcollege.com/rules/5130/)（2026-11-12確認）。
+根拠：[麻雀豆腐：点箱とハコテン](https://majandofu.com/mahjong-glossary-tenbako)、[麻雀カレッジ：青天井](https://mahjongcollege.com/rules/5130/)（2026-11-12確認）。
 
 ```diff
 - 100点棒、1,000点棒、5,000点棒、10,000点棒と4種類あります。
