@@ -43,11 +43,13 @@ export const mahjongBeginnerPack: LearningPack = {
           options: [
             { id: 'four-groups-pair', segments: [{ type: 'text', text: '3枚組を4つと、同じ牌2枚の組を1つ' }] },
             { id: 'three-groups-two-pairs', segments: [{ type: 'text', text: '3枚組を3つと、同じ牌2枚の組を2つ' }] },
-            { id: 'seven-pairs', segments: [{ type: 'text', text: '七対子：同じ牌2枚の組を7つ' }] },
+            { id: 'seven-pairs', segments: [{ type: 'text', text: '同じ牌2枚の組を7つ' }] },
           ],
           correctOptionId: 'four-groups-pair',
           explanation: [
-            { type: 'text', text: '七対子は、同じ牌2枚の組を7つそろえて役としてアガれる正式な形です。ただし、3枚組を4つと雀頭を1つ作る一般的な基本形とは別の形です。' },
+            { type: 'text', text: '同じ牌2枚の組を7つそろえて役として' },
+            { type: 'term', reference: { id: 'mahjong:yaku-021', label: '七対子', shortDefinition: '同じ牌2枚の組を7つ集めると成立する役です。鳴くと成立しません。' } },
+            { type: 'text', text: 'がありますが、これは基本形ではなく例外形です。' },
           ],
           reviewLessonId: 'winning-shape',
           sources: [{
