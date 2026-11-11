@@ -424,7 +424,8 @@ main { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
 .course-quiz-questions { display: grid; gap: 14px; }
 .course-quiz-question { min-width: 0; margin: 0; padding: 17px; border: 1px solid #e7ebe4; border-radius: 13px; background: #fdfdfb; }
 .course-quiz-question h3 { display: flex; align-items: flex-start; gap: 9px; margin: 0 0 13px; color: #33483a; font-size: 13px; line-height: 1.7; }
-.course-quiz-question h3 > span { flex: 0 0 auto; display: grid; width: 25px; height: 25px; place-items: center; border-radius: 8px; background: #e9f1e5; color: #4b7252; font-size: 9px; }
+.course-quiz-question-number { flex: 0 0 25px; display: grid; width: 25px; height: 25px; place-items: center; border-radius: 8px; background: #e9f1e5; color: #4b7252; font-size: 9px; }
+.course-quiz-prompt { flex: 1; min-width: 0; }
 .course-quiz-options { display: grid; gap: 7px; }
 .course-quiz-option { display: flex; align-items: flex-start; gap: 10px; width: 100%; padding: 10px 12px; border: 1px solid #e2e8df; border-radius: 10px; background: #fff; color: #43564a; font-size: 11px; line-height: 1.7; text-align: left; }
 .course-quiz-option:hover { border-color: #a9c2a7; background: #f9fcf7; }
