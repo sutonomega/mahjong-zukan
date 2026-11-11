@@ -9,6 +9,7 @@ import { suitedTileReadings } from './data/suitedTileReadings'
 import CoursePlayer from './platform/CoursePlayer'
 import { mahjongBeginnerPack } from './content-packs/mahjong/beginner-course'
 import { resolveMahjongGlossaryEntryId } from './content-packs/mahjong/glossaryAdapter'
+import { mahjongExtensionRenderers } from './content-packs/mahjong/extensionRenderers'
 
 const typeFilters = ['すべて', '役', '用語'] as const
 type TypeFilter = typeof typeFilters[number]
@@ -227,6 +228,7 @@ function App() {
       <CoursePlayer
         pack={mahjongBeginnerPack}
         course={mahjongBeginnerPack.courses[0]}
+        renderExtension={(extension) => mahjongExtensionRenderers[extension.rendererId]?.(extension)}
         onOpenTerm={(reference) => {
           const entryId = resolveMahjongGlossaryEntryId(reference)
           const entry = entryId ? entries.find((item) => item.id === entryId) : undefined
