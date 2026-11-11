@@ -41,7 +41,7 @@ export const mahjongBeginnerPack: LearningPack = {
             id: 'jannyumon-tile-types',
             title: '雀入門 牌の種類と呼び方',
             url: 'https://www.jannyumon.jp/rule/pai/',
-            accessedOn: '2026-11-11',
+            accessedOn: '2026-11-12',
           }],
         },
         {
@@ -67,7 +67,7 @@ export const mahjongBeginnerPack: LearningPack = {
             id: 'jannyumon-hand-shape',
             title: '雀入門 手牌の種類',
             url: 'https://www.jannyumon.jp/rule/tehai/',
-            accessedOn: '2026-11-11',
+            accessedOn: '2026-11-12',
           }],
         },
         {
@@ -100,7 +100,7 @@ export const mahjongBeginnerPack: LearningPack = {
             id: 'jannyumon-game-flow',
             title: '雀入門 麻雀の基本の流れ',
             url: 'https://www.jannyumon.jp/howto/flow/',
-            accessedOn: '2026-11-11',
+            accessedOn: '2026-11-12',
           }],
         },
         {
@@ -128,16 +128,10 @@ export const mahjongBeginnerPack: LearningPack = {
           reviewLessonId: 'first-yaku',
           sources: [
             {
-              id: 'jannyumon-yaku-introduction',
-              title: '雀入門 麻雀のおもしろさ',
-              url: 'https://www.jannyumon.jp/about/',
-              accessedOn: '2026-11-11',
-            },
-            {
-              id: 'saikouisen-riichi-regulation',
-              title: '最高位戦日本プロ麻雀協会 競技規定',
-              url: 'https://saikouisen.com/pdf/saikouisen_regulation_250825.pdf.pdf',
-              accessedOn: '2026-11-11',
+              id: 'jannyumon-basic-yaku',
+              title: '雀入門 一飜役一覧',
+              url: 'https://www.jannyumon.jp/yaku/1honyaku/',
+              accessedOn: '2026-11-12',
             },
           ],
         },
@@ -148,6 +142,12 @@ export const mahjongBeginnerPack: LearningPack = {
         id: 'tiles-and-hand',
         title: '牌と手牌を知ろう',
         summary: '麻雀で使う牌と、自分の前に並べる牌を知ります。',
+        sources: [{
+          id: 'jannyumon-tile-types',
+          title: '雀入門 牌の種類と呼び方',
+          url: 'https://www.jannyumon.jp/rule/pai/',
+          accessedOn: '2026-11-12',
+        }],
         blocks: [
           { type: 'paragraph', segments: [
             { type: 'text', text: '麻雀では、絵柄のついた牌を組み合わせてアガリを目指します。数字の並ぶ' },
@@ -182,6 +182,12 @@ export const mahjongBeginnerPack: LearningPack = {
         id: 'turns-and-discard',
         title: '局の始まりからアガリまで',
         summary: '牌が配られてから、アガリまたは流局になるまでを順に追います。',
+        sources: [{
+          id: 'jannyumon-game-flow',
+          title: '雀入門 麻雀の基本の流れ',
+          url: 'https://www.jannyumon.jp/howto/flow/',
+          accessedOn: '2026-11-12',
+        }],
         blocks: [
           { type: 'paragraph', segments: [
             { type: 'text', text: '麻雀は、短いまとまりの' },
@@ -257,6 +263,12 @@ export const mahjongBeginnerPack: LearningPack = {
         id: 'winning-shape',
         title: 'アガリの基本形を作ろう',
         summary: '3枚組4つと2枚組1つを目指す、基本の形を学びます。',
+        sources: [{
+          id: 'jannyumon-hand-shape',
+          title: '雀入門 手牌の種類',
+          url: 'https://www.jannyumon.jp/rule/tehai/',
+          accessedOn: '2026-11-12',
+        }],
         blocks: [
           { type: 'paragraph', segments: [
             { type: 'text', text: '一般的なアガリの基本形は、3枚組を4つと、同じ牌2枚の組を1つ作る形です。数字が続く3枚組を' },
@@ -293,14 +305,12 @@ export const mahjongBeginnerPack: LearningPack = {
         id: 'first-yaku',
         title: 'アガリには「役」が必要',
         summary: '立直・断幺九・役牌を、成立する牌姿と注意例で学びます。',
-        sources: [
-          {
-            id: 'saikouisen-riichi-regulation',
-            title: '最高位戦日本プロ麻雀協会 競技規定',
-            url: 'https://saikouisen.com/pdf/saikouisen_regulation_250825.pdf.pdf',
-            accessedOn: '2026-11-11',
-          },
-        ],
+        sources: [{
+          id: 'jannyumon-basic-yaku',
+          title: '雀入門 一飜役一覧',
+          url: 'https://www.jannyumon.jp/yaku/1honyaku/',
+          accessedOn: '2026-11-12',
+        }],
         blocks: [
           { type: 'paragraph', segments: [
             { type: 'text', text: '麻雀では、牌の形がそろっただけではアガれません。アガリには、決められた条件である' },
@@ -311,7 +321,8 @@ export const mahjongBeginnerPack: LearningPack = {
             { type: 'text', text: '以下の例は、左から順子・刻子・雀頭などのまとまりを並べた完成形です。萬・筒・索は牌の種類を表し、同じ数字でも種類が違えば別の牌です。' },
           ] },
           { type: 'paragraph', segments: [
-            { type: 'text', text: '立直（リーチ）は、' },
+            { type: 'term', reference: { id: 'mahjong:yaku-001', label: '立直（リーチ）', shortDefinition: '門前でテンパイし、立直を宣言して成立する役です。' } },
+            { type: 'text', text: 'は、' },
             { type: 'term', reference: { id: 'mahjong:term-187', label: 'テンパイ', shortDefinition: 'あと1枚、必要な牌が加わればアガリになる状態です。' } },
             { type: 'text', text: 'したときに、鳴いていない状態を保ち、リーチを宣言して成立する役です。宣言には通常1000点を出します。' },
           ] },
@@ -377,7 +388,9 @@ export const mahjongBeginnerPack: LearningPack = {
             }] },
           },
           { type: 'paragraph', segments: [
-            { type: 'text', text: '役牌（翻牌）は、白・發・中、またはその局で自分の風・場の風にあたる風牌を3枚そろえる役です。用語辞典では' },
+            { type: 'text', text: '役牌（翻牌）は、白・發・中、またはその局で自分の風・場の風にあたる' },
+            { type: 'term', reference: { id: 'mahjong:term-080', label: '風牌', shortDefinition: '東・南・西・北の4種類の字牌です。' } },
+            { type: 'text', text: 'で刻子か槓子を作る役です。用語辞典では' },
             { type: 'term', reference: { id: 'mahjong:term-105', label: '翻牌', shortDefinition: '三元牌や自風・場風を3枚そろえると役になる牌です。' } },
             { type: 'text', text: 'として説明しています。' },
           ] },
@@ -422,7 +435,9 @@ export const mahjongBeginnerPack: LearningPack = {
             { type: 'term', reference: { id: 'mahjong:yaku-004', label: '断幺九', shortDefinition: '2〜8の数牌だけで手牌を作る役です。' } },
             { type: 'text', text: '、' },
             { type: 'term', reference: { id: 'mahjong:yaku-011', label: '白', shortDefinition: '白を3枚そろえると成立する役牌です。' } },
-            { type: 'text', text: 'から確認できます。ルールによって喰いタンなどの扱いが異なることがあるので、遊ぶ場のルールも確認しましょう。' },
+            { type: 'text', text: 'から確認できます。ルールによって' },
+            { type: 'term', reference: { id: 'mahjong:term-140', label: '喰いタン', shortDefinition: '鳴いて断幺九を成立させることです。認められるかはルールによります。' } },
+            { type: 'text', text: 'などの扱いが異なることがあるので、遊ぶ場のルールも確認しましょう。' },
           ] },
         ],
       },
