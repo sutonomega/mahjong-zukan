@@ -20,6 +20,12 @@ function QuizSegments({ segments, onOpenTerm }: { segments: LessonSegment[]; onO
       >{segment.reference.label}</button>)}</>
 }
 
+function QuizOptionSegments({ segments }: { segments: LessonSegment[] }) {
+  return <>{segments.map((segment, index) => segment.type === 'text'
+    ? <span key={index}>{segment.text}</span>
+    : <span className="course-quiz-term-label" key={index}>{segment.reference.label}</span>)}</>
+}
+
 function getOption(question: LearningQuizQuestion, optionId: string) {
   return question.options.find((option) => option.id === optionId)
 }
@@ -76,7 +82,7 @@ export default function LearningQuizPlayer({ quiz, onOpenLesson, onOpenTerm }: L
                 type="button"
               >
                 <span className="course-quiz-option-mark">{isSelected && isCorrect ? <Check size={16} /> : String.fromCharCode(65 + question.options.indexOf(option))}</span>
-                <span><QuizSegments segments={option.segments} onOpenTerm={onOpenTerm} /></span>
+                <span><QuizOptionSegments segments={option.segments} /></span>
               </button>
             })}
           </div>
