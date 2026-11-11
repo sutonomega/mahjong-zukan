@@ -45,11 +45,34 @@ export type LearningLesson = {
   sources?: ContentSource[]
 }
 
+export type LearningQuizOption = {
+  id: string
+  segments: LessonSegment[]
+}
+
+export type LearningQuizQuestion = {
+  id: string
+  prompt: LessonSegment[]
+  options: LearningQuizOption[]
+  correctOptionId: string
+  explanation: LessonSegment[]
+  reviewLessonId?: string
+  sources?: ContentSource[]
+}
+
+export type LearningQuiz = {
+  id: string
+  title: string
+  description: string
+  questions: LearningQuizQuestion[]
+}
+
 export type LearningCourse = {
   id: string
   title: string
   description: string
   lessons: LearningLesson[]
+  quizzes?: LearningQuiz[]
 }
 
 export type LearningPack = {
