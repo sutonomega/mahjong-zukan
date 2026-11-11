@@ -156,4 +156,4 @@ npm run build -- --base=/${GITHUB_REPOSITORY#*/}
 6. カード・表・吹き出しを変える場合は、スマートフォン幅も確認する。
 7. 進捗保存を変更する場合は、再読み込み後の復元、複数パック・コース間の分離、未知IDや不正データ、保存不可の状態を確認する。
 8. マージ前に `npm run build` を実行する。
-8. GitHub Pagesへの公開は `main` へのマージ後、またはActionsの手動実行で行う。
+9. GitHub Pagesへの公開は `main` へのマージ後、またはActionsの手動実行で行う。
