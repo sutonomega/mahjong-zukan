@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { BookOpen, Search, X, ChevronRight, Check, Sparkles, CircleHelp, ArrowLeft, BookmarkCheck } from 'lucide-react'
-import { entries, getCategory, getDisplayName, getEntryExplanation, classifyEntryQuery, references, getEntryReadingVariants, type Entry, type LearningLevel } from './data/entries'
+import { entries, getCategory, getDisplayName, getEntryExplanation, references, getEntryReadingVariants, type Entry, type LearningLevel } from './data/entries'
 import YakuArtwork from './components/YakuArtwork'
 import TermArtwork from './components/TermArtwork'
 import GlossaryLinkedText, { getGlossaryEntries } from './components/GlossaryLinkedText'
@@ -292,7 +292,7 @@ function App() {
           <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="学習記事や用語を検索" aria-label="学習記事と図鑑を検索" />
           {query && <button className="clear-search" onClick={() => setQuery('')} aria-label="検索をクリア"><X size={17} /></button>}
         </div>
-        <button className="topbar-nav-button" onClick={() => setActiveView('glossary')} type="button">図鑑・学習ガイドを見る</button>
+        <button className="topbar-nav-button" onClick={() => setActiveView('glossary')} type="button">図鑑へ</button>
       </header>
       {query.trim() && <section className="content-search-results" aria-live="polite" aria-label="学習記事と図鑑の検索結果">
         <div className="content-search-heading"><h2>検索結果</h2><span>{contentSearchResults.length} 件</span></div>
