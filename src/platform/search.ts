@@ -107,20 +107,15 @@ export function searchContentPacks(
         .map((value) => normalize(value, pack.locale))
         .filter(Boolean)
       const descriptionTokens = tokenize(item.description ?? '', pack.locale)
-      let score: number | null = null
-      let match: SearchMatch
-
-      if (titleTerms.includes(query)) {
-        score = 0
-        match = 'exact-title'
-      } else if (metadataTerms.includes(query)) {
-        score = 1
-        match = 'exact-metadata'
-      } else if (hasExactTokenPhrase(query, descriptionTokens)) {
-        score = 2
-        match = 'exact-description'
-      }
-      if (score !== null) matches.push({ result: { packId: pack.packId, locale: pack.locale, item, match }, score, order })
+      const match: SearchMatch | null = titleTerms.includes(query)
+        ? 'exact-title'
+        : metadataTerms.includes(query)
+          ? 'exact-metadata'
+          : hasExactTokenPhrase(query, descriptionTokens)
+            ? 'exact-description'
+            : null
+      const score = match === 'exact-title' ? 0 : match === 'exact-metadata' ? 1 : match === 'exact-description' ? 2 : null
+      if (match && score !== null) matches.push({ result: { packId: pack.packId, locale: pack.locale, item, match }, score, order })
       order++
     }
   }
