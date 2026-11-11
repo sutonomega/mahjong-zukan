@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { BookOpen, Search, X, ChevronRight, Check, Sparkles, CircleHelp, ArrowLeft, BookmarkCheck } from 'lucide-react'
 import { entries, getCategory, getDisplayName, getEntryExplanation, references, getEntryReadingVariants, type Entry } from './data/entries'
 import YakuArtwork from './components/YakuArtwork'
@@ -43,6 +43,40 @@ const mahjongSearchPack: SearchablePack = (() => {
 
 type EntryHistoryLocation = { id: string; scrollY: number }
 
+const GLOSSARY_PROGRESS_KEY = 'mahjong-zukan-learned'
+const GLOSSARY_PROGRESS_SCHEMA_VERSION = 1
+
+function loadLearnedEntryIds(): string[] {
+  try {
+    const raw = typeof window === 'undefined' ? null : window.localStorage.getItem(GLOSSARY_PROGRESS_KEY)
+    if (!raw) return []
+    const saved: unknown = JSON.parse(raw)
+    const ids = Array.isArray(saved)
+      ? saved
+      : typeof saved === 'object' && saved !== null && 'schemaVersion' in saved
+        && saved.schemaVersion === GLOSSARY_PROGRESS_SCHEMA_VERSION
+        && 'learnedEntryIds' in saved && Array.isArray(saved.learnedEntryIds)
+          ? saved.learnedEntryIds
+          : []
+    const knownIds = new Set(entries.map((entry) => entry.id))
+    return [...new Set(ids.filter((id): id is string => typeof id === 'string' && knownIds.has(id)))]
+  } catch {
+    return []
+  }
+}
+
+function saveLearnedEntryIds(learnedEntryIds: string[]) {
+  try {
+    if (typeof window === 'undefined') return
+    window.localStorage.setItem(GLOSSARY_PROGRESS_KEY, JSON.stringify({
+      schemaVersion: GLOSSARY_PROGRESS_SCHEMA_VERSION,
+      learnedEntryIds,
+    }))
+  } catch {
+    // Keep glossary controls usable when browser storage is unavailable or full.
+  }
+}
+
 function App() {
   const [query, setQuery] = useState('')
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('すべて')
@@ -53,13 +87,11 @@ function App() {
   const [entryReturnView, setEntryReturnView] = useState<'course' | 'glossary'>('course')
   const [entryReturnScroll, setEntryReturnScroll] = useState(0)
   const [entryHistory, setEntryHistory] = useState<EntryHistoryLocation[]>([])
-  const [learned, setLearned] = useState<string[]>(() => {
-    try {
-      return JSON.parse(localStorage.getItem('mahjong-zukan-learned') ?? '[]') as string[]
-    } catch {
-      return []
-    }
-  })
+  const [learned, setLearned] = useState<string[]>(loadLearnedEntryIds)
+
+  useEffect(() => {
+    saveLearnedEntryIds(learned)
+  }, [learned])
 
   const categories = useMemo(() => [...new Set(entries.map(getCategory))], [])
   const selected = entries.find((entry) => entry.id === selectedId) ?? null
@@ -124,9 +156,10 @@ function App() {
   }
 
   function toggleLearned(id: string) {
-    const next = learned.includes(id) ? learned.filter((item) => item !== id) : [...learned, id]
-    setLearned(next)
-    localStorage.setItem('mahjong-zukan-learned', JSON.stringify(next))
+    if (!entries.some((entry) => entry.id === id)) return
+    setLearned((current) => current.includes(id)
+      ? current.filter((item) => item !== id)
+      : [...current, id])
   }
 
   function openEntry(entry: Entry) {

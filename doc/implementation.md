@@ -21,7 +21,7 @@ npm run preview
 
 ```text
 src/
-  App.tsx                         学習コースとSTEPカード、一覧、検索、フィルター、詳細、進捗、画面遷移
+  App.tsx                         ホーム、学習コース選択、図鑑一覧・検索・フィルター・詳細、進捗と画面遷移
   main.tsx                        Reactの起動点
   styles.css                      共通CSS、吹き出し、レスポンシブ表示
   components/
@@ -32,6 +32,9 @@ src/
     entries.ts                    型、全役・用語データ、出典原文、レベル・カテゴリ、検索判定
     hanLevels.ts                  「翻」詳細に出す補足表
     suitedTileReadings.ts         萬子・筒子・索子の読み方表
+  platform/
+    CoursePlayer.tsx               共通コース表示、レッスン進捗
+    progressStorage.ts             バージョン付きのコース進捗保存・復元
 doc/
   design.md                       サイトの設計と振る舞い
   implementation.md               この実装書
@@ -45,7 +48,7 @@ vite.config.ts                     Vite設定
 
 `src/data/entries.ts` の `entries` 配列を役・用語の唯一のデータ元として使う。全276件が同じファイルにあり、表示内容と学習分類を項目ごとに編集できる。
 
-各項目は `id`、`type`、`origin`、`name`、`displayName`、`reading`、`explanation`、`level`、`category`、`sourceCategory`、`source` を持つ。`level` は初級・中級・上級、`category` はレベルに沿った学習カテゴリ。`sourceCategory` と `source` はExcel原文の確認用。補足用語は `origin: 'supplemental'` とする。
+各項目は `id`、`type`、`origin`、`name`、`displayName`、`reading`、`explanation`、`level`、`category`、`sourceCategory`、`source` を持つ。`level` は取込元データとして保持するが、用語・役の画面分類や絞り込みには使わない。`category` は図鑑で使うカテゴリ。`sourceCategory` と `source` はExcel原文の確認用。補足用語は `origin: 'supplemental'` とする。
 
 各項目の `id` は一意の識別子として使う。表示名は重複する場合や表示補正があるため、進捗保存やリンクの識別子には使わない。
 
@@ -81,7 +84,7 @@ Excelにない用語も `src/data/entries.ts` の `entries` 配列に追加す�
 2. タイトルまたは読み方の部分一致、または検索語3〜12文字で1文字分だけ異なる曖昧一致。
 3. 説明文内の部分一致。
 
-各項目には最優先の分類一つだけを返す。`App.tsx` 側でレベル・学習カテゴリ・項目種類のフィルターを適用し、「検索結果」「もしかして？」「関連する項目」を描画する。
+各項目には最優先の分類一つだけを返す。`App.tsx` 側で学習記事・用語の検索結果と、図鑑の種類・カテゴリフィルターを適用し、「検索結果」「もしかして？」「関連する項目」を描画する。
 
 `getEntryReadingVariants` は表示読み・元データの読みを取得し、スラッシュで区切られた各読みを個別候補にする。検索処理と用語リンク処理で共通利用する。`normalizeSearchText` はNFKC、小文字化、カタカナからひらがなへの変換、空白と一般的な句読点の除去を行う。変更時は漢字名・かな表記・説明文検索への影響を確認する。
 
@@ -103,14 +106,27 @@ Excelにない用語も `src/data/entries.ts` の `entries` 配列に追加す�
 
 ## 6. 画面状態と進捗
 
-画面状態は `App.tsx` で管理する。
+画面状態は `App.tsx` と `CoursePlayer.tsx` で管理する。起動時は学習コース選択と図鑑一覧を含むホームを表示し、入門編を選ぶとコース画面へ移動する。
 
-- `query`、`typeFilter`、`categoryFilter`、`levelFilter`: 検索・絞り込み。学習STEPカードを選ぶと `levelFilter` と `categoryFilter` を設定して一覧へスクロールする。「この編をすべて見る」はカテゴリを指定せず、レベル全体を表示する。
+- `query`、`typeFilter`、`categoryFilter`: 図鑑の検索と絞り込み。用語・役の難易度絞り込みは行わない。
 - `selectedId`: 詳細を開いている項目。
 - `entryHistory`: 詳細画面間のIDとスクロール位置。
-- `learned`: 習得済みの項目ID一覧。
+- `learned`: 図鑑で習得済みにした項目ID一覧。
+- `CoursePlayer` の進捗: 完了レッスンIDと現在のレッスンID。図鑑の習得状態と独立して保存する。
 
-進捗は `localStorage` の `mahjong-zukan-learned` にJSON配列として保存する。保存キーを変更する場合は、既存データの読み込み・移行を考慮する。
+### コース進捗の保存
+
+`src/platform/progressStorage.ts` が、教材パック・コースごとの進捗を読み書きする。
+
+- キーは `learning-platform:<packId>:<courseId>:v1`。IDをURLエンコードして衝突を防ぐ。
+- 保存値は `schemaVersion`、`packId`、`courseId`、完了済みレッスンID、現在のレッスンIDを持つ。
+- 読み込み時に既知のレッスンIDだけを採用し、未知IDや不正データは初期状態へ戻す。
+- 旧形式（スキーマ情報がない進捗）は有効なレッスンIDを検証して読み込み、次回保存時に現行形式へ移行する。
+- ブラウザー保存領域が利用できない、または容量不足の場合も、画面内の学習操作は続けられる。
+
+### 図鑑の習得状態
+
+図鑑の習得状態はコース進捗とは別の `mahjong-zukan-learned` キーで保存する。現行形式は `schemaVersion` と `learnedEntryIds` を持つ。従来のJSON配列も読み込み、既知の項目IDに絞って現行形式へ移行する。読み書きに失敗しても画面の操作を止めない。
 
 カードは `<article>` にし、タイトルと「くわしく」をそれぞれボタンにしている。カード説明の用語リンクもボタンであるため、カード全体をボタンに戻すとHTML上のボタンの入れ子が発生する。
 
@@ -132,11 +148,12 @@ npm run build -- --base=/${GITHUB_REPOSITORY#*/}
 
 ## 9. 変更時の確認手順
 
-1. `entries.ts` の対象項目を更新する。学習レベルとカテゴリも同じ項目で管理する。
+1. `entries.ts` の対象項目を更新する。図鑑のカテゴリは同じ項目で管理し、難易度の表示や絞り込みは追加しない。
 2. Excel由来項目の表示値を修正する場合は `source` 内の原文を保持する。
 3. 用語追加は同じ `entries.ts` に記録する。翻数表は `hanLevels.ts`、数牌の読み方表は `suitedTileReadings.ts` に追加する。
 4. 表示処理は共通ヘルパー・`GlossaryLinkedText` を使い、カード・詳細・吹き出しを別実装にしない。
 5. 検索を変える場合は、完全一致・部分一致・説明文一致・カテゴリ絞り込みを確認する。
 6. カード・表・吹き出しを変える場合は、スマートフォン幅も確認する。
-7. マージ前に `npm run build` を実行する。
-8. GitHub Pagesへの公開は `main` へのマージ後、またはActionsの手動実行で行う。
+7. 進捗保存を変更する場合は、再読み込み後の復元、複数パック・コース間の分離、未知IDや不正データ、保存不可の状態を確認する。
+8. マージ前に `npm run build` を実行する。
+9. GitHub Pagesへの公開は `main` へのマージ後、またはActionsの手動実行で行う。

@@ -2,11 +2,7 @@ import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { ArrowLeft, ArrowRight, BookOpen, Check, RotateCcw } from 'lucide-react'
 import type { LearningCourse, LearningLesson, LearningPack, LessonSegment, GlossaryReference, LessonExtension } from '../platform/contracts'
 import LearningQuizPlayer from './LearningQuizPlayer'
-
-type SavedProgress = {
-  completedLessonIds: string[]
-  activeLessonId: string
-}
+import { readCourseProgress, writeCourseProgress } from './progressStorage'
 
 type CoursePlayerProps = {
   pack: LearningPack
@@ -14,25 +10,6 @@ type CoursePlayerProps = {
   onOpenTerm: (reference: GlossaryReference) => void
   renderExtension?: (extension: LessonExtension) => ReactNode
   initialLessonId?: string
-}
-
-function readProgress(key: string, course: LearningCourse, initialLessonId?: string): SavedProgress {
-  const preferredLessonId = course.lessons.some((lesson) => lesson.id === initialLessonId) ? initialLessonId as string : undefined
-  const fallback = { completedLessonIds: [], activeLessonId: preferredLessonId ?? course.lessons[0]?.id ?? '' }
-  try {
-    const saved = JSON.parse(localStorage.getItem(key) ?? 'null') as Partial<SavedProgress> | null
-    if (!saved) return fallback
-    return {
-      completedLessonIds: Array.isArray(saved.completedLessonIds)
-        ? saved.completedLessonIds.filter((id): id is string => course.lessons.some((lesson) => lesson.id === id))
-        : [],
-      activeLessonId: preferredLessonId ?? (course.lessons.some((lesson) => lesson.id === saved.activeLessonId)
-        ? saved.activeLessonId as string
-        : fallback.activeLessonId),
-    }
-  } catch {
-    return fallback
-  }
 }
 
 function LessonSegments({ segments, onOpenTerm }: { segments: LessonSegment[]; onOpenTerm: CoursePlayerProps['onOpenTerm'] }) {
@@ -49,8 +26,7 @@ function LessonSegments({ segments, onOpenTerm }: { segments: LessonSegment[]; o
 }
 
 export default function CoursePlayer({ pack, course, onOpenTerm, renderExtension, initialLessonId }: CoursePlayerProps) {
-  const progressKey = 'learning-platform:' + pack.packId + ':' + course.id + ':v1'
-  const [progress, setProgress] = useState(() => readProgress(progressKey, course, initialLessonId))
+  const [progress, setProgress] = useState(() => readCourseProgress(pack.packId, course.id, course.lessons.map((lesson) => lesson.id), initialLessonId))
   const [activeQuizId, setActiveQuizId] = useState<string | null>(null)
   const lessons = course.lessons
   const activeIndex = Math.max(0, lessons.findIndex((lesson) => lesson.id === progress.activeLessonId))
@@ -65,12 +41,8 @@ export default function CoursePlayer({ pack, course, onOpenTerm, renderExtension
   }, [initialLessonId, lessons])
 
   useEffect(() => {
-    try {
-      localStorage.setItem(progressKey, JSON.stringify(progress))
-    } catch {
-      // Keep the lesson usable when browser storage is unavailable.
-    }
-  }, [progress, progressKey])
+    writeCourseProgress(pack.packId, course.id, progress)
+  }, [pack.packId, course.id, progress])
 
   function selectLesson(lesson: LearningLesson) {
     setActiveQuizId(null)
