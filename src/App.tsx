@@ -8,6 +8,7 @@ import { hanLevels } from './data/hanLevels'
 import { suitedTileReadings } from './data/suitedTileReadings'
 import CoursePlayer from './platform/CoursePlayer'
 import { mahjongBeginnerPack } from './content-packs/mahjong/beginner-course'
+import { resolveMahjongGlossaryEntryId } from './content-packs/mahjong/glossaryAdapter'
 
 const typeFilters = ['すべて', '役', '用語'] as const
 type TypeFilter = typeof typeFilters[number]
@@ -189,8 +190,8 @@ function App() {
           pack={mahjongBeginnerPack}
           course={mahjongBeginnerPack.courses[0]}
           onOpenTerm={(reference) => {
-            const entryId = reference.id.replace(/^mahjong:/, '')
-            const entry = entries.find((item) => item.id === entryId)
+            const entryId = resolveMahjongGlossaryEntryId(reference)
+            const entry = entryId ? entries.find((item) => item.id === entryId) : undefined
             if (entry) {
               setActiveView('course')
               openEntry(entry)
