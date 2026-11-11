@@ -59,7 +59,7 @@ function loadLearnedEntryIds(): string[] {
           ? saved.learnedEntryIds
           : []
     const knownIds = new Set(entries.map((entry) => entry.id))
-    return [...new Set(ids.filter((id): id is string => typeof id === 'string' && knownIds.has(id))]
+    return [...new Set(ids.filter((id): id is string => typeof id === 'string' && knownIds.has(id)))]
   } catch {
     return []
   }
