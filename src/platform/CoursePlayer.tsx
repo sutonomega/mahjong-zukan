@@ -51,6 +51,7 @@ function LessonSegments({ segments, onOpenTerm }: { segments: LessonSegment[]; o
 export default function CoursePlayer({ pack, course, onOpenTerm, renderExtension, initialLessonId }: CoursePlayerProps) {
   const progressKey = 'learning-platform:' + pack.packId + ':' + course.id + ':v1'
   const [progress, setProgress] = useState(() => readProgress(progressKey, course, initialLessonId))
+  const [activeQuizId, setActiveQuizId] = useState<string | null>(null)
   const lessons = course.lessons
   const activeIndex = Math.max(0, lessons.findIndex((lesson) => lesson.id === progress.activeLessonId))
   const activeLesson = lessons[activeIndex]
@@ -72,6 +73,7 @@ export default function CoursePlayer({ pack, course, onOpenTerm, renderExtension
   }, [progress, progressKey])
 
   function selectLesson(lesson: LearningLesson) {
+    setActiveQuizId(null)
     setProgress((current) => ({ ...current, activeLessonId: lesson.id }))
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
@@ -131,9 +133,10 @@ export default function CoursePlayer({ pack, course, onOpenTerm, renderExtension
         </button>)}
         {completedCount > 0 && <button className="course-reset-button" onClick={resetProgress} type="button"><RotateCcw size={13} />進捗をリセット</button>}
         {course.quizzes?.map((quiz) => <button
-          className="course-quiz-outline-item"
+          aria-current={activeQuizId === quiz.id ? 'step' : undefined}
+          className={'course-quiz-outline-item' + (activeQuizId === quiz.id ? ' is-active' : '')}
           key={quiz.id}
-          onClick={() => document.getElementById('course-quiz-' + quiz.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+          onClick={() => { setActiveQuizId(quiz.id); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
           type="button"
         >
           <span className="course-outline-number">?</span>
@@ -141,7 +144,7 @@ export default function CoursePlayer({ pack, course, onOpenTerm, renderExtension
         </button>)}
       </nav>
 
-      <article className="course-lesson">
+      {!activeQuizId && <article className="course-lesson">
         <div className="course-lesson-kicker">LESSON {String(activeIndex + 1).padStart(2, '0')} / {String(lessons.length).padStart(2, '0')}</div>
         <h2>{activeLesson.title}</h2>
         <p className="course-lesson-summary">{activeLesson.summary}</p>
@@ -182,17 +185,17 @@ export default function CoursePlayer({ pack, course, onOpenTerm, renderExtension
             {activeIndex < lessons.length - 1 && <ArrowRight size={16} />}
           </button>
         </div>
-      </article>
+      </article>}
+      {course.quizzes?.map((quiz) => activeQuizId === quiz.id && <LearningQuizPlayer
+        key={quiz.id}
+        quiz={quiz}
+        onOpenTerm={onOpenTerm}
+        onOpenLesson={(lessonId) => {
+          const lesson = lessons.find((item) => item.id === lessonId)
+          if (lesson) selectLesson(lesson)
+        }}
+      />)}
     </div>
-    {course.quizzes?.map((quiz) => <LearningQuizPlayer
-      key={quiz.id}
-      quiz={quiz}
-      onOpenTerm={onOpenTerm}
-      onOpenLesson={(lessonId) => {
-        const lesson = lessons.find((item) => item.id === lessonId)
-        if (lesson) selectLesson(lesson)
-      }}
-    />)}
     <p className="course-term-hint">下線のある用語は、ポイントすると短い説明が見られます。選ぶと図鑑の詳しい説明を開きます。</p>
   </main>
 }
