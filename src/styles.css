@@ -370,3 +370,12 @@ main { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
   .course-flow-copy h3 { font-size: 13px; }
   .course-flow-copy p { font-size: 11px; line-height: 1.85; }
 }
+
+
+.mahjong-yaku-example + .mahjong-yaku-example { margin-top: 18px; padding-top: 17px; border-top: 1px solid #e5ebe2; }
+.mahjong-yaku-example h4 { margin: 0 0 10px; color: #30483a; font: 700 12px 'Noto Serif JP', serif; }
+.mahjong-yaku-example .mahjong-hand-groups { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.mahjong-yaku-example .mahjong-group-description { min-height: 2.8em; }
+@media (max-width: 760px) {
+  .mahjong-yaku-example .mahjong-hand-groups { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

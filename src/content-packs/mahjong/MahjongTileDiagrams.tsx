@@ -108,6 +108,61 @@ function WinningHandDiagram({ groups, pair }: { groups: HandGroup[]; pair: HandG
   </figure>
 }
 
+type YakuHandExample = {
+  title: string
+  groups: HandGroup[]
+  pair: HandGroup
+  note: string
+}
+
+function readYakuHandExamples(extension: LessonExtension): YakuHandExample[] | null {
+  if (!isRecord(extension.payload) || !Array.isArray(extension.payload.examples)) return null
+  const examples: YakuHandExample[] = []
+  for (const item of extension.payload.examples) {
+    if (!isRecord(item) || !Array.isArray(item.groups) || !isRecord(item.pair)) return null
+    const title = readString(item.title)
+    const note = readString(item.note)
+    if (!title || !note || item.groups.length !== 4) return null
+    const groups: HandGroup[] = []
+    for (const group of item.groups) {
+      if (!isRecord(group)) return null
+      const name = readString(group.name)
+      const tiles = readStringArray(group.tiles)
+      const description = readString(group.description)
+      if (!name || !tiles || tiles.length !== 3 || !description) return null
+      groups.push({ name, tiles, description })
+    }
+    const pairName = readString(item.pair.name)
+    const pairTiles = readStringArray(item.pair.tiles)
+    const pairDescription = readString(item.pair.description)
+    if (!pairName || !pairTiles || pairTiles.length !== 2 || !pairDescription) return null
+    examples.push({ title, groups, pair: { name: pairName, tiles: pairTiles, description: pairDescription }, note })
+  }
+  return examples.length ? examples : null
+}
+
+function YakuHandExamplesDiagram({ examples }: { examples: YakuHandExample[] }) {
+  return <figure className="mahjong-diagram mahjong-yaku-examples">
+    <figcaption>役の牌姿例</figcaption>
+    {examples.map((example) => <section className="mahjong-yaku-example" key={example.title}>
+      <h4>{example.title}</h4>
+      <ol className="mahjong-hand-groups">
+        {example.groups.map((group, index) => <li className="mahjong-hand-group" key={group.name + '-' + index}>
+          <span className="mahjong-group-name">{group.name}</span>
+          <TileFaces tiles={group.tiles} />
+          <span className="mahjong-group-description">{group.description}</span>
+        </li>)}
+      </ol>
+      <div className="mahjong-pair-group">
+        <span className="mahjong-group-name">{example.pair.name}</span>
+        <TileFaces tiles={example.pair.tiles} />
+        <span className="mahjong-group-description">{example.pair.description}</span>
+      </div>
+      <p className="mahjong-diagram-note">{example.note}</p>
+    </section>)}
+  </figure>
+}
+
 function DiagramFallback({ extension }: { extension: LessonExtension }) {
   return <aside className="course-extension-fallback">{extension.altText}</aside>
 }
@@ -123,6 +178,11 @@ export default function MahjongTileDiagrams({ extension }: { extension: LessonEx
   if (extension.rendererId === 'mahjong.winning-hand') {
     const hand = readHandGroups(extension)
     return hand ? <WinningHandDiagram groups={hand.groups} pair={hand.pair} /> : <DiagramFallback extension={extension} />
+  }
+
+  if (extension.rendererId === 'mahjong.yaku-hands') {
+    const examples = readYakuHandExamples(extension)
+    return examples ? <YakuHandExamplesDiagram examples={examples} /> : <DiagramFallback extension={extension} />
   }
 
   return <DiagramFallback extension={extension} />
