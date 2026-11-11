@@ -147,9 +147,23 @@ export const mahjongBeginnerPack: LearningPack = {
             { type: 'term', reference: { id: 'mahjong:term-187', label: 'テンパイ', shortDefinition: 'あと1枚、必要な牌が加わればアガリになる状態です。' } },
             { type: 'text', text: 'したときに、鳴いていない状態を保ち、リーチを宣言して成立する役です。宣言には通常1000点を出します。' },
           ] },
-          { type: 'callout', title: '立直の成立例', segments: [
-            { type: 'text', text: '二萬・三萬・四萬／四筒・五筒・六筒／六索・七索・八索／白・白・白／二筒・二筒。鳴かずにテンパイしてリーチを宣言し、その後にこの形でアガれば立直が役になります。完成した形だけでは、宣言したかどうかは分からない点に注意しましょう。' },
-          ] },
+          {
+            type: 'extension',
+            rendererId: 'mahjong.yaku-hands',
+            schemaVersion: 1,
+            altText: '立直の成立例です。順子3組、白の刻子、二筒の雀頭でできた手牌。',
+            payload: { examples: [{
+              title: '立直の成立例',
+              groups: [
+                { name: '順子', tiles: ['二萬', '三萬', '四萬'], description: '萬子の数字が続く3枚' },
+                { name: '順子', tiles: ['四筒', '五筒', '六筒'], description: '筒子の数字が続く3枚' },
+                { name: '順子', tiles: ['六索', '七索', '八索'], description: '索子の数字が続く3枚' },
+                { name: '刻子', tiles: ['白', '白', '白'], description: '同じ牌を3枚' },
+              ],
+              pair: { name: '雀頭', tiles: ['二筒', '二筒'], description: '同じ牌2枚' },
+              note: 'この完成形は例です。立直には、鳴かずにテンパイして宣言することも必要です。',
+            }] },
+          },
           { type: 'callout', title: '立直の注意例', segments: [
             { type: 'text', text: '他の人の捨て牌を使ってチーやポンをした手では、立直できません。牌姿が同じように見えても、鳴いているかどうかが条件になります。' },
           ] },
@@ -160,23 +174,79 @@ export const mahjongBeginnerPack: LearningPack = {
             { type: 'term', reference: { id: 'mahjong:term-081', label: '字牌', shortDefinition: '東南西北と白發中の牌です。' } },
             { type: 'text', text: 'を使いません。ここでは、鳴いても断幺九が認められる一般的なルールを前提にします。' },
           ] },
-          { type: 'callout', title: '断幺九の成立例', segments: [
-            { type: 'text', text: '二萬・三萬・四萬／五萬・六萬・七萬／三筒・四筒・五筒／六索・七索・八索／五筒・五筒。すべて2〜8の数牌なので断幺九です。' },
-          ] },
-          { type: 'callout', title: '断幺九の注意例', segments: [
-            { type: 'text', text: '一萬・二萬・三萬／五萬・六萬・七萬／三筒・四筒・五筒／六索・七索・八索／五筒・五筒。この形には一萬があるため、断幺九にはなりません。白・發・中や東南西北が含まれる場合も同じです。' },
-          ] },
+          {
+            type: 'extension',
+            rendererId: 'mahjong.yaku-hands',
+            schemaVersion: 1,
+            altText: '断幺九の成立例です。すべて2から8の数牌です。',
+            payload: { examples: [{
+              title: '断幺九の成立例',
+              groups: [
+                { name: '順子', tiles: ['二萬', '三萬', '四萬'], description: '2〜8の数牌' },
+                { name: '順子', tiles: ['五萬', '六萬', '七萬'], description: '2〜8の数牌' },
+                { name: '順子', tiles: ['三筒', '四筒', '五筒'], description: '2〜8の数牌' },
+                { name: '順子', tiles: ['六索', '七索', '八索'], description: '2〜8の数牌' },
+              ],
+              pair: { name: '雀頭', tiles: ['五筒', '五筒'], description: '同じ牌2枚' },
+              note: 'すべて2〜8の数牌なので、断幺九の条件に合います。',
+            }] },
+          },
+          {
+            type: 'extension',
+            rendererId: 'mahjong.yaku-hands',
+            schemaVersion: 1,
+            altText: '断幺九にならない注意例です。一萬が含まれています。',
+            payload: { examples: [{
+              title: '断幺九の注意例',
+              groups: [
+                { name: '順子', tiles: ['一萬', '二萬', '三萬'], description: '一萬を含む' },
+                { name: '順子', tiles: ['五萬', '六萬', '七萬'], description: '2〜8の数牌' },
+                { name: '順子', tiles: ['三筒', '四筒', '五筒'], description: '2〜8の数牌' },
+                { name: '順子', tiles: ['六索', '七索', '八索'], description: '2〜8の数牌' },
+              ],
+              pair: { name: '雀頭', tiles: ['五筒', '五筒'], description: '同じ牌2枚' },
+              note: '一萬が含まれるため、形がそろっていても断幺九にはなりません。',
+            }] },
+          },
           { type: 'paragraph', segments: [
             { type: 'text', text: '役牌（翻牌）は、白・發・中、またはその局で自分の風・場の風にあたる風牌を3枚そろえる役です。用語辞典では' },
             { type: 'term', reference: { id: 'mahjong:term-105', label: '翻牌', shortDefinition: '三元牌や自風・場風を3枚そろえると役になる牌です。' } },
             { type: 'text', text: 'として説明しています。' },
           ] },
-          { type: 'callout', title: '役牌の成立例', segments: [
-            { type: 'text', text: '白・白・白／二萬・三萬・四萬／三筒・四筒・五筒／六索・七索・八索／二筒・二筒。白の3枚組があるため、白が役になります。役牌は鳴いて作っても成立します。' },
-          ] },
-          { type: 'callout', title: '役牌の注意例', segments: [
-            { type: 'text', text: '南場で自分が西家のとき、東・東・東は役牌になりません。風牌は、東南西北というだけで役になるのではなく、自分の風か場の風と一致する必要があります。なお、白・發・中はいつでも役牌です。' },
-          ] },
+          {
+            type: 'extension',
+            rendererId: 'mahjong.yaku-hands',
+            schemaVersion: 1,
+            altText: '役牌の成立例です。白を3枚そろえています。',
+            payload: { examples: [{
+              title: '役牌の成立例',
+              groups: [
+                { name: '刻子', tiles: ['白', '白', '白'], description: '三元牌の白' },
+                { name: '順子', tiles: ['二萬', '三萬', '四萬'], description: '萬子の数字が続く3枚' },
+                { name: '順子', tiles: ['三筒', '四筒', '五筒'], description: '筒子の数字が続く3枚' },
+                { name: '順子', tiles: ['六索', '七索', '八索'], description: '索子の数字が続く3枚' },
+              ],
+              pair: { name: '雀頭', tiles: ['二筒', '二筒'], description: '同じ牌2枚' },
+              note: '白・發・中は、どの局でも役牌です。役牌は鳴いて作っても成立します。',
+            }] },
+          },
+          {
+            type: 'extension',
+            rendererId: 'mahjong.yaku-hands',
+            schemaVersion: 1,
+            altText: '役牌にならない注意例です。南場の西家では東は自風・場風ではありません。',
+            payload: { examples: [{
+              title: '役牌の注意例',
+              groups: [
+                { name: '刻子', tiles: ['東', '東', '東'], description: '風牌の東' },
+                { name: '順子', tiles: ['二萬', '三萬', '四萬'], description: '萬子の数字が続く3枚' },
+                { name: '順子', tiles: ['三筒', '四筒', '五筒'], description: '筒子の数字が続く3枚' },
+                { name: '順子', tiles: ['六索', '七索', '八索'], description: '索子の数字が続く3枚' },
+              ],
+              pair: { name: '雀頭', tiles: ['二筒', '二筒'], description: '同じ牌2枚' },
+              note: '南場で自分が西家なら東は自風でも場風でもありません。東の刻子だけでは役になりません。',
+            }] },
+          },
           { type: 'paragraph', segments: [
             { type: 'text', text: '3つの役の詳しい項目は、' },
             { type: 'term', reference: { id: 'mahjong:yaku-001', label: '立直', shortDefinition: '鳴かずにテンパイし、リーチを宣言して成立する役です。' } },
