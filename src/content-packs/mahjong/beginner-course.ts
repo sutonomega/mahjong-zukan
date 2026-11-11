@@ -48,18 +48,76 @@ export const mahjongBeginnerPack: LearningPack = {
       },
       {
         id: 'turns-and-discard',
-        title: '順番に牌を引いて、1枚捨てる',
-        summary: '自分の番に何をするのかを見てみます。',
+        title: '局の始まりからアガリまで',
+        summary: '牌が配られてから、アガリまたは流局になるまでを順に追います。',
         blocks: [
           { type: 'paragraph', segments: [
-            { type: 'text', text: 'ゲームが始まると、各プレイヤーは最初の' },
-            { type: 'term', reference: { id: 'mahjong:term-067', label: '配牌', shortDefinition: 'ゲーム開始時に各プレイヤーへ配られる牌です。' } },
-            { type: 'text', text: 'を受け取ります。その後は順番に牌を引き、手牌から1枚を' },
-            { type: 'term', reference: { id: 'mahjong:term-117', label: '打牌', shortDefinition: '手牌から1枚選んで場に出すことです。' } },
-            { type: 'text', text: 'します。これを繰り返しながら、アガリに近づく牌を残していきます。' },
+            { type: 'text', text: '麻雀は、短いまとまりの' },
+            { type: 'term', reference: { id: 'mahjong:term-001', label: '局', shortDefinition: '配牌からアガリまたは流局までのゲーム単位です。' } },
+            { type: 'text', text: 'を繰り返します。局の最初に牌を配ることを' },
+            { type: 'term', reference: { id: 'mahjong:term-067', label: '配牌', shortDefinition: '局の最初に各プレイヤーへ牌を配ることです。親は14枚、他の人は13枚です。' } },
+            { type: 'text', text: 'といいます。' },
           ] },
-          { type: 'callout', title: '覚えておこう', segments: [
-            { type: 'text', text: '「引く」「1枚選んで捨てる」を繰り返すのが、自分の番の基本です。' },
+          { type: 'steps', steps: [
+            {
+              title: '牌が配られ、親から始まる',
+              segments: [
+                { type: 'text', text: '局が始まると、' },
+                { type: 'term', reference: { id: 'mahjong:term-031', label: '親', shortDefinition: 'その局で最初に打ち始めるプレイヤーです。' } },
+                { type: 'text', text: 'は14枚、他のプレイヤーは13枚を受け取ります。親は最初のツモをせず、1枚捨てて局を始めます。' },
+              ],
+            },
+            {
+              title: '順番に1枚引いて、1枚捨てる',
+              segments: [
+                { type: 'text', text: '通常は自分の番に牌を1枚' },
+                { type: 'term', reference: { id: 'mahjong:term-116', label: 'ツモ（自摸）', shortDefinition: '順番に牌山から牌を1枚引くことです。' } },
+                { type: 'text', text: 'り、手牌から1枚' },
+                { type: 'term', reference: { id: 'mahjong:term-117', label: '打牌', shortDefinition: '手牌から1枚選んで場に出すことです。' } },
+                { type: 'text', text: 'します。' },
+              ],
+            },
+            {
+              title: '捨て牌を使って組み合わせることもある',
+              segments: [
+                { type: 'text', text: '他の人が捨てた牌を使って' },
+                { type: 'term', reference: { id: 'mahjong:term-121', label: 'チー', shortDefinition: '上家が捨てた牌を使い、数字の続く3枚組を作ることです。' } },
+                { type: 'text', text: 'や' },
+                { type: 'term', reference: { id: 'mahjong:term-120', label: 'ポン', shortDefinition: '他の人の捨て牌を使い、同じ牌3枚の組を作ることです。' } },
+                { type: 'text', text: 'をすることを鳴きといいます。鳴きの細かな順番や種類は、後で覚えれば大丈夫です。' },
+              ],
+            },
+            {
+              title: 'アガリまであと1枚になる',
+              segments: [
+                { type: 'text', text: '必要な牌があと1枚でそろう状態を' },
+                { type: 'term', reference: { id: 'mahjong:term-187', label: 'テンパイ（聴牌）', shortDefinition: 'あと1枚必要な牌が加わればアガリになる状態です。' } },
+                { type: 'text', text: 'といいます。' },
+              ],
+            },
+            {
+              title: '形と役がそろったらアガリ',
+              segments: [
+                { type: 'text', text: '必要な形と' },
+                { type: 'term', reference: { id: 'mahjong:yaku-001', label: '役（立直の例）', shortDefinition: '立直は、門前でテンパイしたときに宣言できる役です。' } },
+                { type: 'text', text: 'がそろったらアガれます。自分で必要な牌を引く' },
+                { type: 'term', reference: { id: 'mahjong:term-116', label: 'ツモ', shortDefinition: '自分の番に牌を引くことです。' } },
+                { type: 'text', text: 'と、他の人の捨て牌でアガる' },
+                { type: 'term', reference: { id: 'mahjong:term-170', label: 'ロン', shortDefinition: '他の人の捨て牌でアガることです。' } },
+                { type: 'text', text: 'があります。' },
+              ],
+            },
+            {
+              title: '誰もアガらなければ流局',
+              segments: [
+                { type: 'text', text: '山の牌がなくなるまで誰もアガらなかった場合は' },
+                { type: 'term', reference: { id: 'mahjong:term-002', label: '流局', shortDefinition: 'その局で誰もアガらずに局が終わることです。' } },
+                { type: 'text', text: 'になり、次の局へ進みます。' },
+              ],
+            },
+          ] },
+          { type: 'callout', title: 'まずは大まかな流れをつかもう', segments: [
+            { type: 'text', text: '配牌のあと、順番にツモと打牌を繰り返し、アガリか流局で局が終わります。鳴きの優先順位、点数計算、親の交代などは別のレッスンで学びます。' },
           ] },
         ],
       },
