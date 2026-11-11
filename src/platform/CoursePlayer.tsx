@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { ArrowLeft, ArrowRight, BookOpen, Check, RotateCcw } from 'lucide-react'
 import type { LearningCourse, LearningLesson, LearningPack, LessonSegment, GlossaryReference } from '../platform/contracts'
 
@@ -11,6 +11,7 @@ type CoursePlayerProps = {
   pack: LearningPack
   course: LearningCourse
   onOpenTerm: (reference: GlossaryReference) => void
+  renderExtension?: (extension: LessonExtension) => ReactNode
 }
 
 function readProgress(key: string, course: LearningCourse): SavedProgress {
@@ -44,7 +45,7 @@ function LessonSegments({ segments, onOpenTerm }: { segments: LessonSegment[]; o
       >{segment.reference.label}</button>)}</>
 }
 
-export default function CoursePlayer({ pack, course, onOpenTerm }: CoursePlayerProps) {
+export default function CoursePlayer({ pack, course, onOpenTerm, renderExtension }: CoursePlayerProps) {
   const progressKey = 'learning-platform:' + pack.packId + ':' + course.id + ':v1'
   const [progress, setProgress] = useState(() => readProgress(progressKey, course))
   const lessons = course.lessons
@@ -127,12 +128,21 @@ export default function CoursePlayer({ pack, course, onOpenTerm }: CoursePlayerP
         <h2>{activeLesson.title}</h2>
         <p className="course-lesson-summary">{activeLesson.summary}</p>
         <div className="course-lesson-body">
-          {activeLesson.blocks.map((block, index) => block.type === 'paragraph'
-            ? <p key={activeLesson.id + '-block-' + index}><LessonSegments segments={block.segments} onOpenTerm={onOpenTerm} /></p>
-            : <aside className="course-callout" key={activeLesson.id + '-block-' + index}>
+          {activeLesson.blocks.map((block, index) => {
+            const key = activeLesson.id + '-block-' + index
+            if (block.type === 'paragraph') {
+              return <p key={key}><LessonSegments segments={block.segments} onOpenTerm={onOpenTerm} /></p>
+            }
+            if (block.type === 'callout') {
+              return <aside className="course-callout" key={key}>
                 <strong>{block.title}</strong>
                 <p><LessonSegments segments={block.segments} onOpenTerm={onOpenTerm} /></p>
-              </aside>)}
+              </aside>
+            }
+            return <div className="course-extension" key={key}>
+              {renderExtension?.(block) ?? <aside className="course-extension-fallback">{block.altText}</aside>}
+            </div>
+          })}
         </div>
         <div className="course-lesson-actions">
           <button className="course-previous-button" disabled={activeIndex === 0} onClick={() => selectLesson(lessons[activeIndex - 1])} type="button"><ArrowLeft size={16} />前のレッスン</button>

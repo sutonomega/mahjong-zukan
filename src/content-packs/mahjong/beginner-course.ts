@@ -18,12 +18,29 @@ export const mahjongBeginnerPack: LearningPack = {
         summary: '麻雀で使う牌と、自分の前に並べる牌を知ります。',
         blocks: [
           { type: 'paragraph', segments: [
-            { type: 'text', text: '麻雀では、絵柄のついた牌を組み合わせてアガリを目指します。自分が持っている牌のまとまりを' },
+            { type: 'text', text: '麻雀では、絵柄のついた牌を組み合わせてアガリを目指します。数字の並ぶ' },
+            { type: 'term', reference: { id: 'mahjong:term-082', label: '数牌', shortDefinition: '萬子・筒子・索子の3種類がある、数字の牌です。' } },
+            { type: 'text', text: 'と、東や白のような' },
+            { type: 'term', reference: { id: 'mahjong:term-081', label: '字牌', shortDefinition: '東南西北の風牌と、白發中の三元牌です。' } },
+            { type: 'text', text: 'があります。自分が持っている牌のまとまりを' },
             { type: 'term', reference: { id: 'mahjong:term-066', label: '牌', shortDefinition: '麻雀で使う、絵柄や数字が描かれた道具です。' } },
             { type: 'text', text: 'といい、自分の前にある牌を' },
             { type: 'term', reference: { id: 'mahjong:term-068', label: '手牌', shortDefinition: '自分の手元でそろえていく牌の集まりです。' } },
             { type: 'text', text: 'といいます。' },
           ] },
+          {
+            type: 'extension',
+            rendererId: 'mahjong.tile-families',
+            schemaVersion: 1,
+            altText: '数牌には萬子・筒子・索子があり、字牌には東南西北の風牌と白發中の三元牌があります。',
+            payload: { families: [
+              { category: '数牌', name: '萬子', reading: 'マンズ', examples: ['一萬', '五萬', '九萬'], description: '萬の字がついた1から9までの牌です。' },
+              { category: '数牌', name: '筒子', reading: 'ピンズ', examples: ['一筒', '五筒', '九筒'], description: '丸い模様の1から9までの牌です。' },
+              { category: '数牌', name: '索子', reading: 'ソーズ', examples: ['一索', '五索', '九索'], description: '竹の模様の1から9までの牌です。' },
+              { category: '字牌', name: '風牌', reading: 'かぜはい', examples: ['東', '南', '西', '北'], description: '東・南・西・北の4種類です。' },
+              { category: '字牌', name: '三元牌', reading: 'さんげんぱい', examples: ['白', '發', '中'], description: '白・發・中の3種類です。' },
+            ] },
+          },
           { type: 'callout', title: 'このレッスンのポイント', segments: [
             { type: 'text', text: '最初は牌の名前を全部覚えなくても大丈夫。まずは「牌を集めて形を作るゲーム」とつかめば十分です。' },
           ] },
@@ -77,6 +94,21 @@ export const mahjongBeginnerPack: LearningPack = {
             { type: 'term', reference: { id: 'mahjong:term-141', label: '雀頭', shortDefinition: 'アガリの形に使う、同じ牌2枚の組です。' } },
             { type: 'text', text: 'です。' },
           ] },
+          {
+            type: 'extension',
+            rendererId: 'mahjong.winning-hand',
+            schemaVersion: 1,
+            altText: 'アガリの基本形の例です。順子の一萬・二萬・三萬、四筒・五筒・六筒、二索・三索・四索、白の刻子、東2枚の雀頭でできています。',
+            payload: {
+              groups: [
+                { name: '順子', tiles: ['一萬', '二萬', '三萬'], description: '萬子の数字が続く3枚' },
+                { name: '順子', tiles: ['四筒', '五筒', '六筒'], description: '筒子の数字が続く3枚' },
+                { name: '順子', tiles: ['二索', '三索', '四索'], description: '索子の数字が続く3枚' },
+                { name: '刻子', tiles: ['白', '白', '白'], description: '同じ牌を3枚' },
+              ],
+              pair: { name: '雀頭', tiles: ['東', '東'], description: '同じ牌を2枚' },
+            },
+          },
           { type: 'paragraph', segments: [
             { type: 'text', text: '必要な形と役がそろってアガることを' },
             { type: 'term', reference: { id: 'mahjong:term-155', label: '和了（アガリ）', shortDefinition: '決められた条件を満たして、局に勝つことです。' } },
