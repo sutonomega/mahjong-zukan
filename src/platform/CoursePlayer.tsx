@@ -139,6 +139,17 @@ export default function CoursePlayer({ pack, course, onOpenTerm, renderExtension
                 <p><LessonSegments segments={block.segments} onOpenTerm={onOpenTerm} /></p>
               </aside>
             }
+            if (block.type === 'steps') {
+              return <ol className="course-steps-list" key={key}>
+                {block.steps.map((step, stepIndex) => <li className="course-flow-step" key={activeLesson.id + '-step-' + stepIndex}>
+                  <span className="course-flow-number">{String(stepIndex + 1).padStart(2, '0')}</span>
+                  <div className="course-flow-copy">
+                    <h3>{step.title}</h3>
+                    <p><LessonSegments segments={step.segments} onOpenTerm={onOpenTerm} /></p>
+                  </div>
+                </li>)}
+              </ol>
+            }
             return <div className="course-extension" key={key}>
               {renderExtension?.(block) ?? <aside className="course-extension-fallback">{block.altText}</aside>}
             </div>
