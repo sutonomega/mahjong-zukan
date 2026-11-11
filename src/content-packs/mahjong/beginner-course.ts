@@ -26,8 +26,11 @@ export const mahjongBeginnerPack: LearningPack = {
           ],
           correctOptionId: 'east',
           explanation: [
-            { type: 'text', text: '東は字牌です。五筒と二索は、数字が書かれた数牌です。' },
+            { type: 'text', text: '東は' },
             { type: 'term', reference: { id: 'mahjong:term-081', label: '字牌', shortDefinition: '東南西北と白發中の牌です。' } },
+            { type: 'text', text: 'です。五筒と二索は、数字が書かれた' },
+            { type: 'term', reference: { id: 'mahjong:term-082', label: '数牌', shortDefinition: '萬子・筒子・索子の3種類がある、数字の牌です。' } },
+            { type: 'text', text: 'です。' },
           ],
           reviewLessonId: 'tiles-and-hand',
           sources: [{
