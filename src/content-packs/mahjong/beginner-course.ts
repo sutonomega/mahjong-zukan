@@ -77,8 +77,8 @@ export const mahjongBeginnerPack: LearningPack = {
             { type: 'text', text: 'のあと、通常の自分の番で繰り返すことは何ですか？' },
           ],
           options: [
-            { id: 'discard-draw', segments: [{ type: 'text', text: '手牌から1枚捨ててから、牌を2枚引く' }] },
-            { id: 'draw-discard', segments: [{ type: 'text', text: '牌を1枚引き、手牌から1枚捨てる' }] },
+            { id: 'discard-draw', segments: [{ type: 'term', reference: { id: 'mahjong:term-068', label: '手牌', shortDefinition: '自分の手元でそろえていく牌の集まりです。' } }, { type: 'text', text: 'から1枚捨ててから、牌を2枚引く' }] },
+            { id: 'draw-discard', segments: [{ type: 'text', text: '牌を1枚引き、' }, { type: 'term', reference: { id: 'mahjong:term-068', label: '手牌', shortDefinition: '自分の手元でそろえていく牌の集まりです。' } }, { type: 'text', text: 'から1枚捨てる' }] },
             { id: 'draw-two', segments: [{ type: 'text', text: '牌を2枚引いて、そのまま次の人に渡す' }] },
           ],
           correctOptionId: 'draw-discard',
@@ -91,7 +91,9 @@ export const mahjongBeginnerPack: LearningPack = {
             { type: 'term', reference: { id: 'mahjong:term-068', label: '手牌', shortDefinition: '自分の手元でそろえていく牌の集まりです。' } },
             { type: 'text', text: 'から1枚選んで' },
             { type: 'term', reference: { id: 'mahjong:term-117', label: '打牌', shortDefinition: '手牌から1枚選んで場に出すことです。' } },
-            { type: 'text', text: 'します。親の最初の打牌など、局の始まりには特別な順序があります。' },
+            { type: 'text', text: 'します。親の最初の' },
+            { type: 'term', reference: { id: 'mahjong:term-117', label: '打牌', shortDefinition: '手牌から1枚選んで場に出すことです。' } },
+            { type: 'text', text: 'など、局の始まりには特別な順序があります。' },
           ],
           reviewLessonId: 'turns-and-discard',
           sources: [{
@@ -108,9 +110,9 @@ export const mahjongBeginnerPack: LearningPack = {
             { type: 'text', text: 'の条件はどれですか？' },
           ],
           options: [
-            { id: 'terminals-and-honors', segments: [{ type: 'text', text: '1・9の数牌と字牌だけで手牌を作る' }] },
+            { id: 'terminals-and-honors', segments: [{ type: 'text', text: '1・9の' }, { type: 'term', reference: { id: 'mahjong:term-082', label: '数牌', shortDefinition: '萬子・筒子・索子の3種類がある、数字の牌です。' } }, { type: 'text', text: 'と' }, { type: 'term', reference: { id: 'mahjong:term-081', label: '字牌', shortDefinition: '東南西北と白發中の牌です。' } }, { type: 'text', text: 'だけで' }, { type: 'term', reference: { id: 'mahjong:term-068', label: '手牌', shortDefinition: '自分の手元でそろえていく牌の集まりです。' } }, { type: 'text', text: 'を作る' }] },
             { id: 'honors-in-triplets', segments: [{ type: 'text', text: '東南西北をそれぞれ3枚ずつそろえる' }] },
-            { id: 'middle-number-tiles', segments: [{ type: 'text', text: '2〜8の数牌だけで手牌を作る' }] },
+            { id: 'middle-number-tiles', segments: [{ type: 'text', text: '2〜8の' }, { type: 'term', reference: { id: 'mahjong:term-082', label: '数牌', shortDefinition: '萬子・筒子・索子の3種類がある、数字の牌です。' } }, { type: 'text', text: 'だけで' }, { type: 'term', reference: { id: 'mahjong:term-068', label: '手牌', shortDefinition: '自分の手元でそろえていく牌の集まりです。' } }, { type: 'text', text: 'を作る' }] },
           ],
           correctOptionId: 'middle-number-tiles',
           explanation: [
