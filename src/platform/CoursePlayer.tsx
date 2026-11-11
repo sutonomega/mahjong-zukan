@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { ArrowLeft, ArrowRight, BookOpen, Check, RotateCcw } from 'lucide-react'
 import type { LearningCourse, LearningLesson, LearningPack, LessonSegment, GlossaryReference, LessonExtension } from '../platform/contracts'
+import LearningQuizPlayer from './LearningQuizPlayer'
 
 type SavedProgress = {
   completedLessonIds: string[]
@@ -129,6 +130,15 @@ export default function CoursePlayer({ pack, course, onOpenTerm, renderExtension
           <span><strong>{lesson.title}</strong><small>{lesson.summary}</small></span>
         </button>)}
         {completedCount > 0 && <button className="course-reset-button" onClick={resetProgress} type="button"><RotateCcw size={13} />進捗をリセット</button>}
+        {course.quizzes?.map((quiz) => <button
+          className="course-quiz-outline-item"
+          key={quiz.id}
+          onClick={() => document.getElementById('course-quiz-' + quiz.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+          type="button"
+        >
+          <span className="course-outline-number">?</span>
+          <span><strong>{quiz.title}</strong><small>レッスンの内容を確認</small></span>
+        </button>)}
       </nav>
 
       <article className="course-lesson">
@@ -174,6 +184,15 @@ export default function CoursePlayer({ pack, course, onOpenTerm, renderExtension
         </div>
       </article>
     </div>
+    {course.quizzes?.map((quiz) => <LearningQuizPlayer
+      key={quiz.id}
+      quiz={quiz}
+      onOpenTerm={onOpenTerm}
+      onOpenLesson={(lessonId) => {
+        const lesson = lessons.find((item) => item.id === lessonId)
+        if (lesson) selectLesson(lesson)
+      }}
+    />)}
     <p className="course-term-hint">下線のある用語は、ポイントすると短い説明が見られます。選ぶと図鑑の詳しい説明を開きます。</p>
   </main>
 }
