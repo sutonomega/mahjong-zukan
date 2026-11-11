@@ -38,7 +38,7 @@ export const mahjongBeginnerPack: LearningPack = {
             { type: 'text', text: 'ゲームが始まると、各プレイヤーは最初の' },
             { type: 'term', reference: { id: 'mahjong:term-067', label: '配牌', shortDefinition: 'ゲーム開始時に各プレイヤーへ配られる牌です。' } },
             { type: 'text', text: 'を受け取ります。その後は順番に牌を引き、手牌から1枚を' },
-            { type: 'term', reference: { id: 'mahjong:term-118', label: '捨てる', shortDefinition: '手牌から選んだ牌を場に出すことです。' } },
+            { type: 'term', reference: { id: 'mahjong:term-117', label: '打牌', shortDefinition: '手牌から1枚選んで場に出すことです。' } },
             { type: 'text', text: 'ことを繰り返します。' },
           ] },
           { type: 'callout', title: '覚えておこう', segments: [
@@ -58,7 +58,7 @@ export const mahjongBeginnerPack: LearningPack = {
           ] },
           { type: 'paragraph', segments: [
             { type: 'text', text: 'ただし、形がそろうだけではアガれないルールがあります。アガリには、決められた条件である' },
-            { type: 'term', reference: { id: 'mahjong:term-052', label: '役', shortDefinition: 'アガリを成立させるために必要な条件や組み合わせです。' } },
+            { type: 'term', reference: { id: 'mahjong:term-175', label: '手役', shortDefinition: '手牌の組み合わせなどによって成立する、アガリの条件です。' } },
             { type: 'text', text: 'が必要です。次のコースでは、まず覚えやすい役から見ていきましょう。' },
           ] },
         ],
