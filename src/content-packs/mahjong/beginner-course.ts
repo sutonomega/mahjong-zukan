@@ -48,7 +48,7 @@ export const mahjongBeginnerPack: LearningPack = {
           id: 'winning-shape',
           prompt: [
             { type: 'text', text: '一般的な' },
-            { type: 'term', reference: { id: 'mahjong:term-155', label: 'アガリ', shortDefinition: '決められた条件を満たして、局に勝つことです。' } },
+            { type: 'term', reference: { id: 'mahjong:term-155', label: '和了（アガリ）', shortDefinition: '決められた条件を満たして、局に勝つことです。' } },
             { type: 'text', text: 'の基本形はどれですか？' },
           ],
           options: [
@@ -86,7 +86,7 @@ export const mahjongBeginnerPack: LearningPack = {
             { type: 'text', text: '通常は' },
             { type: 'term', reference: { id: 'mahjong:term-070', label: '牌山', shortDefinition: '局の進行中に、順番に牌を引いていく山です。' } },
             { type: 'text', text: 'から1枚引く' },
-            { type: 'term', reference: { id: 'mahjong:term-116', label: 'ツモ', shortDefinition: '自分の番に牌を1枚引くことです。' } },
+            { type: 'term', reference: { id: 'mahjong:term-116', label: '自摸（ツモ）', shortDefinition: '自分の番に牌を1枚引くことです。' } },
             { type: 'text', text: 'のあと、' },
             { type: 'term', reference: { id: 'mahjong:term-068', label: '手牌', shortDefinition: '自分の手元でそろえていく牌の集まりです。' } },
             { type: 'text', text: 'から1枚選んで' },
@@ -116,7 +116,7 @@ export const mahjongBeginnerPack: LearningPack = {
           ],
           correctOptionId: 'middle-number-tiles',
           explanation: [
-            { type: 'term', reference: { id: 'mahjong:yaku-004', label: '断幺九', shortDefinition: '2〜8の数牌だけで手牌を作る役です。' } },
+            { type: 'term', reference: { id: 'mahjong:yaku-004', label: '断幺九（タンヤオ）', shortDefinition: '2〜8の数牌だけで手牌を作る役です。' } },
             { type: 'text', text: 'は、2〜8の' },
             { type: 'term', reference: { id: 'mahjong:term-082', label: '数牌', shortDefinition: '萬子・筒子・索子の3種類がある、数字の牌です。' } },
             { type: 'text', text: 'だけで' },
@@ -209,7 +209,7 @@ export const mahjongBeginnerPack: LearningPack = {
               title: '順番に1枚引いて、1枚捨てる',
               segments: [
                 { type: 'text', text: '通常は自分の番に牌を1枚' },
-                { type: 'term', reference: { id: 'mahjong:term-116', label: 'ツモ（自摸）', shortDefinition: '順番に牌山から牌を1枚引くことです。' } },
+                { type: 'term', reference: { id: 'mahjong:term-116', label: '自摸（ツモ）', shortDefinition: '順番に牌山から牌を1枚引くことです。' } },
                 { type: 'text', text: 'り、手牌から1枚' },
                 { type: 'term', reference: { id: 'mahjong:term-117', label: '打牌', shortDefinition: '手牌から1枚選んで場に出すことです。' } },
                 { type: 'text', text: 'します。' },
@@ -229,7 +229,7 @@ export const mahjongBeginnerPack: LearningPack = {
               title: 'アガリまであと1枚になる',
               segments: [
                 { type: 'text', text: '必要な牌があと1枚でそろう状態を' },
-                { type: 'term', reference: { id: 'mahjong:term-187', label: 'テンパイ（聴牌）', shortDefinition: 'あと1枚必要な牌が加わればアガリになる状態です。' } },
+                { type: 'term', reference: { id: 'mahjong:term-187', label: '聴牌（テンパイ）', shortDefinition: 'あと1枚必要な牌が加わればアガリになる状態です。' } },
                 { type: 'text', text: 'といいます。' },
               ],
             },
@@ -237,9 +237,9 @@ export const mahjongBeginnerPack: LearningPack = {
               title: '形と役がそろったらアガリ',
               segments: [
                 { type: 'text', text: '必要な形と' },
-                { type: 'term', reference: { id: 'mahjong:yaku-001', label: '役（立直の例）', shortDefinition: '立直は、門前でテンパイしたときに宣言できる役です。' } },
+                { type: 'term', reference: { id: 'mahjong:term-175', label: '手役', shortDefinition: '和了した手に成立している役のことです。ドラとは区別します。' } },
                 { type: 'text', text: 'がそろったらアガれます。自分で必要な牌を引く' },
-                { type: 'term', reference: { id: 'mahjong:term-116', label: 'ツモ', shortDefinition: '自分の番に牌を引くことです。' } },
+                { type: 'term', reference: { id: 'mahjong:term-116', label: '自摸（ツモ）', shortDefinition: '自分の番に牌を引くことです。' } },
                 { type: 'text', text: 'と、他の人の捨て牌でアガる' },
                 { type: 'term', reference: { id: 'mahjong:term-170', label: 'ロン', shortDefinition: '他の人の捨て牌でアガることです。' } },
                 { type: 'text', text: 'があります。' },
@@ -347,7 +347,8 @@ export const mahjongBeginnerPack: LearningPack = {
             { type: 'text', text: '他の人の捨て牌を使ってチーやポンをした手では、立直できません。牌姿が同じように見えても、鳴いているかどうかが条件になります。' },
           ] },
           { type: 'paragraph', segments: [
-            { type: 'text', text: '断幺九（タンヤオ）は、' },
+            { type: 'term', reference: { id: 'mahjong:yaku-004', label: '断幺九（タンヤオ）', shortDefinition: '2〜8の数牌だけで手牌を作る役です。' } },
+            { type: 'text', text: 'は、' },
             { type: 'term', reference: { id: 'mahjong:term-082', label: '数牌', shortDefinition: '萬子・筒子・索子の3種類がある数字の牌です。' } },
             { type: 'text', text: 'の2から8だけで手牌を作る役です。1・9や' },
             { type: 'term', reference: { id: 'mahjong:term-081', label: '字牌', shortDefinition: '東南西北と白發中の牌です。' } },
@@ -430,13 +431,13 @@ export const mahjongBeginnerPack: LearningPack = {
           },
           { type: 'paragraph', segments: [
             { type: 'text', text: '3つの役の詳しい項目は、' },
-            { type: 'term', reference: { id: 'mahjong:yaku-001', label: '立直', shortDefinition: '鳴かずにテンパイし、リーチを宣言して成立する役です。' } },
+            { type: 'term', reference: { id: 'mahjong:yaku-001', label: '立直（リーチ）', shortDefinition: '鳴かずにテンパイし、リーチを宣言して成立する役です。' } },
             { type: 'text', text: '、' },
-            { type: 'term', reference: { id: 'mahjong:yaku-004', label: '断幺九', shortDefinition: '2〜8の数牌だけで手牌を作る役です。' } },
+            { type: 'term', reference: { id: 'mahjong:yaku-004', label: '断幺九（タンヤオ）', shortDefinition: '2〜8の数牌だけで手牌を作る役です。' } },
             { type: 'text', text: '、' },
             { type: 'term', reference: { id: 'mahjong:yaku-011', label: '白', shortDefinition: '白を3枚そろえると成立する役牌です。' } },
             { type: 'text', text: 'から確認できます。ルールによって' },
-            { type: 'term', reference: { id: 'mahjong:term-140', label: '喰いタン', shortDefinition: '鳴いて断幺九を成立させることです。認められるかはルールによります。' } },
+            { type: 'term', reference: { id: 'mahjong:term-140', label: '喰い断么九（喰いタン）', shortDefinition: '鳴いて断幺九を成立させることです。認められるかはルールによります。' } },
             { type: 'text', text: 'などの扱いが異なることがあるので、遊ぶ場のルールも確認しましょう。' },
           ] },
         ],
