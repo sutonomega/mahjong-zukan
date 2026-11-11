@@ -12,25 +12,6 @@ type CoursePlayerProps = {
   initialLessonId?: string
 }
 
-function readProgress(key: string, course: LearningCourse, initialLessonId?: string): SavedProgress {
-  const preferredLessonId = course.lessons.some((lesson) => lesson.id === initialLessonId) ? initialLessonId as string : undefined
-  const fallback = { completedLessonIds: [], activeLessonId: preferredLessonId ?? course.lessons[0]?.id ?? '' }
-  try {
-    const saved = JSON.parse(localStorage.getItem(key) ?? 'null') as Partial<SavedProgress> | null
-    if (!saved) return fallback
-    return {
-      completedLessonIds: Array.isArray(saved.completedLessonIds)
-        ? saved.completedLessonIds.filter((id): id is string => course.lessons.some((lesson) => lesson.id === id))
-        : [],
-      activeLessonId: preferredLessonId ?? (course.lessons.some((lesson) => lesson.id === saved.activeLessonId)
-        ? saved.activeLessonId as string
-        : fallback.activeLessonId),
-    }
-  } catch {
-    return fallback
-  }
-}
-
 function LessonSegments({ segments, onOpenTerm }: { segments: LessonSegment[]; onOpenTerm: CoursePlayerProps['onOpenTerm'] }) {
   return <>{segments.map((segment, index) => segment.type === 'text'
     ? <span key={index}>{segment.text}</span>
