@@ -124,17 +124,67 @@ export const mahjongBeginnerPack: LearningPack = {
       {
         id: 'first-yaku',
         title: 'アガリには「役」が必要',
-        summary: '形だけでなく、アガリを成立させる条件があることを知ります。',
+        summary: '立直・断幺九・役牌を、成立する牌姿と注意例で学びます。',
+        sources: [
+          {
+            id: 'saikouisen-riichi-regulation',
+            title: '最高位戦日本プロ麻雀協会 競技規定',
+            url: 'https://saikouisen.com/pdf/saikouisen_regulation_250825.pdf.pdf',
+            accessedOn: '2026-11-11',
+          },
+        ],
         blocks: [
           { type: 'paragraph', segments: [
             { type: 'text', text: '麻雀では、牌の形がそろっただけではアガれません。アガリには、決められた条件である' },
-            { type: 'term', reference: { id: 'mahjong:term-175', label: '手役', shortDefinition: '手牌の組み合わせなどによって成立する、アガリの条件です。' } },
-            { type: 'text', text: 'が少なくとも1つ必要です。' },
+            { type: 'term', reference: { id: 'mahjong:term-175', label: '役', shortDefinition: '手牌の組み合わせやアガリ方によって成立する、アガリの条件です。' } },
+            { type: 'text', text: 'が少なくとも1つ必要です。このレッスンでは、入門で覚えやすい3つを見ます。' },
+          ] },
+          { type: 'callout', title: '牌姿の読み方', segments: [
+            { type: 'text', text: '以下の例は、左から順子・刻子・雀頭などのまとまりを並べた完成形です。萬・筒・索は牌の種類を表し、同じ数字でも種類が違えば別の牌です。' },
           ] },
           { type: 'paragraph', segments: [
-            { type: 'text', text: '最初に覚える役の例が' },
-            { type: 'term', reference: { id: 'mahjong:yaku-001', label: '立直（リーチ）', shortDefinition: '門前でテンパイしたときに宣言できる役です。' } },
-            { type: 'text', text: 'です。まずは「アガリには役が必要」と覚えましょう。' },
+            { type: 'text', text: '立直（リーチ）は、' },
+            { type: 'term', reference: { id: 'mahjong:term-187', label: 'テンパイ', shortDefinition: 'あと1枚、必要な牌が加わればアガリになる状態です。' } },
+            { type: 'text', text: 'したときに、鳴いていない状態を保ち、リーチを宣言して成立する役です。宣言には通常1000点を出します。' },
+          ] },
+          { type: 'callout', title: '立直の成立例', segments: [
+            { type: 'text', text: '二萬・三萬・四萬／四筒・五筒・六筒／六索・七索・八索／白・白・白／二筒・二筒。鳴かずにテンパイしてリーチを宣言し、その後にこの形でアガれば立直が役になります。完成した形だけでは、宣言したかどうかは分からない点に注意しましょう。' },
+          ] },
+          { type: 'callout', title: '立直の注意例', segments: [
+            { type: 'text', text: '他の人の捨て牌を使ってチーやポンをした手では、立直できません。牌姿が同じように見えても、鳴いているかどうかが条件になります。' },
+          ] },
+          { type: 'paragraph', segments: [
+            { type: 'text', text: '断幺九（タンヤオ）は、' },
+            { type: 'term', reference: { id: 'mahjong:term-082', label: '数牌', shortDefinition: '萬子・筒子・索子の3種類がある数字の牌です。' } },
+            { type: 'text', text: 'の2から8だけで手牌を作る役です。1・9や' },
+            { type: 'term', reference: { id: 'mahjong:term-081', label: '字牌', shortDefinition: '東南西北と白發中の牌です。' } },
+            { type: 'text', text: 'を使いません。ここでは、鳴いても断幺九が認められる一般的なルールを前提にします。' },
+          ] },
+          { type: 'callout', title: '断幺九の成立例', segments: [
+            { type: 'text', text: '二萬・三萬・四萬／五萬・六萬・七萬／三筒・四筒・五筒／六索・七索・八索／五筒・五筒。すべて2〜8の数牌なので断幺九です。' },
+          ] },
+          { type: 'callout', title: '断幺九の注意例', segments: [
+            { type: 'text', text: '一萬・二萬・三萬／五萬・六萬・七萬／三筒・四筒・五筒／六索・七索・八索／五筒・五筒。この形には一萬があるため、断幺九にはなりません。白・發・中や東南西北が含まれる場合も同じです。' },
+          ] },
+          { type: 'paragraph', segments: [
+            { type: 'text', text: '役牌（翻牌）は、白・發・中、またはその局で自分の風・場の風にあたる風牌を3枚そろえる役です。用語辞典では' },
+            { type: 'term', reference: { id: 'mahjong:term-105', label: '翻牌', shortDefinition: '三元牌や自風・場風を3枚そろえると役になる牌です。' } },
+            { type: 'text', text: 'として説明しています。' },
+          ] },
+          { type: 'callout', title: '役牌の成立例', segments: [
+            { type: 'text', text: '白・白・白／二萬・三萬・四萬／三筒・四筒・五筒／六索・七索・八索／二筒・二筒。白の3枚組があるため、白が役になります。役牌は鳴いて作っても成立します。' },
+          ] },
+          { type: 'callout', title: '役牌の注意例', segments: [
+            { type: 'text', text: '南場で自分が西家のとき、東・東・東は役牌になりません。風牌は、東南西北というだけで役になるのではなく、自分の風か場の風と一致する必要があります。なお、白・發・中はいつでも役牌です。' },
+          ] },
+          { type: 'paragraph', segments: [
+            { type: 'text', text: '3つの役の詳しい項目は、' },
+            { type: 'term', reference: { id: 'mahjong:yaku-001', label: '立直', shortDefinition: '鳴かずにテンパイし、リーチを宣言して成立する役です。' } },
+            { type: 'text', text: '、' },
+            { type: 'term', reference: { id: 'mahjong:yaku-004', label: '断幺九', shortDefinition: '2〜8の数牌だけで手牌を作る役です。' } },
+            { type: 'text', text: '、' },
+            { type: 'term', reference: { id: 'mahjong:yaku-011', label: '白', shortDefinition: '白を3枚そろえると成立する役牌です。' } },
+            { type: 'text', text: 'から確認できます。ルールによって喰いタンなどの扱いが異なることがあるので、遊ぶ場のルールも確認しましょう。' },
           ] },
         ],
       },
