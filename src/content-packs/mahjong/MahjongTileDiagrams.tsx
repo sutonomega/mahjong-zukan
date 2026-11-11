@@ -23,8 +23,8 @@ function readString(value: JsonValue | undefined): string | null {
 }
 
 function readStringArray(value: JsonValue | undefined): string[] | null {
-  if (!Array.isArray(value) || !value.every((item) => typeof item === 'string')) return null
-  return value
+  if (!Array.isArray(value) || value.some((item) => typeof item !== 'string')) return null
+  return value as string[]
 }
 
 function readTileFamilies(extension: LessonExtension): TileFamily[] | null {
@@ -44,9 +44,13 @@ function readTileFamilies(extension: LessonExtension): TileFamily[] | null {
 }
 
 function readHandGroups(extension: LessonExtension): { groups: HandGroup[]; pair: HandGroup } | null {
-  if (!isRecord(extension.payload) || !Array.isArray(extension.payload.groups) || !isRecord(extension.payload.pair)) return null
+  const payload = extension.payload
+  if (!isRecord(payload)) return null
+  const groupValues = payload.groups
+  const pairValue = payload.pair
+  if (!Array.isArray(groupValues) || !isRecord(pairValue)) return null
   const groups: HandGroup[] = []
-  for (const item of extension.payload.groups) {
+  for (const item of groupValues) {
     if (!isRecord(item)) return null
     const name = readString(item.name)
     const tiles = readStringArray(item.tiles)
@@ -54,9 +58,9 @@ function readHandGroups(extension: LessonExtension): { groups: HandGroup[]; pair
     if (!name || !tiles || tiles.length !== 3 || !description) return null
     groups.push({ name, tiles, description })
   }
-  const pairName = readString(extension.payload.pair.name)
-  const pairTiles = readStringArray(extension.payload.pair.tiles)
-  const pairDescription = readString(extension.payload.pair.description)
+  const pairName = readString(pairValue.name)
+  const pairTiles = readStringArray(pairValue.tiles)
+  const pairDescription = readString(pairValue.description)
   if (!pairName || !pairTiles || pairTiles.length !== 2 || !pairDescription || groups.length !== 4) return null
   return { groups, pair: { name: pairName, tiles: pairTiles, description: pairDescription } }
 }
@@ -104,18 +108,22 @@ function WinningHandDiagram({ groups, pair }: { groups: HandGroup[]; pair: HandG
   </figure>
 }
 
+function DiagramFallback({ extension }: { extension: LessonExtension }) {
+  return <aside className="course-extension-fallback">{extension.altText}</aside>
+}
+
 export default function MahjongTileDiagrams({ extension }: { extension: LessonExtension }) {
-  if (extension.schemaVersion !== 1) return null
+  if (extension.schemaVersion !== 1) return <DiagramFallback extension={extension} />
 
   if (extension.rendererId === 'mahjong.tile-families') {
     const families = readTileFamilies(extension)
-    return families ? <TileFamiliesDiagram families={families} /> : null
+    return families ? <TileFamiliesDiagram families={families} /> : <DiagramFallback extension={extension} />
   }
 
   if (extension.rendererId === 'mahjong.winning-hand') {
     const hand = readHandGroups(extension)
-    return hand ? <WinningHandDiagram groups={hand.groups} pair={hand.pair} /> : null
+    return hand ? <WinningHandDiagram groups={hand.groups} pair={hand.pair} /> : <DiagramFallback extension={extension} />
   }
 
-  return null
+  return <DiagramFallback extension={extension} />
 }
