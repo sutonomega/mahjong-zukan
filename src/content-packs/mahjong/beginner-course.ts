@@ -18,7 +18,11 @@ export const mahjongBeginnerPack: LearningPack = {
       questions: [
         {
           id: 'tile-families',
-          prompt: [{ type: 'text', text: '次のうち、字牌はどれですか？' }],
+          prompt: [
+            { type: 'text', text: '次のうち、' },
+            { type: 'term', reference: { id: 'mahjong:term-081', label: '字牌', shortDefinition: '東南西北と白發中の牌です。' } },
+            { type: 'text', text: 'はどれですか？' },
+          ],
           options: [
             { id: 'east', segments: [{ type: 'text', text: '東' }] },
             { id: 'five-dots', segments: [{ type: 'text', text: '五筒' }] },
@@ -42,11 +46,15 @@ export const mahjongBeginnerPack: LearningPack = {
         },
         {
           id: 'winning-shape',
-          prompt: [{ type: 'text', text: '一般的なアガリの基本形はどれですか？' }],
+          prompt: [
+            { type: 'text', text: '一般的な' },
+            { type: 'term', reference: { id: 'mahjong:term-155', label: 'アガリ', shortDefinition: '決められた条件を満たして、局に勝つことです。' } },
+            { type: 'text', text: 'の基本形はどれですか？' },
+          ],
           options: [
-            { id: 'four-groups-pair', segments: [{ type: 'text', text: '3枚組を4つと、同じ牌2枚の組を1つ' }] },
-            { id: 'three-groups-two-pairs', segments: [{ type: 'text', text: '3枚組を3つと、同じ牌2枚の組を2つ' }] },
             { id: 'seven-pairs', segments: [{ type: 'text', text: '同じ牌2枚の組を7つ' }] },
+            { id: 'three-groups-two-pairs', segments: [{ type: 'text', text: '3枚組を3つと、同じ牌2枚の組を2つ' }] },
+            { id: 'four-groups-pair', segments: [{ type: 'text', text: '3枚組を4つと、同じ牌2枚の組を1つ' }] },
           ],
           correctOptionId: 'four-groups-pair',
           explanation: [
@@ -64,19 +72,26 @@ export const mahjongBeginnerPack: LearningPack = {
         },
         {
           id: 'turn-actions',
-          prompt: [{ type: 'text', text: '配牌のあと、通常の自分の番で繰り返すことは何ですか？' }],
+          prompt: [
+            { type: 'term', reference: { id: 'mahjong:term-067', label: '配牌', shortDefinition: '局の最初に各プレイヤーへ牌を配ることです。' } },
+            { type: 'text', text: 'のあと、通常の自分の番で繰り返すことは何ですか？' },
+          ],
           options: [
-            { id: 'draw-discard', segments: [{ type: 'text', text: '牌を1枚引き、手牌から1枚捨てる' }] },
             { id: 'discard-draw', segments: [{ type: 'text', text: '手牌から1枚捨ててから、牌を2枚引く' }] },
+            { id: 'draw-discard', segments: [{ type: 'text', text: '牌を1枚引き、手牌から1枚捨てる' }] },
             { id: 'draw-two', segments: [{ type: 'text', text: '牌を2枚引いて、そのまま次の人に渡す' }] },
           ],
           correctOptionId: 'draw-discard',
           explanation: [
-            { type: 'text', text: '通常は牌山から1枚引くツモのあと、手牌から1枚選んで捨てます。親の最初の打牌など、局の始まりには特別な順序があります。' },
+            { type: 'text', text: '通常は' },
+            { type: 'term', reference: { id: 'mahjong:term-070', label: '牌山', shortDefinition: '局の進行中に、順番に牌を引いていく山です。' } },
+            { type: 'text', text: 'から1枚引く' },
             { type: 'term', reference: { id: 'mahjong:term-116', label: 'ツモ', shortDefinition: '自分の番に牌を1枚引くことです。' } },
-            { type: 'text', text: 'と' },
-            { type: 'term', reference: { id: 'mahjong:term-117', label: '打牌', shortDefinition: '手牌から1枚選んで捨てることです。' } },
-            { type: 'text', text: 'を順番に行います。' },
+            { type: 'text', text: 'のあと、' },
+            { type: 'term', reference: { id: 'mahjong:term-068', label: '手牌', shortDefinition: '自分の手元でそろえていく牌の集まりです。' } },
+            { type: 'text', text: 'から1枚選んで' },
+            { type: 'term', reference: { id: 'mahjong:term-117', label: '打牌', shortDefinition: '手牌から1枚選んで場に出すことです。' } },
+            { type: 'text', text: 'します。親の最初の打牌など、局の始まりには特別な順序があります。' },
           ],
           reviewLessonId: 'turns-and-discard',
           sources: [{
@@ -88,16 +103,25 @@ export const mahjongBeginnerPack: LearningPack = {
         },
         {
           id: 'tanyao-condition',
-          prompt: [{ type: 'text', text: '断幺九（タンヤオ）の条件はどれですか？' }],
+          prompt: [
+            { type: 'term', reference: { id: 'mahjong:yaku-004', label: '断幺九（タンヤオ）', shortDefinition: '2〜8の数牌だけで手牌を作る役です。' } },
+            { type: 'text', text: 'の条件はどれですか？' },
+          ],
           options: [
-            { id: 'middle-number-tiles', segments: [{ type: 'text', text: '2〜8の数牌だけで手牌を作る' }] },
             { id: 'terminals-and-honors', segments: [{ type: 'text', text: '1・9の数牌と字牌だけで手牌を作る' }] },
             { id: 'honors-in-triplets', segments: [{ type: 'text', text: '東南西北をそれぞれ3枚ずつそろえる' }] },
+            { id: 'middle-number-tiles', segments: [{ type: 'text', text: '2〜8の数牌だけで手牌を作る' }] },
           ],
           correctOptionId: 'middle-number-tiles',
           explanation: [
-            { type: 'text', text: '断幺九は、2〜8の数牌だけで手牌を作る役です。1・9や字牌が含まれると成立しません。' },
             { type: 'term', reference: { id: 'mahjong:yaku-004', label: '断幺九', shortDefinition: '2〜8の数牌だけで手牌を作る役です。' } },
+            { type: 'text', text: 'は、2〜8の' },
+            { type: 'term', reference: { id: 'mahjong:term-082', label: '数牌', shortDefinition: '萬子・筒子・索子の3種類がある、数字の牌です。' } },
+            { type: 'text', text: 'だけで' },
+            { type: 'term', reference: { id: 'mahjong:term-068', label: '手牌', shortDefinition: '自分の手元でそろえていく牌の集まりです。' } },
+            { type: 'text', text: 'を作る役です。1・9や' },
+            { type: 'term', reference: { id: 'mahjong:term-081', label: '字牌', shortDefinition: '東南西北と白發中の牌です。' } },
+            { type: 'text', text: 'が含まれると成立しません。' },
           ],
           reviewLessonId: 'first-yaku',
           sources: [
