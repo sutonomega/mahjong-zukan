@@ -29,11 +29,20 @@ export type LessonBlock =
   | { type: 'steps'; steps: LessonStep[] }
   | ({ type: 'extension' } & LessonExtension)
 
+export type ContentSource = {
+  id: string
+  title: string
+  url: string
+  accessedOn: string
+}
+
 export type LearningLesson = {
   id: string
   title: string
   summary: string
   blocks: LessonBlock[]
+  /** Editorial sources and rule-set assumptions for this lesson. */
+  sources?: ContentSource[]
 }
 
 export type LearningCourse = {
