@@ -6,6 +6,9 @@ import TermArtwork from './components/TermArtwork'
 import GlossaryLinkedText, { getGlossaryEntries } from './components/GlossaryLinkedText'
 import { hanLevels } from './data/hanLevels'
 import { suitedTileReadings } from './data/suitedTileReadings'
+import CoursePlayer from './platform/CoursePlayer'
+import { mahjongBeginnerPack } from './content-packs/mahjong/beginner-course'
+import { resolveMahjongGlossaryEntryId } from './content-packs/mahjong/glossaryAdapter'
 
 const typeFilters = ['すべて', '役', '用語'] as const
 type TypeFilter = typeof typeFilters[number]
@@ -46,6 +49,9 @@ function App() {
   const [categoryFilter, setCategoryFilter] = useState('すべて')
   const [levelFilter, setLevelFilter] = useState<'すべて' | LearningLevel>('すべて')
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [activeView, setActiveView] = useState<'course' | 'glossary'>('course')
+  const [entryReturnView, setEntryReturnView] = useState<'course' | 'glossary'>('course')
+  const [entryReturnScroll, setEntryReturnScroll] = useState(0)
   const [entryHistory, setEntryHistory] = useState<EntryHistoryLocation[]>([])
   const [learned, setLearned] = useState<string[]>(() => {
     try {
@@ -86,6 +92,10 @@ function App() {
   }
 
   function openEntry(entry: Entry) {
+    if (!selectedId) {
+      setEntryReturnView(activeView)
+      setEntryReturnScroll(window.scrollY)
+    }
     if (selectedId && selectedId !== entry.id) {
       setEntryHistory((history) => [...history, { id: selectedId, scrollY: window.scrollY }])
     }
@@ -97,6 +107,8 @@ function App() {
     const previous = entryHistory[entryHistory.length - 1]
     if (!previous) {
       setSelectedId(null)
+      setActiveView(entryReturnView)
+      window.requestAnimationFrame(() => window.scrollTo({ top: entryReturnScroll, behavior: 'auto' }))
       return
     }
 
@@ -132,7 +144,7 @@ function App() {
     return (
       <div className="app-shell">
         <header className="topbar">
-          <button className="brand-button" onClick={() => { setSelectedId(null); setEntryHistory([]) }} aria-label="図鑑の一覧へ戻る">
+          <button className="brand-button" onClick={() => { setSelectedId(null); setEntryHistory([]); setActiveView('glossary') }} aria-label="図鑑の一覧へ戻る">
             <span className="brand-mark"><BookOpen size={21} /></span>
             <span>麻雀図鑑</span>
           </button>
@@ -202,6 +214,29 @@ function App() {
     )
   }
 
+  if (activeView === 'course' && !selected) {
+    return <div className="app-shell">
+      <header className="topbar">
+        <button className="brand-button" onClick={() => { setActiveView('course'); setSelectedId(null); setEntryHistory([]) }} aria-label="学習コーストップ">
+          <span className="brand-mark"><BookOpen size={21} /></span>
+          <span>麻雀図鑑</span>
+        </button>
+        <span className="topbar-note">はじめての麻雀を、もっとわかりやすく。</span>
+        <button className="topbar-nav-button" onClick={() => setActiveView('glossary')} type="button">図鑑・学習ガイドを見る</button>
+      </header>
+      <CoursePlayer
+        pack={mahjongBeginnerPack}
+        course={mahjongBeginnerPack.courses[0]}
+        onOpenTerm={(reference) => {
+          const entryId = resolveMahjongGlossaryEntryId(reference)
+          const entry = entryId ? entries.find((item) => item.id === entryId) : undefined
+          if (entry) openEntry(entry)
+        }}
+      />
+      <footer className="footer"><span>麻雀図鑑</span><span>少しずつ覚えていこう。</span></footer>
+    </div>
+  }
+
   function renderEntryCard(entry: Entry) {
     return <article className="entry-card" key={entry.id}>
       <div className="entry-card-top"><span className={`type-pill level-${entry.level}`}>{entry.level}</span><span className="entry-category">{getCategory(entry)}</span></div>
@@ -232,6 +267,7 @@ function App() {
           <span>麻雀図鑑</span>
         </button>
         <span className="topbar-note">はじめての麻雀を、もっとわかりやすく。</span>
+        <button className="topbar-nav-button" onClick={() => setActiveView('course')} type="button">入門コースへ</button>
       </header>
 
       <main>
