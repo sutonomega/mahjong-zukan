@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { BookOpen, Check, ExternalLink, RotateCcw } from 'lucide-react'
+import { BookOpen, Check, RotateCcw } from 'lucide-react'
 import type { LearningQuiz, LearningQuizQuestion, LessonSegment, GlossaryReference } from './contracts'
 
 type LearningQuizPlayerProps = {
@@ -14,7 +14,8 @@ function QuizSegments({ segments, onOpenTerm }: { segments: LessonSegment[]; onO
     : <button
         aria-label={segment.reference.label + 'の図鑑を開く'}
         className="course-term-link"
-        key={index}
+        data-tooltip={segment.reference.shortDefinition}
+        key={segment.reference.id + '-' + index}
         onClick={() => onOpenTerm(segment.reference)}
         type="button"
       >{segment.reference.label}</button>)}</>
@@ -91,10 +92,9 @@ export default function LearningQuizPlayer({ quiz, onOpenLesson, onOpenTerm }: L
             <strong>{isCorrect ? '正解です。' : '今回は不正解です。'}</strong>
             {!isCorrect && correctOption && <p>正解は「<QuizSegments segments={correctOption.segments} onOpenTerm={onOpenTerm} />」です。</p>}
             <p><QuizSegments segments={question.explanation} onOpenTerm={onOpenTerm} /></p>
-            <div className="course-quiz-followups">
-              {question.reviewLessonId && <button className="course-quiz-review-link" onClick={() => onOpenLesson(question.reviewLessonId!)} type="button"><BookOpen size={14} />関連レッスンを復習</button>}
-              {question.sources?.map((source) => <a href={source.url} key={source.id} rel="noreferrer" target="_blank">{source.title}<ExternalLink size={12} /></a>)}
-            </div>
+            {question.reviewLessonId && <div className="course-quiz-followups">
+              <button className="course-quiz-review-link" onClick={() => onOpenLesson(question.reviewLessonId!)} type="button"><BookOpen size={14} />関連レッスンを復習</button>
+            </div>}
           </div>}
         </section>
       })}
