@@ -30,6 +30,7 @@ export type SearchResult = {
 export type SearchOptions = {
   packIds?: string[]
   normalize?: (value: string, locale: string) => string
+  minimumDescriptionQueryLength?: number
 }
 
 export function normalizeSearchText(value: string, locale: string): string {
@@ -119,7 +120,7 @@ export function searchContentPacks(
       } else if (metadata.some((field) => field.includes(query as string))) {
         score = 2
         match = 'suggested-title'
-      } else if (description.includes(query)) {
+      } else if (query.length >= (options.minimumDescriptionQueryLength ?? 2) && description.includes(query)) {
         score = 3
         match = 'related-description'
       }
