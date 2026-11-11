@@ -122,6 +122,42 @@ export const mahjongBeginnerPack: LearningPack = {
         ],
       },
       {
+        id: 'winning-shape',
+        title: 'アガリの基本形を作ろう',
+        summary: '3枚組4つと2枚組1つを目指す、基本の形を学びます。',
+        blocks: [
+          { type: 'paragraph', segments: [
+            { type: 'text', text: '一般的なアガリの基本形は、3枚組を4つと、同じ牌2枚の組を1つ作る形です。数字が続く3枚組を' },
+            { type: 'term', reference: { id: 'mahjong:term-146', label: '順子', shortDefinition: '同じ種類の数牌で、数字が続く3枚の組です。' } },
+            { type: 'text', text: '、同じ牌3枚の組を' },
+            { type: 'term', reference: { id: 'mahjong:term-147', label: '刻子', shortDefinition: '同じ種類の牌を3枚そろえた組です。' } },
+            { type: 'text', text: 'と呼びます。2枚組は' },
+            { type: 'term', reference: { id: 'mahjong:term-141', label: '雀頭', shortDefinition: 'アガリの形に使う、同じ牌2枚の組です。' } },
+            { type: 'text', text: 'です。' },
+          ] },
+          {
+            type: 'extension',
+            rendererId: 'mahjong.winning-hand',
+            schemaVersion: 1,
+            altText: 'アガリの基本形の例です。順子の一萬・二萬・三萬、四筒・五筒・六筒、二索・三索・四索、白の刻子、東2枚の雀頭でできています。',
+            payload: {
+              groups: [
+                { name: '順子', tiles: ['一萬', '二萬', '三萬'], description: '萬子の数字が続く3枚' },
+                { name: '順子', tiles: ['四筒', '五筒', '六筒'], description: '筒子の数字が続く3枚' },
+                { name: '順子', tiles: ['二索', '三索', '四索'], description: '索子の数字が続く3枚' },
+                { name: '刻子', tiles: ['白', '白', '白'], description: '同じ牌を3枚' },
+              ],
+              pair: { name: '雀頭', tiles: ['東', '東'], description: '同じ牌を2枚' },
+            },
+          },
+          { type: 'paragraph', segments: [
+            { type: 'text', text: '必要な形と役がそろってアガることを' },
+            { type: 'term', reference: { id: 'mahjong:term-155', label: '和了（アガリ）', shortDefinition: '決められた条件を満たして、局に勝つことです。' } },
+            { type: 'text', text: 'といいます。まずはこの基本形を目標に、牌を集めていきましょう。' },
+          ] },
+        ],
+      },
+      {
         id: 'first-yaku',
         title: 'アガリには「役」が必要',
         summary: '立直・断幺九・役牌を、成立する牌姿と注意例で学びます。',
@@ -258,42 +294,7 @@ export const mahjongBeginnerPack: LearningPack = {
           ] },
         ],
       },
-      {
-        id: 'winning-shape',
-        title: 'アガリの基本形を作ろう',
-        summary: '3枚組4つと2枚組1つを目指す、基本の形を学びます。',
-        blocks: [
-          { type: 'paragraph', segments: [
-            { type: 'text', text: '一般的なアガリの基本形は、3枚組を4つと、同じ牌2枚の組を1つ作る形です。数字が続く3枚組を' },
-            { type: 'term', reference: { id: 'mahjong:term-146', label: '順子', shortDefinition: '同じ種類の数牌で、数字が続く3枚の組です。' } },
-            { type: 'text', text: '、同じ牌3枚の組を' },
-            { type: 'term', reference: { id: 'mahjong:term-147', label: '刻子', shortDefinition: '同じ種類の牌を3枚そろえた組です。' } },
-            { type: 'text', text: 'と呼びます。2枚組は' },
-            { type: 'term', reference: { id: 'mahjong:term-141', label: '雀頭', shortDefinition: 'アガリの形に使う、同じ牌2枚の組です。' } },
-            { type: 'text', text: 'です。' },
-          ] },
-          {
-            type: 'extension',
-            rendererId: 'mahjong.winning-hand',
-            schemaVersion: 1,
-            altText: 'アガリの基本形の例です。順子の一萬・二萬・三萬、四筒・五筒・六筒、二索・三索・四索、白の刻子、東2枚の雀頭でできています。',
-            payload: {
-              groups: [
-                { name: '順子', tiles: ['一萬', '二萬', '三萬'], description: '萬子の数字が続く3枚' },
-                { name: '順子', tiles: ['四筒', '五筒', '六筒'], description: '筒子の数字が続く3枚' },
-                { name: '順子', tiles: ['二索', '三索', '四索'], description: '索子の数字が続く3枚' },
-                { name: '刻子', tiles: ['白', '白', '白'], description: '同じ牌を3枚' },
-              ],
-              pair: { name: '雀頭', tiles: ['東', '東'], description: '同じ牌を2枚' },
-            },
-          },
-          { type: 'paragraph', segments: [
-            { type: 'text', text: '必要な形と役がそろってアガることを' },
-            { type: 'term', reference: { id: 'mahjong:term-155', label: '和了（アガリ）', shortDefinition: '決められた条件を満たして、局に勝つことです。' } },
-            { type: 'text', text: 'といいます。まずはこの基本形を目標に、牌を集めていきましょう。' },
-          ] },
-        ],
-      },
+
     ],
   }],
 }
