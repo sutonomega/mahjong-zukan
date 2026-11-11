@@ -18,7 +18,7 @@ export type SearchablePack = {
   items: SearchableItem[]
 }
 
-export type SearchMatch = 'exact-title' | 'suggested-title' | 'related-description'
+export type SearchMatch = 'exact-title' | 'exact-metadata' | 'exact-description'
 
 export type SearchResult = {
   packId: string
@@ -30,8 +30,12 @@ export type SearchResult = {
 export type SearchOptions = {
   packIds?: string[]
   normalize?: (value: string, locale: string) => string
-  minimumDescriptionQueryLength?: number
+  tokenize?: (value: string, locale: string) => string[]
 }
+
+type WordSegment = { segment: string; isWordLike?: boolean }
+type WordSegmenter = { segment: (value: string) => Iterable<WordSegment> }
+type WordSegmenterConstructor = new (locale: string, options: { granularity: 'word' }) => WordSegmenter
 
 export function normalizeSearchText(value: string, locale: string): string {
   let normalized = value.normalize('NFKC')
@@ -46,33 +50,33 @@ export function normalizeSearchText(value: string, locale: string): string {
   return normalized.replace(/[\s\u3000・･、。，,.!?！？：:;；()（）「」『』【】\[\]{}<>「」『』'"`]/g, '')
 }
 
-function isWithinOneEdit(query: string, candidate: string): boolean {
-  if (Math.abs(query.length - candidate.length) > 1) return false
-  let queryIndex = 0
-  let candidateIndex = 0
-  let edits = 0
-  while (queryIndex < query.length && candidateIndex < candidate.length) {
-    if (query[queryIndex] === candidate[candidateIndex]) {
-      queryIndex++
-      candidateIndex++
-      continue
-    }
-    if (++edits > 1) return false
-    if (query.length > candidate.length) queryIndex++
-    else if (candidate.length > query.length) candidateIndex++
-    else {
-      queryIndex++
-      candidateIndex++
-    }
+export function tokenizeSearchText(value: string, locale: string): string[] {
+  const Segmenter = (Intl as unknown as { Segmenter?: WordSegmenterConstructor }).Segmenter
+  if (Segmenter) {
+    const segments = new Segmenter(locale, { granularity: 'word' }).segment(value)
+    return Array.from(segments)
+      .filter((segment) => segment.isWordLike !== false)
+      .map((segment) => normalizeSearchText(segment.segment, locale))
+      .filter(Boolean)
   }
-  if (queryIndex < query.length || candidateIndex < candidate.length) edits++
-  return edits <= 1
+
+  return value
+    .split(/[\s\u3000・･、。，,.!?！？：:;；()（）「」『』【】\[\]{}<>「」『』'"`／/]+/)
+    .map((segment) => normalizeSearchText(segment, locale))
+    .filter(Boolean)
 }
 
-function containsOneEditMatch(query: string, value: string): boolean {
-  for (let start = 0; start < value.length; start++) {
-    for (let length = Math.max(1, query.length - 1); length <= query.length + 1; length++) {
-      if (start + length <= value.length && isWithinOneEdit(query, value.slice(start, start + length))) return true
+function splitVariants(values: string[]): string[] {
+  return values.flatMap((value) => value.split(/[／/]/)).map((value) => value.trim()).filter(Boolean)
+}
+
+function hasExactTokenPhrase(query: string, tokens: string[]): boolean {
+  for (let start = 0; start < tokens.length; start++) {
+    let phrase = ''
+    for (let end = start; end < tokens.length; end++) {
+      phrase += tokens[end]
+      if (phrase === query) return true
+      if (phrase.length >= query.length) break
     }
   }
   return false
@@ -84,45 +88,37 @@ export function searchContentPacks(
   options: SearchOptions = {},
 ): SearchResult[] {
   const selectedPackIds = options.packIds ? new Set(options.packIds) : null
+  const normalize = options.normalize ?? normalizeSearchText
+  const tokenize = options.tokenize ?? tokenizeSearchText
   const matches: { result: SearchResult; score: number; order: number }[] = []
-  const queryByLocale = new Map<string, string>()
   let order = 0
 
   for (const pack of packs) {
     if (selectedPackIds && !selectedPackIds.has(pack.packId)) continue
-    const normalize = options.normalize ?? normalizeSearchText
-    let query = queryByLocale.get(pack.locale)
-    if (query === undefined) {
-      query = normalize(rawQuery, pack.locale)
-      queryByLocale.set(pack.locale, query)
-    }
+    const query = normalize(rawQuery.trim(), pack.locale)
     if (!query) continue
 
     for (const item of pack.items) {
-      const normalized = (values: (string | undefined)[]) => values
+      const titleTerms = splitVariants([item.title, ...(item.aliases ?? []), ...(item.readings ?? [])])
+        .map((value) => normalize(value, pack.locale))
+        .filter(Boolean)
+      const metadataTerms = [item.category, ...(item.keywords ?? [])]
         .filter((value): value is string => Boolean(value?.trim()))
         .map((value) => normalize(value, pack.locale))
-      const titles = normalized([item.title])
-      const aliases = normalized(item.aliases ?? [])
-      const readings = normalized(item.readings ?? [])
-      const metadata = normalized([item.category, ...(item.keywords ?? [])])
-      const description = normalize(item.description ?? '', pack.locale)
+        .filter(Boolean)
+      const descriptionTokens = tokenize(item.description ?? '', pack.locale)
       let score: number | null = null
       let match: SearchMatch
 
-      if ([...titles, ...aliases, ...readings].some((field) => field === query)) {
+      if (titleTerms.includes(query)) {
         score = 0
         match = 'exact-title'
-      } else if ([...titles, ...aliases, ...readings].some((field) => field.includes(query))
-        || (query.length >= 3 && query.length <= 12 && [...titles, ...aliases, ...readings].some((field) => containsOneEditMatch(query as string, field)))) {
+      } else if (metadataTerms.includes(query)) {
         score = 1
-        match = 'suggested-title'
-      } else if (metadata.some((field) => field.includes(query as string))) {
+        match = 'exact-metadata'
+      } else if (hasExactTokenPhrase(query, descriptionTokens)) {
         score = 2
-        match = 'suggested-title'
-      } else if (query.length >= (options.minimumDescriptionQueryLength ?? 2) && description.includes(query)) {
-        score = 3
-        match = 'related-description'
+        match = 'exact-description'
       }
       if (score !== null) matches.push({ result: { packId: pack.packId, locale: pack.locale, item, match }, score, order })
       order++
