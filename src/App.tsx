@@ -6,6 +6,9 @@ import TermArtwork from './components/TermArtwork'
 import GlossaryLinkedText from './components/GlossaryLinkedText'
 import { hanLevels } from './data/hanLevels'
 import { suitedTileReadings } from './data/suitedTileReadings'
+import CoursePlayer from './platform/CoursePlayer'
+import { mahjongBeginnerPack } from './content-packs/mahjong/beginner-course'
+import { resolveMahjongGlossaryEntryId } from './content-packs/mahjong/glossaryAdapter'
 
 const typeFilters = ['すべて', '役', '用語'] as const
 type TypeFilter = typeof typeFilters[number]
@@ -16,6 +19,9 @@ function App() {
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('すべて')
   const [categoryFilter, setCategoryFilter] = useState('すべて')
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [activeView, setActiveView] = useState<'course' | 'glossary'>('course')
+  const [entryReturnView, setEntryReturnView] = useState<'course' | 'glossary'>('course')
+  const [entryReturnScroll, setEntryReturnScroll] = useState(0)
   const [entryHistory, setEntryHistory] = useState<EntryHistoryLocation[]>([])
   const [learned, setLearned] = useState<string[]>(() => {
     try {
@@ -52,6 +58,10 @@ function App() {
   }
 
   function openEntry(entry: Entry) {
+    if (!selectedId) {
+      setEntryReturnView(activeView)
+      setEntryReturnScroll(window.scrollY)
+    }
     if (selectedId && selectedId !== entry.id) {
       setEntryHistory((history) => [...history, { id: selectedId, scrollY: window.scrollY }])
     }
@@ -63,6 +73,8 @@ function App() {
     const previous = entryHistory[entryHistory.length - 1]
     if (!previous) {
       setSelectedId(null)
+      setActiveView(entryReturnView)
+      window.requestAnimationFrame(() => window.scrollTo({ top: entryReturnScroll, behavior: 'auto' }))
       return
     }
 
@@ -81,7 +93,7 @@ function App() {
     return (
       <div className="app-shell">
         <header className="topbar">
-          <button className="brand-button" onClick={() => { setSelectedId(null); setEntryHistory([]) }} aria-label="図鑑の一覧へ戻る">
+          <button className="brand-button" onClick={() => { setSelectedId(null); setEntryHistory([]); setActiveView('glossary') }} aria-label="図鑑の一覧へ戻る">
             <span className="brand-mark"><BookOpen size={21} /></span>
             <span>麻雀図鑑</span>
           </button>
@@ -164,14 +176,28 @@ function App() {
   return (
     <div className="app-shell">
       <header className="topbar">
-        <button className="brand-button" onClick={resetFilters} aria-label="麻雀図鑑トップ">
+        <button className="brand-button" onClick={() => { setActiveView('course'); setSelectedId(null); setEntryHistory([]) }} aria-label="学習コーストップ">
           <span className="brand-mark"><BookOpen size={21} /></span>
           <span>麻雀図鑑</span>
         </button>
         <span className="topbar-note">はじめての麻雀を、もっとわかりやすく。</span>
+        <button className="topbar-nav-button" onClick={() => setActiveView(activeView === 'course' ? 'glossary' : 'course')} type="button">
+          {activeView === 'course' ? '図鑑を見る' : '学習コース'}
+        </button>
       </header>
-
       <main>
+        {activeView === 'course' ? <CoursePlayer
+          pack={mahjongBeginnerPack}
+          course={mahjongBeginnerPack.courses[0]}
+          onOpenTerm={(reference) => {
+            const entryId = resolveMahjongGlossaryEntryId(reference)
+            const entry = entryId ? entries.find((item) => item.id === entryId) : undefined
+            if (entry) {
+              setActiveView('course')
+              openEntry(entry)
+            }
+          }}
+        /> : <>
         <section className="hero">
           <div className="hero-content">
             <div className="eyebrow"><Sparkles size={14} /> BEGINNER'S FIELD GUIDE</div>
@@ -222,11 +248,12 @@ function App() {
           </> : <div className="entry-grid">{searchGroups.all.map(renderEntryCard)}</div>}
         </section>
 
-        <section className="reference-section">
+        </>}
+        {activeView === 'glossary' && <section className="reference-section">
           <h2>参考リンク</h2>
           <p>Excelのシート「図」に記載されていた参考URLです。参照先の画像は転載していません。</p>
           <ul>{references.map((reference) => <li key={reference.url}><a href={reference.url} target="_blank" rel="noreferrer">{reference.label}</a></li>)}</ul>
-        </section>
+        </section>}
       </main>
       <footer className="footer"><span>麻雀図鑑</span><span>少しずつ覚えていこう。</span></footer>
     </div>
