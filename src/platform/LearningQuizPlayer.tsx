@@ -24,7 +24,11 @@ function QuizSegments({ segments, onOpenTerm }: { segments: LessonSegment[]; onO
 function QuizOptionSegments({ segments }: { segments: LessonSegment[] }) {
   return <>{segments.map((segment, index) => segment.type === 'text'
     ? <span key={index}>{segment.text}</span>
-    : <span className="course-quiz-term-label" key={index}>{segment.reference.label}</span>)}</>
+    : <span
+        className="course-term-link course-quiz-term-label"
+        data-tooltip={segment.reference.shortDefinition}
+        key={segment.reference.id + '-' + index}
+      >{segment.reference.label}</span>)}</>
 }
 
 function getOption(question: LearningQuizQuestion, optionId: string) {
