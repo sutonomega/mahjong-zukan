@@ -180,13 +180,10 @@ function App() {
           <span>麻雀図鑑</span>
         </button>
         <span className="topbar-note">はじめての麻雀を、もっとわかりやすく。</span>
-      </header>
-
-      <div className="topbar-actions">
         <button className="topbar-nav-button" onClick={() => setActiveView(activeView === 'course' ? 'glossary' : 'course')} type="button">
           {activeView === 'course' ? '図鑑を見る' : '学習コース'}
         </button>
-      </div>
+      </header>
       <main>
         {activeView === 'course' ? <CoursePlayer
           pack={mahjongBeginnerPack}
