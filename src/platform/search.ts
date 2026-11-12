@@ -36,6 +36,14 @@ export type SearchOptions = {
 type WordSegment = { segment: string; isWordLike?: boolean }
 type WordSegmenter = { segment: (value: string) => Iterable<WordSegment> }
 type WordSegmenterConstructor = new (locale: string, options: { granularity: 'word' }) => WordSegmenter
+type SearchNormalizer = NonNullable<SearchOptions['normalize']>
+type SearchTokenizer = NonNullable<SearchOptions['tokenize']>
+type DescriptionAliasIndex = Map<SearchableItem, Set<string>>
+
+const descriptionAliasIndexes = new WeakMap<
+  SearchablePack,
+  WeakMap<SearchNormalizer, WeakMap<SearchTokenizer, DescriptionAliasIndex>>
+>()
 
 export function normalizeSearchText(value: string, locale: string): string {
   let normalized = value.normalize('NFKC')
@@ -70,6 +78,65 @@ function splitVariants(values: string[]): string[] {
   return values.flatMap((value) => value.split(/[／/]/)).map((value) => value.trim()).filter(Boolean)
 }
 
+function getTokenPhrases(tokens: string[]): Set<string> {
+  const phrases = new Set<string>()
+  for (let start = 0; start < tokens.length; start++) {
+    let phrase = ''
+    for (let end = start; end < tokens.length; end++) {
+      phrase += tokens[end]
+      phrases.add(phrase)
+    }
+  }
+  return phrases
+}
+
+function getDescriptionAliasIndex(
+  pack: SearchablePack,
+  normalize: SearchNormalizer,
+  tokenize: SearchTokenizer,
+): DescriptionAliasIndex {
+  let normalizerIndexes = descriptionAliasIndexes.get(pack)
+  if (!normalizerIndexes) {
+    normalizerIndexes = new WeakMap<SearchNormalizer, WeakMap<SearchTokenizer, DescriptionAliasIndex>>()
+    descriptionAliasIndexes.set(pack, normalizerIndexes)
+  }
+
+  let tokenizerIndexes = normalizerIndexes.get(normalize)
+  if (!tokenizerIndexes) {
+    tokenizerIndexes = new WeakMap<SearchTokenizer, DescriptionAliasIndex>()
+    normalizerIndexes.set(normalize, tokenizerIndexes)
+  }
+
+  const cached = tokenizerIndexes.get(tokenize)
+  if (cached) return cached
+
+  const referencedTerms = pack.items.map((item) => ({
+    item,
+    titles: splitVariants([item.title, ...(item.aliases ?? [])])
+      .map((value) => normalize(value, pack.locale))
+      .filter(Boolean),
+    aliases: splitVariants([...(item.aliases ?? []), ...(item.readings ?? [])])
+      .map((value) => normalize(value, pack.locale))
+      .filter(Boolean),
+  }))
+  const index: DescriptionAliasIndex = new Map()
+
+  for (const item of pack.items) {
+    const descriptionPhrases = getTokenPhrases(tokenize(item.description ?? '', pack.locale))
+    const aliases = new Set<string>()
+
+    for (const referencedTerm of referencedTerms) {
+      if (!referencedTerm.titles.some((title) => descriptionPhrases.has(title))) continue
+      referencedTerm.aliases.forEach((alias) => aliases.add(alias))
+    }
+
+    index.set(item, aliases)
+  }
+
+  tokenizerIndexes.set(tokenize, index)
+  return index
+}
+
 function hasExactTokenPhrase(query: string, tokens: string[]): boolean {
   for (let start = 0; start < tokens.length; start++) {
     let phrase = ''
@@ -98,6 +165,7 @@ export function searchContentPacks(
     const query = normalize(rawQuery.trim(), pack.locale)
     if (!query) continue
 
+    const descriptionAliasesByItem = getDescriptionAliasIndex(pack, normalize, tokenize)
     for (const item of pack.items) {
       const titleTerms = splitVariants([item.title, ...(item.aliases ?? []), ...(item.readings ?? [])])
         .map((value) => normalize(value, pack.locale))
@@ -107,11 +175,12 @@ export function searchContentPacks(
         .map((value) => normalize(value, pack.locale))
         .filter(Boolean)
       const descriptionTokens = tokenize(item.description ?? '', pack.locale)
+      const descriptionAliases = descriptionAliasesByItem.get(item) ?? new Set<string>()
       const match: SearchMatch | null = titleTerms.includes(query)
         ? 'exact-title'
         : metadataTerms.includes(query)
           ? 'exact-metadata'
-          : hasExactTokenPhrase(query, descriptionTokens)
+          : hasExactTokenPhrase(query, descriptionTokens) || descriptionAliases.has(query)
             ? 'exact-description'
             : null
       const score = match === 'exact-title' ? 0 : match === 'exact-metadata' ? 1 : match === 'exact-description' ? 2 : null

@@ -58,7 +58,7 @@ export const mahjongBeginnerPack: LearningPack = {
           ],
           correctOptionId: 'four-groups-pair',
           explanation: [
-            { type: 'text', text: '同じ牌2枚の組を7つそろえて役として' },
+            { type: 'text', text: '同じ牌2枚の組を7つそろえる役として' },
             { type: 'term', reference: { id: 'mahjong:yaku-021', label: '七対子', shortDefinition: '同じ牌2枚の組を7つ集めると成立する役です。鳴くと成立しません。' } },
             { type: 'text', text: 'がありますが、これは基本形ではなく例外形です。' },
           ],
