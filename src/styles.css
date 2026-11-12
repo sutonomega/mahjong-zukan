@@ -25,6 +25,7 @@ a:focus-visible { outline: 3px solid #17483a; outline-offset: 3px; border-radius
 .app-shell { min-height: 100vh; }
 .topbar { height: 72px; padding: 0 max(24px, calc((100vw - 1160px) / 2)); display: flex; align-items: center; justify-content: space-between; background: #fff; border-bottom: 1px solid var(--line); }
 .brand-button { display: flex; align-items: center; gap: 10px; border: 0; background: none; color: var(--green); font-size: 18px; font-weight: 800; letter-spacing: .04em; }
+.course-topbar .brand-button { flex-shrink: 0; white-space: nowrap; }
 .brand-mark { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 11px; color: #f8f8ee; background: var(--green); }
 .topbar-note { color: var(--muted); font-size: 12px; letter-spacing: .04em; }
 main { max-width: 1160px; margin: 0 auto; padding: 0 24px; }

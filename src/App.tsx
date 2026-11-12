@@ -343,7 +343,7 @@ function MahjongApp() {
   if (activeView === 'course' && !selected) {
     return <div className="app-shell">
       <a className="skip-link" href="#main-content">本文へスキップ</a>
-      <header className="topbar">
+      <header className="topbar course-topbar">
         <button className="brand-button" onClick={() => { setActiveView('course'); setSelectedId(null); setEntryHistory([]) }} aria-label="学習コーストップ">
           <span className="brand-mark"><BookOpen size={21} /></span>
           <span>麻雀図鑑</span>
