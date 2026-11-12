@@ -25,6 +25,19 @@
 - 型の検査と本番向けビルド: `npm run build`
 - ビルド成果物をローカルで表示: `npm run build` の成功後に `npm run preview`
 
+### ブラウザー・スマートフォン幅の確認
+
+自動確認にはPlaywrightを使います。初回は依存パッケージと各ブラウザーをインストールします。
+
+```bash
+npm ci
+npx playwright install chromium firefox webkit
+```
+
+確認を実行するには `npm run test:e2e` を使います。Chromium、Firefox、WebKitに加えて、幅320pxのタッチ対応表示とiPhone 13相当のWebKit表示で、ホーム、レッスン直リンク、用語リンク、理解度チェック、横スクロール、キーボードのスキップリンクを確認します。個別に実行する場合は、たとえば `npm run test:e2e -- --project=chromium-mobile-320` を使います。失敗時のスクリーンショットとトレースは `test-results/` に保存されます。
+
+GitHub Actionsは `dev` または `main` 向けPull Requestで同じ確認を実行します。これは実ブラウザーエンジンによる自動確認と端末表示の再現であり、実機スマートフォンの操作、OS固有のSafari、スクリーンリーダーの読み上げを代替しません。これらは必要に応じて手動確認し、IssueまたはPRに結果を記録します。
+
 GitHub Actionsの公開ワークフローは、Node.js 24で依存パッケージをインストールしてから、GitHub Pages用のパスを指定して `npm run build` を実行します。公開前の変更では、少なくともビルドが成功することを確認してください。画面や操作を変更した場合は、変更箇所に応じてPC・スマートフォン幅、キーボード操作、用語リンクを確認します。
 
 ## コンテンツの更新
