@@ -3,6 +3,7 @@ import { ArrowLeft, ArrowRight, BookOpen, Check, RotateCcw } from 'lucide-react'
 import type { LearningCourse, LearningLesson, LearningPack, LessonSegment, GlossaryReference, LessonExtension } from '../platform/contracts'
 import LearningQuizPlayer from './LearningQuizPlayer'
 import { readCourseProgress, writeCourseProgress } from './progressStorage'
+import { getPreferredScrollBehavior } from './accessibility'
 
 type CoursePlayerProps = {
   pack: LearningPack
@@ -47,7 +48,7 @@ export default function CoursePlayer({ pack, course, onOpenTerm, renderExtension
   function selectLesson(lesson: LearningLesson) {
     setActiveQuizId(null)
     setProgress((current) => ({ ...current, activeLessonId: lesson.id }))
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    window.scrollTo({ top: 0, behavior: getPreferredScrollBehavior() })
   }
 
   function completeAndContinue() {
@@ -60,7 +61,7 @@ export default function CoursePlayer({ pack, course, onOpenTerm, renderExtension
       completedLessonIds,
       activeLessonId: nextLesson?.id ?? activeLesson.id,
     })
-    if (nextLesson) window.scrollTo({ top: 0, behavior: 'smooth' })
+    if (nextLesson) window.scrollTo({ top: 0, behavior: getPreferredScrollBehavior() })
   }
 
   function resetProgress() {
@@ -108,7 +109,7 @@ export default function CoursePlayer({ pack, course, onOpenTerm, renderExtension
           aria-current={activeQuizId === quiz.id ? 'step' : undefined}
           className={'course-quiz-outline-item' + (activeQuizId === quiz.id ? ' is-active' : '')}
           key={quiz.id}
-          onClick={() => { setActiveQuizId(quiz.id); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
+          onClick={() => { setActiveQuizId(quiz.id); window.scrollTo({ top: 0, behavior: getPreferredScrollBehavior() }) }}
           type="button"
         >
           <span className="course-outline-number">?</span>
@@ -171,3 +172,4 @@ export default function CoursePlayer({ pack, course, onOpenTerm, renderExtension
     <p className="course-term-hint">下線のある用語は、ポイントすると短い説明が見られます。選ぶと図鑑の詳しい説明を開きます。</p>
   </main>
 }
+
