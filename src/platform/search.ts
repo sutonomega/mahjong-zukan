@@ -70,6 +70,41 @@ function splitVariants(values: string[]): string[] {
   return values.flatMap((value) => value.split(/[／/]/)).map((value) => value.trim()).filter(Boolean)
 }
 
+function getTokenPhrases(tokens: string[]): Set<string> {
+  const phrases = new Set<string>()
+  for (let start = 0; start < tokens.length; start++) {
+    let phrase = ''
+    for (let end = start; end < tokens.length; end++) {
+      phrase += tokens[end]
+      phrases.add(phrase)
+    }
+  }
+  return phrases
+}
+
+function getDescriptionAliases(
+  pack: SearchablePack,
+  descriptionTokens: string[],
+  normalize: (value: string, locale: string) => string,
+): Set<string> {
+  const descriptionPhrases = getTokenPhrases(descriptionTokens)
+  const aliases = new Set<string>()
+
+  for (const referencedItem of pack.items) {
+    const referencedTitles = splitVariants([referencedItem.title, ...(referencedItem.aliases ?? [])])
+      .map((value) => normalize(value, pack.locale))
+      .filter(Boolean)
+    if (!referencedTitles.some((title) => descriptionPhrases.has(title))) continue
+
+    for (const alias of splitVariants([...(referencedItem.aliases ?? []), ...(referencedItem.readings ?? [])])) {
+      const normalized = normalize(alias, pack.locale)
+      if (normalized) aliases.add(normalized)
+    }
+  }
+
+  return aliases
+}
+
 function hasExactTokenPhrase(query: string, tokens: string[]): boolean {
   for (let start = 0; start < tokens.length; start++) {
     let phrase = ''
@@ -107,11 +142,12 @@ export function searchContentPacks(
         .map((value) => normalize(value, pack.locale))
         .filter(Boolean)
       const descriptionTokens = tokenize(item.description ?? '', pack.locale)
+      const descriptionAliases = getDescriptionAliases(pack, descriptionTokens, normalize)
       const match: SearchMatch | null = titleTerms.includes(query)
         ? 'exact-title'
         : metadataTerms.includes(query)
           ? 'exact-metadata'
-          : hasExactTokenPhrase(query, descriptionTokens)
+          : hasExactTokenPhrase(query, descriptionTokens) || descriptionAliases.has(query)
             ? 'exact-description'
             : null
       const score = match === 'exact-title' ? 0 : match === 'exact-metadata' ? 1 : match === 'exact-description' ? 2 : null
