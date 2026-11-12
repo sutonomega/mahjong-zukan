@@ -11,14 +11,17 @@ type LearningQuizPlayerProps = {
 function QuizSegments({ segments, onOpenTerm }: { segments: LessonSegment[]; onOpenTerm: LearningQuizPlayerProps['onOpenTerm'] }) {
   return <>{segments.map((segment, index) => segment.type === 'text'
     ? <span key={index}>{segment.text}</span>
-    : <button
+    : <a
         aria-label={segment.reference.label + 'の図鑑を開く'}
         className="course-term-link"
         data-tooltip={segment.reference.shortDefinition}
+        href="#glossary-entry"
         key={segment.reference.id + '-' + index}
-        onClick={() => onOpenTerm(segment.reference)}
-        type="button"
-      >{segment.reference.label}</button>)}</>
+        onClick={(event) => {
+          event.preventDefault()
+          onOpenTerm(segment.reference)
+        }}
+      >{segment.reference.label}</a>)}</>
 }
 
 function QuizOptionSegments({ segments }: { segments: LessonSegment[] }) {
