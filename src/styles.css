@@ -331,11 +331,11 @@ main { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
 .mahjong-diagram { margin: 0; padding: 20px; border: 1px solid #e2e9df; border-radius: 14px; background: #fbfcf9; }
 .mahjong-diagram figcaption { margin-bottom: 15px; color: #30483a; font: 700 15px 'Noto Serif JP', serif; }
 .mahjong-family-category + .mahjong-family-category { margin-top: 17px; padding-top: 15px; border-top: 1px solid #e8ede5; }
-.mahjong-family-category > h4 { margin: 0 0 10px; color: #5a7560; font-size: 11px; }
+.mahjong-family-category > h3 { margin: 0 0 10px; color: #5a7560; font-size: 11px; }
 .mahjong-family-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; }
 .mahjong-family-card { min-width: 0; padding: 12px; border: 1px solid #e7ebe4; border-radius: 10px; background: #fff; }
-.mahjong-family-card h5 { display: flex; justify-content: space-between; gap: 6px; margin: 0 0 9px; color: #30483a; font-size: 12px; }
-.mahjong-family-card h5 span { color: #89968b; font-size: 9px; font-weight: 500; }
+.mahjong-family-card h4 { display: flex; justify-content: space-between; gap: 6px; margin: 0 0 9px; color: #30483a; font-size: 12px; }
+.mahjong-family-card h4 span { color: #89968b; font-size: 9px; font-weight: 500; }
 .mahjong-tile-faces { display: flex; flex-wrap: wrap; gap: 4px; }
 .mahjong-tile-face { display: grid; flex: 0 0 34px; width: 34px; height: 46px; place-items: center; border: 1px solid #d7dbd0; border-radius: 5px; background: linear-gradient(135deg, #fffef9, #e9e9df); box-shadow: 0 2px 3px #203a2b10; color: #294c3c; font: 700 12px 'Noto Serif JP', serif; white-space: nowrap; }
 .mahjong-family-card p { margin: 8px 0 0; color: #76847a; font-size: 9px; line-height: 1.65; }
@@ -373,7 +373,7 @@ main { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
 
 
 .mahjong-yaku-example + .mahjong-yaku-example { margin-top: 18px; padding-top: 17px; border-top: 1px solid #e5ebe2; }
-.mahjong-yaku-example h4 { margin: 0 0 10px; color: #30483a; font: 700 12px 'Noto Serif JP', serif; }
+.mahjong-yaku-example h3 { margin: 0 0 10px; color: #30483a; font: 700 12px 'Noto Serif JP', serif; }
 .mahjong-yaku-example .mahjong-hand-groups { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .mahjong-yaku-example .mahjong-group-description { min-height: 2.8em; }
 @media (max-width: 760px) {
