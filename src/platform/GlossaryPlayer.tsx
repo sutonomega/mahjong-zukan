@@ -44,7 +44,7 @@ export default function GlossaryPlayer({ pack, initialEntryId }: GlossaryPlayerP
       <button className="glossary-runtime-back" onClick={() => setSelectedId(null)} type="button"><ArrowLeft size={16} />用語一覧へ戻る</button>
       <article className="glossary-runtime-detail">
         <p>{selectedEntry.category}</p>
-        <h2 id="glossary-runtime-title">{selectedEntry.title}</h2>
+        <h1 id="glossary-runtime-title">{selectedEntry.title}</h1>
         {selectedEntry.reading && <p className="glossary-runtime-reading">{selectedEntry.reading}</p>}
         <p className="glossary-runtime-definition">{selectedEntry.shortDefinition}</p>
         <p>{selectedEntry.description}</p>
@@ -53,7 +53,7 @@ export default function GlossaryPlayer({ pack, initialEntryId }: GlossaryPlayerP
   }
 
   return <section className="glossary-runtime" aria-labelledby="glossary-runtime-title">
-    <h2 id="glossary-runtime-title">{pack.title}</h2>
+    <h1 id="glossary-runtime-title">{pack.title}</h1>
     <p>{pack.description}</p>
     <label className="glossary-runtime-search"><Search size={17} /><span className="visually-hidden">用語を検索</span>
       <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="用語を検索" />
@@ -72,3 +72,4 @@ export default function GlossaryPlayer({ pack, initialEntryId }: GlossaryPlayerP
       : <p className="glossary-runtime-empty">一致する用語はありません。</p>}
   </section>
 }
+

@@ -14,6 +14,7 @@ import { learningPackToSearchPack, searchContentPacks, type SearchResult, type S
 import ContentPackDemo from './platform/ContentPackDemo'
 import GlossaryPlayer from './platform/GlossaryPlayer'
 import { contentPackDemos, standaloneGlossaryDemos } from './content-packs/demoPacks'
+import { getPreferredScrollBehavior } from './platform/accessibility'
 
 const typeFilters = ['すべて', '役', '用語'] as const
 type TypeFilter = typeof typeFilters[number]
@@ -133,7 +134,7 @@ function MahjongApp() {
       setLessonToOpen(result.item.id)
       setActiveView('course')
       setQuery('')
-      window.scrollTo({ top: 0, behavior: 'smooth' })
+      window.scrollTo({ top: 0, behavior: getPreferredScrollBehavior() })
       return
     }
     const entry = entries.find((item) => item.id === result.item.id)
@@ -174,7 +175,7 @@ function MahjongApp() {
       setEntryHistory((history) => [...history, { id: selectedId, scrollY: window.scrollY }])
     }
     setSelectedId(entry.id)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    window.scrollTo({ top: 0, behavior: getPreferredScrollBehavior() })
   }
 
   function backFromEntry() {
@@ -203,7 +204,7 @@ function MahjongApp() {
     setLessonToOpen(undefined)
     setQuery('')
     setActiveView('course')
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    window.scrollTo({ top: 0, behavior: getPreferredScrollBehavior() })
   }
 
   if (selected) {
@@ -448,6 +449,7 @@ export default function App() {
 
   if (demoPack) return <ContentPackDemo {...demoPack} />
   if (glossaryDemo) return <div className="app-shell">
+    <a className="skip-link" href="#main-content">本文へスキップ</a>
     <header className="topbar">
       <span className="brand-button">{glossaryDemo.title}</span>
       <span className="topbar-note">独立した用語集の表示例 · {glossaryDemo.locale}</span>
@@ -459,3 +461,4 @@ export default function App() {
   </div>
   return <MahjongApp />
 }
+
