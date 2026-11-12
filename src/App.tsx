@@ -12,7 +12,8 @@ import { resolveMahjongGlossaryEntryId } from './content-packs/mahjong/glossaryA
 import { mahjongExtensionRenderers } from './content-packs/mahjong/extensionRenderers'
 import { learningPackToSearchPack, searchContentPacks, type SearchResult, type SearchablePack } from './platform/search'
 import ContentPackDemo from './platform/ContentPackDemo'
-import { contentPackDemos } from './content-packs/demoPacks'
+import GlossaryPlayer from './platform/GlossaryPlayer'
+import { contentPackDemos, standaloneGlossaryDemos } from './content-packs/demoPacks'
 
 const typeFilters = ['すべて', '役', '用語'] as const
 type TypeFilter = typeof typeFilters[number]
@@ -432,8 +433,29 @@ function MahjongApp() {
 }
 
 export default function App() {
-  const demoPackId = typeof window === 'undefined' ? null : new URLSearchParams(window.location.search).get('demoPack')
+  const searchParams = typeof window === 'undefined' ? null : new URLSearchParams(window.location.search)
+  const demoPackId = searchParams?.get('demoPack')
   const demoPack = demoPackId ? contentPackDemos[demoPackId] : undefined
+  const glossaryDemoId = searchParams?.get('glossaryDemo')
+  const glossaryDemo = glossaryDemoId ? standaloneGlossaryDemos[glossaryDemoId] : undefined
+
+  useEffect(() => {
+    if (!glossaryDemo) return
+    const previousTitle = document.title
+    document.title = glossaryDemo.title + ' | 用語集'
+    return () => { document.title = previousTitle }
+  }, [glossaryDemo])
+
   if (demoPack) return <ContentPackDemo {...demoPack} />
+  if (glossaryDemo) return <div className="app-shell">
+    <header className="topbar">
+      <span className="brand-button">{glossaryDemo.title}</span>
+      <span className="topbar-note">独立した用語集の表示例 · {glossaryDemo.locale}</span>
+    </header>
+    <main id="main-content" className="course-layout" tabIndex={-1}>
+      <GlossaryPlayer pack={glossaryDemo} />
+    </main>
+    <footer className="footer"><span>{glossaryDemo.title}</span><span>{glossaryDemo.description}</span></footer>
+  </div>
   return <MahjongApp />
 }

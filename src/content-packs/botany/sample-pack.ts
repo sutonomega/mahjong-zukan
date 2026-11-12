@@ -38,6 +38,24 @@ export const botanyGlossaryPack: GlossaryPack = {
   ],
 }
 
+/** Small English glossary pack for checking locale-aware search independently. */
+export const botanyEnglishGlossaryPack: GlossaryPack = {
+  packId: 'botany-basics-en',
+  title: 'Plant Structure Glossary',
+  description: 'A small glossary about plant leaves.',
+  locale: 'en-US',
+  schemaVersion: 1,
+  contentVersion: '1.0.0',
+  entries: [{
+    id: 'botany-en:leaf-vein',
+    title: 'Leaf vein',
+    aliases: ['Leaf veins'],
+    shortDefinition: 'A vein is a line that carries water and nutrients through a leaf.',
+    description: 'Leaf veins form a branching network that carries water and nutrients through a leaf.',
+    category: 'Leaf structure',
+  }],
+}
+
 export const botanyLearningPack: LearningPack = {
   packId: 'botany-basics',
   title: '植物の基本',
