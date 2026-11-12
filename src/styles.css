@@ -472,3 +472,22 @@ main { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
   .learning-course-grid { grid-template-columns: 1fr; }
   .learning-course-card { min-height: 135px; padding: 15px; }
 }
+
+.skip-link {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: 1000;
+  padding: 10px 14px;
+  transform: translateY(-160%);
+  border: 2px solid var(--green);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--green);
+  font-weight: 700;
+}
+.skip-link:focus {
+  transform: translateY(0);
+  outline: 3px solid #a6c9b2;
+  outline-offset: 3px;
+}
