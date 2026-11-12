@@ -16,14 +16,17 @@ type CoursePlayerProps = {
 function LessonSegments({ segments, onOpenTerm }: { segments: LessonSegment[]; onOpenTerm: CoursePlayerProps['onOpenTerm'] }) {
   return <>{segments.map((segment, index) => segment.type === 'text'
     ? <span key={index}>{segment.text}</span>
-    : <button
+    : <a
         aria-label={segment.reference.label + '。' + segment.reference.shortDefinition + '。クリックで図鑑の詳しい説明を開く'}
         className="course-term-link"
         data-tooltip={segment.reference.shortDefinition}
+        href="#glossary-entry"
         key={segment.reference.id + '-' + index}
-        onClick={() => onOpenTerm(segment.reference)}
-        type="button"
-      >{segment.reference.label}</button>)}</>
+        onClick={(event) => {
+          event.preventDefault()
+          onOpenTerm(segment.reference)
+        }}
+      >{segment.reference.label}</a>)}</>
 }
 
 export default function CoursePlayer({ pack, course, onOpenTerm, renderExtension, initialLessonId }: CoursePlayerProps) {

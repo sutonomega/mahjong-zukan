@@ -102,14 +102,17 @@ export default function GlossaryLinkedText({ text, onOpen }: GlossaryLinkedTextP
       const entry = part.entry
       const displayLabel = getDisplayLabel(entry)
       const tooltip = formatGlossaryText(getEntryExplanation(entry))
-      return <button
+      return <a
         aria-label={`${displayLabel}。説明: ${tooltip}。クリックで用語詳細を開く`}
         className="glossary-term-link"
         data-tooltip={tooltip}
+        href="#glossary-entry"
         key={index}
-        onClick={() => onOpen(entry)}
-        type="button"
-      >{displayLabel}</button>
+        onClick={(event) => {
+          event.preventDefault()
+          onOpen(entry)
+        }}
+      >{displayLabel}</a>
     })}
   </>
 }
