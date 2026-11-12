@@ -149,6 +149,9 @@ main { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
 .empty-state p { font-size: 12px; }
 .primary-button { margin-top: 10px; padding: 10px 18px; border: 0; border-radius: 9px; background: var(--green); color: #fff; font-size: 12px; }
 .footer { display: flex; justify-content: space-between; gap: 20px; padding: 22px max(24px, calc((100vw - 1160px) / 2)); border-top: 1px solid var(--line); background: #fff; color: #87948a; font-size: 10px; letter-spacing: .05em; }
+.footer-feedback { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px 16px; }
+.footer-feedback a { color: #427a54; text-decoration: underline; text-underline-offset: 3px; }
+.footer-feedback small { flex-basis: 100%; text-align: right; letter-spacing: 0; }
 .detail-layout { max-width: 820px; padding-top: 28px; padding-bottom: 60px; }
 .back-link { display: inline-flex; align-items: center; gap: 7px; padding: 8px 0; border: 0; background: none; color: #6f8576; font-size: 12px; }
 .detail-card { margin-top: 15px; padding: 32px; border: 1px solid var(--line); border-radius: 20px; background: #fff; }
@@ -257,6 +260,9 @@ main { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
   .difficulty { font-size: 9px; }
   .details-link, .learned-label { font-size: 9px; }
   .footer { padding: 18px 16px; }
+  .footer { flex-wrap: wrap; }
+  .footer-feedback { justify-content: flex-start; }
+  .footer-feedback small { text-align: left; }
   .detail-layout { padding-top: 18px; }
   .detail-card { padding: 21px 17px; border-radius: 16px; }
   .related-words { gap: 6px; }

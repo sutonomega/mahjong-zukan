@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { BookOpen, Search, X, ChevronRight, Check, Sparkles, CircleHelp, ArrowLeft, BookmarkCheck } from 'lucide-react'
 import { entries, getCategory, getDisplayName, getEntryExplanation, getEntryReadingVariants, type Entry } from './data/entries'
 import YakuArtwork from './components/YakuArtwork'
@@ -47,6 +47,29 @@ const mahjongSearchPack: SearchablePack = (() => {
 
 type EntryHistoryLocation = { id: string; scrollY: number }
 
+function readAppRoute() {
+  if (typeof window === 'undefined') return { selectedId: null, lessonId: undefined, view: 'glossary' as const }
+  const params = new URLSearchParams(window.location.search)
+  const requestedEntryId = params.get('term')
+  const selectedId = requestedEntryId && entries.some((entry) => entry.id === requestedEntryId) ? requestedEntryId : null
+  const requestedLessonId = params.get('lesson')
+  const lessonId = requestedLessonId && mahjongBeginnerPack.courses[0].lessons.some((lesson) => lesson.id === requestedLessonId)
+    ? requestedLessonId
+    : undefined
+  return { selectedId, lessonId, view: params.get('view') === 'course' ? 'course' as const : 'glossary' as const }
+}
+
+function writeAppRoute(route: { view: 'course' | 'glossary'; termId?: string | null; lessonId?: string }, mode: 'push' | 'replace' = 'push') {
+  const url = new URL(window.location.href)
+  url.searchParams.delete('view')
+  url.searchParams.delete('term')
+  url.searchParams.delete('lesson')
+  if (route.view === 'course') url.searchParams.set('view', 'course')
+  if (route.lessonId) url.searchParams.set('lesson', route.lessonId)
+  if (route.termId) url.searchParams.set('term', route.termId)
+  window.history[mode === 'push' ? 'pushState' : 'replaceState']({}, '', url)
+}
+
 const GLOSSARY_PROGRESS_KEY = 'mahjong-zukan-learned'
 const GLOSSARY_PROGRESS_SCHEMA_VERSION = 1
 
@@ -81,14 +104,26 @@ function saveLearnedEntryIds(learnedEntryIds: string[]) {
   }
 }
 
+function AppFooter() {
+  return <footer className="footer">
+    <span>麻雀図鑑</span><span>少しずつ覚えていこう。</span>
+    <nav aria-label="フィードバック" className="footer-feedback">
+      <a href="https://github.com/sutonomega/mahjong-zukan/issues/new?template=bug-report.yml" rel="noreferrer" target="_blank">不具合を報告（GitHub）</a>
+      <a href="https://github.com/sutonomega/mahjong-zukan/issues/new?template=content-feedback.yml" rel="noreferrer" target="_blank">教材に意見を送る（GitHub）</a>
+      <small>報告にはGitHubのアカウントが必要です。送信内容は公開されます。</small>
+    </nav>
+  </footer>
+}
+
 function MahjongApp() {
+  const [initialRoute] = useState(readAppRoute)
   const [query, setQuery] = useState('')
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('すべて')
   const [categoryFilter, setCategoryFilter] = useState('すべて')
-  const [selectedId, setSelectedId] = useState<string | null>(null)
-  const [lessonToOpen, setLessonToOpen] = useState<string | undefined>(undefined)
-  const [activeView, setActiveView] = useState<'course' | 'glossary'>('glossary')
-  const [entryReturnView, setEntryReturnView] = useState<'course' | 'glossary'>('course')
+  const [selectedId, setSelectedId] = useState<string | null>(initialRoute.selectedId)
+  const [lessonToOpen, setLessonToOpen] = useState<string | undefined>(initialRoute.lessonId)
+  const [activeView, setActiveView] = useState<'course' | 'glossary'>(initialRoute.view)
+  const [entryReturnView, setEntryReturnView] = useState<'course' | 'glossary'>(initialRoute.view)
   const [entryReturnScroll, setEntryReturnScroll] = useState(0)
   const [entryHistory, setEntryHistory] = useState<EntryHistoryLocation[]>([])
   const [learned, setLearned] = useState<string[]>(loadLearnedEntryIds)
@@ -96,6 +131,24 @@ function MahjongApp() {
   useEffect(() => {
     saveLearnedEntryIds(learned)
   }, [learned])
+
+  useEffect(() => {
+    function handlePopState() {
+      const route = readAppRoute()
+      setSelectedId(route.selectedId)
+      setLessonToOpen(route.lessonId)
+      setActiveView(route.view)
+      setEntryReturnView(route.view)
+      setEntryHistory([])
+    }
+    window.addEventListener('popstate', handlePopState)
+    return () => window.removeEventListener('popstate', handlePopState)
+  }, [])
+
+  const onCourseLessonChange = useCallback((lessonId: string) => {
+    setLessonToOpen(lessonId)
+    writeAppRoute({ view: 'course', lessonId }, 'replace')
+  }, [])
 
   const categories = useMemo(() => [...new Set(entries.map(getCategory))], [])
   const selected = entries.find((entry) => entry.id === selectedId) ?? null
@@ -133,6 +186,7 @@ function MahjongApp() {
       setEntryHistory([])
       setLessonToOpen(result.item.id)
       setActiveView('course')
+      writeAppRoute({ view: 'course', lessonId: result.item.id })
       setQuery('')
       window.scrollTo({ top: 0, behavior: getPreferredScrollBehavior() })
       return
@@ -175,6 +229,7 @@ function MahjongApp() {
       setEntryHistory((history) => [...history, { id: selectedId, scrollY: window.scrollY }])
     }
     setSelectedId(entry.id)
+    writeAppRoute({ view: activeView, lessonId: activeView === 'course' ? lessonToOpen : undefined, termId: entry.id })
     window.scrollTo({ top: 0, behavior: getPreferredScrollBehavior() })
   }
 
@@ -183,12 +238,14 @@ function MahjongApp() {
     if (!previous) {
       setSelectedId(null)
       setActiveView(entryReturnView)
+      writeAppRoute({ view: entryReturnView, lessonId: entryReturnView === 'course' ? lessonToOpen : undefined }, 'replace')
       window.requestAnimationFrame(() => window.scrollTo({ top: entryReturnScroll, behavior: 'auto' }))
       return
     }
 
     setEntryHistory((history) => history.slice(0, -1))
     setSelectedId(previous.id)
+    writeAppRoute({ view: entryReturnView, lessonId: entryReturnView === 'course' ? lessonToOpen : undefined, termId: previous.id }, 'replace')
     window.requestAnimationFrame(() => window.scrollTo({ top: previous.scrollY, behavior: 'auto' }))
   }
 
@@ -204,6 +261,7 @@ function MahjongApp() {
     setLessonToOpen(undefined)
     setQuery('')
     setActiveView('course')
+    writeAppRoute({ view: 'course' })
     window.scrollTo({ top: 0, behavior: getPreferredScrollBehavior() })
   }
 
@@ -212,7 +270,7 @@ function MahjongApp() {
       <div className="app-shell">
         <a className="skip-link" href="#main-content">本文へスキップ</a>
         <header className="topbar">
-          <button className="brand-button" onClick={() => { setSelectedId(null); setEntryHistory([]); setActiveView('glossary') }} aria-label="図鑑の一覧へ戻る">
+          <button className="brand-button" onClick={() => { setSelectedId(null); setEntryHistory([]); setActiveView('glossary'); writeAppRoute({ view: 'glossary' }) }} aria-label="図鑑の一覧へ戻る">
             <span className="brand-mark"><BookOpen size={21} /></span>
             <span>麻雀図鑑</span>
           </button>
@@ -277,7 +335,7 @@ function MahjongApp() {
             </section>}
           </article>
         </main>
-        <footer className="footer"><span>麻雀図鑑</span><span>少しずつ覚えていこう。</span></footer>
+        <AppFooter />
       </div>
     )
   }
@@ -296,7 +354,7 @@ function MahjongApp() {
           <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="学習記事や用語を検索" aria-label="学習記事と図鑑を検索" />
           {query && <button className="clear-search" onClick={() => setQuery('')} aria-label="検索をクリア"><X size={17} /></button>}
         </div>
-        <button className="topbar-nav-button" onClick={() => setActiveView('glossary')} type="button">図鑑へ</button>
+        <button className="topbar-nav-button" onClick={() => { setActiveView('glossary'); writeAppRoute({ view: 'glossary' }) }} type="button">図鑑へ</button>
       </header>
       {query.trim() && <section className="content-search-results" aria-live="polite" aria-label="学習記事と図鑑の検索結果">
         <div className="content-search-heading"><h2>検索結果</h2><span>{contentSearchResults.length} 件</span></div>
@@ -306,6 +364,7 @@ function MahjongApp() {
       </section>}
       <CoursePlayer
         initialLessonId={lessonToOpen}
+        onLessonChange={onCourseLessonChange}
         pack={mahjongBeginnerPack}
         course={mahjongBeginnerPack.courses[0]}
         renderExtension={(extension) => mahjongExtensionRenderers[extension.rendererId]?.(extension)}
@@ -315,7 +374,7 @@ function MahjongApp() {
           if (entry) openEntry(entry)
         }}
       />
-      <footer className="footer"><span>麻雀図鑑</span><span>少しずつ覚えていこう。</span></footer>
+      <AppFooter />
     </div>
   }
 
@@ -428,7 +487,7 @@ function MahjongApp() {
         </section>
 
       </main>
-      <footer className="footer"><span>麻雀図鑑</span><span>少しずつ覚えていこう。</span></footer>
+      <AppFooter />
     </div>
   )
 }
