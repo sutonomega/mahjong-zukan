@@ -1,73 +1,251 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { BookOpen, Search, X, ChevronRight, Check, Sparkles, CircleHelp, ArrowLeft, BookmarkCheck } from 'lucide-react'
-import { entries, getCategory, getDisplayName, getEntryExplanation, classifyEntryQuery, references, type Entry } from './data/entries'
+import { entries, getCategory, getDisplayName, getEntryExplanation, getEntryReadingVariants, type Entry } from './data/entries'
 import YakuArtwork from './components/YakuArtwork'
 import TermArtwork from './components/TermArtwork'
-import GlossaryLinkedText from './components/GlossaryLinkedText'
+import GlossaryLinkedText, { getGlossaryEntries } from './components/GlossaryLinkedText'
 import { hanLevels } from './data/hanLevels'
 import { suitedTileReadings } from './data/suitedTileReadings'
+import CoursePlayer from './platform/CoursePlayer'
+import { mahjongBeginnerPack } from './content-packs/mahjong/beginner-course'
+import { resolveMahjongGlossaryEntryId } from './content-packs/mahjong/glossaryAdapter'
+import { mahjongExtensionRenderers } from './content-packs/mahjong/extensionRenderers'
+import { learningPackToSearchPack, searchContentPacks, type SearchResult, type SearchablePack } from './platform/search'
+import ContentPackDemo from './platform/ContentPackDemo'
+import GlossaryPlayer from './platform/GlossaryPlayer'
+import { contentPackDemos, standaloneGlossaryDemos } from './content-packs/demoPacks'
+import { getPreferredScrollBehavior } from './platform/accessibility'
 
 const typeFilters = ['すべて', '役', '用語'] as const
 type TypeFilter = typeof typeFilters[number]
+const courseTracks = [
+  { id: 'intro', title: '入門編', description: '牌の見方から、1局の流れ、役とアガリの基本まで学びます。', status: 'available' },
+  { id: 'beginner', title: '初級編', description: '基本を身につけたあとに進むコースです。', status: 'coming-soon' },
+  { id: 'intermediate', title: '中級編', description: '役や待ち、対局ルールをさらに学ぶコースです。', status: 'coming-soon' },
+  { id: 'advanced', title: '上級編', description: '点数計算や戦術などを学ぶコースです。', status: 'coming-soon' },
+] as const
+const mahjongSearchPack: SearchablePack = (() => {
+  const lessons = learningPackToSearchPack(mahjongBeginnerPack)
+  return {
+    ...lessons,
+    items: [
+      ...lessons.items,
+      ...entries.map((entry) => ({
+        id: entry.id,
+        kind: 'glossary',
+        title: getDisplayName(entry),
+        aliases: [entry.name],
+        readings: getEntryReadingVariants(entry),
+        category: getCategory(entry),
+        description: getEntryExplanation(entry),
+        keywords: [entry.sourceCategory],
+        facets: { type: entry.type },
+      })),
+    ],
+  }
+})()
+
 type EntryHistoryLocation = { id: string; scrollY: number }
 
-function App() {
+function readAppRoute() {
+  if (typeof window === 'undefined') return { selectedId: null, lessonId: undefined, view: 'glossary' as const }
+  const params = new URLSearchParams(window.location.search)
+  const requestedEntryId = params.get('term')
+  const selectedId = requestedEntryId && entries.some((entry) => entry.id === requestedEntryId) ? requestedEntryId : null
+  const requestedLessonId = params.get('lesson')
+  const lessonId = requestedLessonId && mahjongBeginnerPack.courses[0].lessons.some((lesson) => lesson.id === requestedLessonId)
+    ? requestedLessonId
+    : undefined
+  return { selectedId, lessonId, view: params.get('view') === 'course' ? 'course' as const : 'glossary' as const }
+}
+
+function writeAppRoute(route: { view: 'course' | 'glossary'; termId?: string | null; lessonId?: string }, mode: 'push' | 'replace' = 'push') {
+  const url = new URL(window.location.href)
+  url.searchParams.delete('view')
+  url.searchParams.delete('term')
+  url.searchParams.delete('lesson')
+  if (route.view === 'course') url.searchParams.set('view', 'course')
+  if (route.lessonId) url.searchParams.set('lesson', route.lessonId)
+  if (route.termId) url.searchParams.set('term', route.termId)
+  window.history[mode === 'push' ? 'pushState' : 'replaceState']({}, '', url)
+}
+
+const GLOSSARY_PROGRESS_KEY = 'mahjong-zukan-learned'
+const GLOSSARY_PROGRESS_SCHEMA_VERSION = 1
+
+function loadLearnedEntryIds(): string[] {
+  try {
+    const raw = typeof window === 'undefined' ? null : window.localStorage.getItem(GLOSSARY_PROGRESS_KEY)
+    if (!raw) return []
+    const saved: unknown = JSON.parse(raw)
+    const ids = Array.isArray(saved)
+      ? saved
+      : typeof saved === 'object' && saved !== null && 'schemaVersion' in saved
+        && saved.schemaVersion === GLOSSARY_PROGRESS_SCHEMA_VERSION
+        && 'learnedEntryIds' in saved && Array.isArray(saved.learnedEntryIds)
+          ? saved.learnedEntryIds
+          : []
+    const knownIds = new Set(entries.map((entry) => entry.id))
+    return [...new Set(ids.filter((id): id is string => typeof id === 'string' && knownIds.has(id)))]
+  } catch {
+    return []
+  }
+}
+
+function saveLearnedEntryIds(learnedEntryIds: string[]) {
+  try {
+    if (typeof window === 'undefined') return
+    window.localStorage.setItem(GLOSSARY_PROGRESS_KEY, JSON.stringify({
+      schemaVersion: GLOSSARY_PROGRESS_SCHEMA_VERSION,
+      learnedEntryIds,
+    }))
+  } catch {
+    // Keep glossary controls usable when browser storage is unavailable or full.
+  }
+}
+
+function AppFooter() {
+  return <footer className="footer">
+    <span>麻雀図鑑</span><span>少しずつ覚えていこう。</span>
+    <nav aria-label="フィードバック" className="footer-feedback">
+      <a href="https://github.com/sutonomega/mahjong-zukan/issues/new?template=bug-report.yml" rel="noreferrer" target="_blank">不具合を報告（GitHub）</a>
+      <a href="https://github.com/sutonomega/mahjong-zukan/issues/new?template=content-feedback.yml" rel="noreferrer" target="_blank">教材に意見を送る（GitHub）</a>
+      <small>報告にはGitHubのアカウントが必要です。送信内容は公開されます。</small>
+    </nav>
+  </footer>
+}
+
+function MahjongApp() {
+  const [initialRoute] = useState(readAppRoute)
   const [query, setQuery] = useState('')
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('すべて')
   const [categoryFilter, setCategoryFilter] = useState('すべて')
-  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [selectedId, setSelectedId] = useState<string | null>(initialRoute.selectedId)
+  const [lessonToOpen, setLessonToOpen] = useState<string | undefined>(initialRoute.lessonId)
+  const [activeView, setActiveView] = useState<'course' | 'glossary'>(initialRoute.view)
+  const [entryReturnView, setEntryReturnView] = useState<'course' | 'glossary'>(initialRoute.view)
+  const [entryReturnScroll, setEntryReturnScroll] = useState(0)
   const [entryHistory, setEntryHistory] = useState<EntryHistoryLocation[]>([])
-  const [learned, setLearned] = useState<string[]>(() => {
-    try {
-      return JSON.parse(localStorage.getItem('mahjong-zukan-learned') ?? '[]') as string[]
-    } catch {
-      return []
-    }
-  })
+  const [learned, setLearned] = useState<string[]>(loadLearnedEntryIds)
 
-  const categories = useMemo(() => [...new Set(entries.filter((entry) => entry.type === '用語').map(getCategory))], [])
+  useEffect(() => {
+    saveLearnedEntryIds(learned)
+  }, [learned])
+
+  useEffect(() => {
+    function handlePopState() {
+      const route = readAppRoute()
+      setSelectedId(route.selectedId)
+      setLessonToOpen(route.lessonId)
+      setActiveView(route.view)
+      setEntryReturnView(route.view)
+      setEntryHistory([])
+    }
+    window.addEventListener('popstate', handlePopState)
+    return () => window.removeEventListener('popstate', handlePopState)
+  }, [])
+
+  const onCourseLessonChange = useCallback((lessonId: string) => {
+    setLessonToOpen(lessonId)
+    writeAppRoute({ view: 'course', lessonId }, 'replace')
+  }, [])
+
+  const categories = useMemo(() => [...new Set(entries.map(getCategory))], [])
   const selected = entries.find((entry) => entry.id === selectedId) ?? null
+  const selectedRelatedEntries = selected
+    ? getGlossaryEntries(getEntryExplanation(selected)).filter((entry) => entry.id !== selected.id)
+    : []
   const learnedCount = entries.filter((entry) => learned.includes(entry.id)).length
+  const contentSearchResults = useMemo(
+    () => searchContentPacks([mahjongSearchPack], query, { packIds: [mahjongBeginnerPack.packId] }),
+    [query],
+  )
+  const lessonSearchResults = contentSearchResults.filter((result) => result.item.kind === 'lesson')
   const searchGroups = useMemo(() => {
     const matchesFilters = (entry: Entry) => (typeFilter === 'すべて' || entry.type === typeFilter)
       && (categoryFilter === 'すべて' || getCategory(entry) === categoryFilter)
     if (!query.trim()) return { exact: [], suggested: [], related: [], all: entries.filter(matchesFilters) }
 
-    const exact: Entry[] = []
-    const suggested: Entry[] = []
-    const related: Entry[] = []
-    entries.filter(matchesFilters).forEach((entry) => {
-      const match = classifyEntryQuery(entry, query)
-      if (match === 'exact-title') exact.push(entry)
-      else if (match === 'suggested-title') suggested.push(entry)
-      else if (match === 'related-description') related.push(entry)
-    })
-    return { exact, suggested, related, all: [] }
-  }, [query, typeFilter, categoryFilter])
+    const glossaryHits = contentSearchResults.filter((result) => result.item.kind === 'glossary')
+    const entriesFor = (match: SearchResult['match']) => glossaryHits
+      .filter((result) => result.match === match)
+      .map((result) => entries.find((entry) => entry.id === result.item.id))
+      .filter((entry): entry is Entry => Boolean(entry))
+      .filter(matchesFilters)
+    return {
+      exact: entriesFor('exact-title'),
+      suggested: entriesFor('exact-metadata'),
+      related: entriesFor('exact-description'),
+      all: [],
+    }
+  }, [query, typeFilter, categoryFilter, contentSearchResults])
+
+  function openSearchResult(result: SearchResult) {
+    if (result.item.kind === 'lesson') {
+      setSelectedId(null)
+      setEntryHistory([])
+      setLessonToOpen(result.item.id)
+      setActiveView('course')
+      writeAppRoute({ view: 'course', lessonId: result.item.id })
+      setQuery('')
+      window.scrollTo({ top: 0, behavior: getPreferredScrollBehavior() })
+      return
+    }
+    const entry = entries.find((item) => item.id === result.item.id)
+    if (entry) openEntry(entry)
+  }
+
+  function renderSearchResult(result: SearchResult) {
+    const isLesson = result.item.kind === 'lesson'
+    return <button
+      className="content-search-result"
+      key={result.packId + ':' + result.item.kind + ':' + result.item.id}
+      onClick={() => openSearchResult(result)}
+      type="button"
+    >
+      <span className={`content-search-kind ${isLesson ? 'lesson' : 'glossary'}`}>{isLesson ? '学習記事' : '図鑑'}</span>
+      <span className="content-search-copy">
+        <strong>{result.item.title}</strong>
+        <small>{[result.item.category, result.item.kind === 'glossary' ? result.item.facets?.type : ''].filter(Boolean).join(' · ')}</small>
+        {result.item.description && <small>{result.item.description.slice(0, 100)}{result.item.description.length > 100 ? '…' : ''}</small>}
+      </span>
+      <ChevronRight size={17} />
+    </button>
+  }
 
   function toggleLearned(id: string) {
-    const next = learned.includes(id) ? learned.filter((item) => item !== id) : [...learned, id]
-    setLearned(next)
-    localStorage.setItem('mahjong-zukan-learned', JSON.stringify(next))
+    if (!entries.some((entry) => entry.id === id)) return
+    setLearned((current) => current.includes(id)
+      ? current.filter((item) => item !== id)
+      : [...current, id])
   }
 
   function openEntry(entry: Entry) {
+    if (!selectedId) {
+      setEntryReturnView(activeView)
+      setEntryReturnScroll(window.scrollY)
+    }
     if (selectedId && selectedId !== entry.id) {
       setEntryHistory((history) => [...history, { id: selectedId, scrollY: window.scrollY }])
     }
     setSelectedId(entry.id)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    writeAppRoute({ view: activeView, lessonId: activeView === 'course' ? lessonToOpen : undefined, termId: entry.id })
+    window.scrollTo({ top: 0, behavior: getPreferredScrollBehavior() })
   }
 
   function backFromEntry() {
     const previous = entryHistory[entryHistory.length - 1]
     if (!previous) {
       setSelectedId(null)
+      setActiveView(entryReturnView)
+      writeAppRoute({ view: entryReturnView, lessonId: entryReturnView === 'course' ? lessonToOpen : undefined }, 'replace')
+      window.requestAnimationFrame(() => window.scrollTo({ top: entryReturnScroll, behavior: 'auto' }))
       return
     }
 
     setEntryHistory((history) => history.slice(0, -1))
     setSelectedId(previous.id)
+    writeAppRoute({ view: entryReturnView, lessonId: entryReturnView === 'course' ? lessonToOpen : undefined, termId: previous.id }, 'replace')
     window.requestAnimationFrame(() => window.scrollTo({ top: previous.scrollY, behavior: 'auto' }))
   }
 
@@ -77,17 +255,28 @@ function App() {
     setCategoryFilter('すべて')
   }
 
+  function openBeginnerCourse() {
+    setSelectedId(null)
+    setEntryHistory([])
+    setLessonToOpen(undefined)
+    setQuery('')
+    setActiveView('course')
+    writeAppRoute({ view: 'course' })
+    window.scrollTo({ top: 0, behavior: getPreferredScrollBehavior() })
+  }
+
   if (selected) {
     return (
       <div className="app-shell">
+        <a className="skip-link" href="#main-content">本文へスキップ</a>
         <header className="topbar">
-          <button className="brand-button" onClick={() => { setSelectedId(null); setEntryHistory([]) }} aria-label="図鑑の一覧へ戻る">
+          <button className="brand-button" onClick={() => { setSelectedId(null); setEntryHistory([]); setActiveView('glossary'); writeAppRoute({ view: 'glossary' }) }} aria-label="図鑑の一覧へ戻る">
             <span className="brand-mark"><BookOpen size={21} /></span>
             <span>麻雀図鑑</span>
           </button>
           <span className="topbar-note">はじめての麻雀を、もっとわかりやすく。</span>
         </header>
-        <main className="detail-layout">
+        <main id="main-content" className="detail-layout" tabIndex={-1}>
           <button className="back-link" onClick={backFromEntry}><ArrowLeft size={16} /> {entryHistory.length > 0 ? '前の説明へ戻る' : '図鑑一覧へ戻る'}</button>
           <article className="detail-card">
             <div className="detail-kicker"><span className={`type-pill type-${selected.type}`}>{selected.type}</span></div>
@@ -101,11 +290,23 @@ function App() {
                 {learned.includes(selected.id) ? '習得済み' : '覚えた！'}
               </button>
             </div>
-            <div className="detail-category-block">{getCategory(selected)}</div>
+            <div className="detail-tag-row">
+              <span className="detail-category-block">{getCategory(selected)}</span>
+              {selected.type === '役' && <>
+                <span className="detail-metadata-tag">翻数：{String(selected.source['翻数（ハンスウ）'] ?? '記載なし')}</span>
+                <span className="detail-metadata-tag">鳴き：{String(selected.source['鳴き'] ?? '記載なし')}</span>
+              </>}
+            </div>
             <section className="detail-section source-description">
-              <h2>説明</h2>
+              <h2>意味</h2>
               <p><GlossaryLinkedText text={getEntryExplanation(selected)} onOpen={openEntry} /></p>
             </section>
+            {selectedRelatedEntries.length > 0 && <section className="detail-section related-words-section">
+              <h2>関連ワード</h2>
+              <div className="related-words">
+                {selectedRelatedEntries.map((entry) => <button className="related-word" key={entry.id} onClick={() => openEntry(entry)}>{getDisplayName(entry)}<ChevronRight size={13} /></button>)}
+              </div>
+            </section>}
             {selected.type === '用語' && selected.id === 'term-052' && <section className="detail-section han-levels-section">
               <h2>翻数の区分（補足）</h2>
               <div className="han-table-wrap">
@@ -134,9 +335,47 @@ function App() {
             </section>}
           </article>
         </main>
-        <footer className="footer"><span>麻雀図鑑</span><span>少しずつ覚えていこう。</span></footer>
+        <AppFooter />
       </div>
     )
+  }
+
+  if (activeView === 'course' && !selected) {
+    return <div className="app-shell">
+      <a className="skip-link" href="#main-content">本文へスキップ</a>
+      <header className="topbar">
+        <button className="brand-button" onClick={() => { setActiveView('course'); setSelectedId(null); setEntryHistory([]) }} aria-label="学習コーストップ">
+          <span className="brand-mark"><BookOpen size={21} /></span>
+          <span>麻雀図鑑</span>
+        </button>
+        <span className="topbar-note">はじめての麻雀を、もっとわかりやすく。</span>
+        <div className="search-box topbar-search-box">
+          <Search size={17} />
+          <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="学習記事や用語を検索" aria-label="学習記事と図鑑を検索" />
+          {query && <button className="clear-search" onClick={() => setQuery('')} aria-label="検索をクリア"><X size={17} /></button>}
+        </div>
+        <button className="topbar-nav-button" onClick={() => { setActiveView('glossary'); writeAppRoute({ view: 'glossary' }) }} type="button">図鑑へ</button>
+      </header>
+      {query.trim() && <section className="content-search-results" aria-live="polite" aria-label="学習記事と図鑑の検索結果">
+        <div className="content-search-heading"><h2>検索結果</h2><span>{contentSearchResults.length} 件</span></div>
+        {contentSearchResults.length > 0
+          ? <div className="content-search-list">{contentSearchResults.map(renderSearchResult)}</div>
+          : <div className="empty-state"><CircleHelp size={26} /><h3>見つからなかったよ</h3><p>記事のタイトル、役や用語を別の言葉でも検索してみてね。</p></div>}
+      </section>}
+      <CoursePlayer
+        initialLessonId={lessonToOpen}
+        onLessonChange={onCourseLessonChange}
+        pack={mahjongBeginnerPack}
+        course={mahjongBeginnerPack.courses[0]}
+        renderExtension={(extension) => mahjongExtensionRenderers[extension.rendererId]?.(extension)}
+        onOpenTerm={(reference) => {
+          const entryId = resolveMahjongGlossaryEntryId(reference)
+          const entry = entryId ? entries.find((item) => item.id === entryId) : undefined
+          if (entry) openEntry(entry)
+        }}
+      />
+      <AppFooter />
+    </div>
   }
 
   function renderEntryCard(entry: Entry) {
@@ -144,13 +383,13 @@ function App() {
       <div className="entry-card-top"><span className={`type-pill type-${entry.type}`}>{entry.type}</span><span className="entry-category">{getCategory(entry)}</span></div>
       <div className="entry-illustration">
         {entry.type === '役'
-          ? <YakuArtwork number={entry.source.No} han={entry.source['翻数（ハンスウ）']} />
-          : <TermArtwork number={entry.source.No} category={entry.source.カテゴリ} />}
+          ? <YakuArtwork number={Number(entry.source['No'])} han={String(entry.source['翻数（ハンスウ）'] ?? '')} />
+          : <TermArtwork number={Number(entry.source['No'])} category={entry.sourceCategory} />}
       </div>
       <h3><button className="entry-title-button" onClick={() => openEntry(entry)}>{getDisplayName(entry)}</button></h3>
       <p className="entry-reading">{entry.reading}</p>
       <p className="entry-summary"><GlossaryLinkedText text={getEntryExplanation(entry)} onOpen={openEntry} /></p>
-      {entry.type === '役' && <p className="entry-yaku-meta">{entry.source['翻数（ハンスウ）']} ・ 鳴き {entry.source.鳴き || '記載なし'}</p>}
+      {entry.type === '役' && <p className="entry-yaku-meta">{entry.source['翻数（ハンスウ）']} ・ 鳴き {entry.source['鳴き'] || '記載なし'}</p>}
       <div className="entry-card-bottom">
         {learned.includes(entry.id) && <span className="learned-label"><Check size={14} />習得済み</span>}
         <button className="details-link" onClick={() => openEntry(entry)}>くわしく <ChevronRight size={15} /></button>
@@ -159,19 +398,21 @@ function App() {
   }
 
   const progress = entries.length ? Math.round((learnedCount / entries.length) * 100) : 0
-  const hasFilters = categoryFilter !== 'すべて' || typeFilter !== 'すべて' || query
+  const hasFilters = categoryFilter !== 'すべて' || typeFilter !== 'すべて' || Boolean(query)
 
   return (
     <div className="app-shell">
+      <a className="skip-link" href="#main-content">本文へスキップ</a>
       <header className="topbar">
         <button className="brand-button" onClick={resetFilters} aria-label="麻雀図鑑トップ">
           <span className="brand-mark"><BookOpen size={21} /></span>
           <span>麻雀図鑑</span>
         </button>
         <span className="topbar-note">はじめての麻雀を、もっとわかりやすく。</span>
+        
       </header>
 
-      <main>
+      <main id="main-content" tabIndex={-1}>
         <section className="hero">
           <div className="hero-content">
             <div className="eyebrow"><Sparkles size={14} /> BEGINNER'S FIELD GUIDE</div>
@@ -195,42 +436,88 @@ function App() {
           </div>
         </section>
 
-        <section className="catalog-section">
+        <section className="learning-section" aria-labelledby="learning-title">
+          <div className="section-heading">
+            <div><span className="section-eyebrow">LEARNING COURSES</span><h2 id="learning-title">学習コース</h2></div>
+            <p className="section-caption">自分の段階に合わせて学ぼう。</p>
+          </div>
+          <div className="learning-course-grid">
+            {courseTracks.map((track, index) => track.status === 'available'
+              ? <button className="learning-course-card is-available" key={track.id} onClick={openBeginnerCourse} type="button">
+                  <span className="learning-card-number">COURSE 0{index + 1}</span>
+                  <strong>{track.title}</strong>
+                  <span className="learning-course-description">{track.description}</span>
+                  <span className="learning-course-action">コースを始める <ChevronRight size={14} /></span>
+                </button>
+              : <button className="learning-course-card is-coming-soon" key={track.id} disabled type="button">
+                  <span className="learning-card-number">COURSE 0{index + 1}</span>
+                  <strong>{track.title}</strong>
+                  <span className="learning-course-status">作成中</span>
+                  <span className="learning-course-description">{track.description}</span>
+                </button>)}
+          </div>
+        </section>
+
+        <section className="catalog-section" id="catalog">
           <div className="section-heading catalog-heading">
             <div><span className="section-eyebrow">THE ENCYCLOPEDIA</span><h2>図鑑をひらく</h2></div>
-            <span className="result-count">{query.trim() ? `${searchGroups.exact.length + searchGroups.suggested.length + searchGroups.related.length} 件の項目` : `${searchGroups.all.length} 件の項目`}</span>
+            <span className="result-count" aria-live="polite" aria-atomic="true">{query.trim() ? `${searchGroups.exact.length + searchGroups.suggested.length + searchGroups.related.length + lessonSearchResults.length} 件の検索結果` : `${searchGroups.all.length} 件の項目`}</span>
           </div>
           <div className="search-box">
             <Search size={19} />
-            <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="名前・読み方・説明・カテゴリで検索（ひらがな・カタカナ対応）…" aria-label="図鑑を検索" />
+            <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="記事・名前・読み方・説明・カテゴリで検索…" aria-label="学習記事と図鑑を検索" />
             {query && <button className="clear-search" onClick={() => setQuery('')} aria-label="検索をクリア"><X size={17} /></button>}
           </div>
           <div className="filter-row">
-            <div className="filter-pills" role="group" aria-label="種類">
-              {typeFilters.map((filter) => <button key={filter} className={`filter-pill ${typeFilter === filter ? 'selected' : ''}`} onClick={() => setTypeFilter(filter)}>{filter}</button>)}
-            </div>
             {hasFilters && <button className="reset-button" onClick={resetFilters}>条件をリセット</button>}
           </div>
-          <div className="filter-pills category-pills" role="group" aria-label="カテゴリ">
-            {['すべて', ...categories].map((category) => <button key={category} className={`filter-pill ${categoryFilter === category ? 'selected' : ''}`} onClick={() => setCategoryFilter(category)}>{category}</button>)}
+          <div className="filter-row type-filter-row"><div className="filter-pills" role="group" aria-label="項目の種類">
+              {typeFilters.map((filter) => <button aria-pressed={typeFilter === filter} key={filter} className={`filter-pill ${typeFilter === filter ? 'selected' : ''}`} onClick={() => setTypeFilter(filter)} type="button">{filter}</button>)}
+            </div></div>
+          <div className="filter-pills category-pills" role="group" aria-label="学習カテゴリ">
+            {['すべて', ...categories].map((category) => <button aria-pressed={categoryFilter === category} key={category} className={`filter-pill ${categoryFilter === category ? 'selected' : ''}`} onClick={() => setCategoryFilter(category)} type="button">{category}</button>)}
           </div>
+          {query.trim() && lessonSearchResults.length > 0 && <section className="search-result-group lesson-search-group"><h3>学習記事</h3><div className="content-search-list">{lessonSearchResults.map(renderSearchResult)}</div></section>}
           {query.trim() ? <>
             {searchGroups.exact.length > 0 && <section className="search-result-group"><h3>検索結果</h3><div className="entry-grid">{searchGroups.exact.map(renderEntryCard)}</div></section>}
-            {searchGroups.suggested.length > 0 && <section className="search-result-group"><h3>もしかして？</h3><div className="entry-grid">{searchGroups.suggested.map(renderEntryCard)}</div></section>}
-            {searchGroups.related.length > 0 && <section className="search-result-group"><h3>関連する項目（説明文に含まれています）</h3><div className="entry-grid">{searchGroups.related.map(renderEntryCard)}</div></section>}
-            {searchGroups.exact.length + searchGroups.suggested.length + searchGroups.related.length === 0 && <div className="empty-state"><CircleHelp size={30} /><h3>見つからなかったよ</h3><p>別の言葉で検索するか、絞り込みを解除してみてね。</p><button className="primary-button" onClick={resetFilters}>すべての項目を見る</button></div>}
+            {searchGroups.suggested.length > 0 && <section className="search-result-group"><h3>カテゴリ・関連語で一致</h3><div className="entry-grid">{searchGroups.suggested.map(renderEntryCard)}</div></section>}
+            {searchGroups.related.length > 0 && <section className="search-result-group"><h3>説明文で一致</h3><div className="entry-grid">{searchGroups.related.map(renderEntryCard)}</div></section>}
+            {searchGroups.exact.length + searchGroups.suggested.length + searchGroups.related.length + lessonSearchResults.length === 0 && <div className="empty-state"><CircleHelp size={30} /><h3>見つからなかったよ</h3><p>別の言葉で検索するか、絞り込みを解除してみてね。</p><button className="primary-button" onClick={resetFilters}>すべての項目を見る</button></div>}
           </> : <div className="entry-grid">{searchGroups.all.map(renderEntryCard)}</div>}
         </section>
 
-        <section className="reference-section">
-          <h2>参考リンク</h2>
-          <p>Excelのシート「図」に記載されていた参考URLです。参照先の画像は転載していません。</p>
-          <ul>{references.map((reference) => <li key={reference.url}><a href={reference.url} target="_blank" rel="noreferrer">{reference.label}</a></li>)}</ul>
-        </section>
       </main>
-      <footer className="footer"><span>麻雀図鑑</span><span>少しずつ覚えていこう。</span></footer>
+      <AppFooter />
     </div>
   )
 }
 
-export default App
+export default function App() {
+  const searchParams = typeof window === 'undefined' ? null : new URLSearchParams(window.location.search)
+  const demoPackId = searchParams?.get('demoPack')
+  const demoPack = demoPackId ? contentPackDemos[demoPackId] : undefined
+  const glossaryDemoId = searchParams?.get('glossaryDemo')
+  const glossaryDemo = glossaryDemoId ? standaloneGlossaryDemos[glossaryDemoId] : undefined
+
+  useEffect(() => {
+    if (!glossaryDemo) return
+    const previousTitle = document.title
+    document.title = glossaryDemo.title + ' | 用語集'
+    return () => { document.title = previousTitle }
+  }, [glossaryDemo])
+
+  if (demoPack) return <ContentPackDemo {...demoPack} />
+  if (glossaryDemo) return <div className="app-shell">
+    <a className="skip-link" href="#main-content">本文へスキップ</a>
+    <header className="topbar">
+      <span className="brand-button">{glossaryDemo.title}</span>
+      <span className="topbar-note">独立した用語集の表示例 · {glossaryDemo.locale}</span>
+    </header>
+    <main id="main-content" className="course-layout" tabIndex={-1}>
+      <GlossaryPlayer pack={glossaryDemo} />
+    </main>
+    <footer className="footer"><span>{glossaryDemo.title}</span><span>{glossaryDemo.description}</span></footer>
+  </div>
+  return <MahjongApp />
+}
+

@@ -1,0 +1,446 @@
+import type { LearningPack } from '../../platform/contracts'
+
+export const mahjongBeginnerPack: LearningPack = {
+  packId: 'mahjong-basics',
+  title: '麻雀の基本',
+  description: '牌の見方から、1局の進み方、役、アガリの形までを順番に学ぶ入門コースです。',
+  locale: 'ja-JP',
+  schemaVersion: 1,
+  contentVersion: '1.0.0',
+  courses: [{
+    id: 'first-steps',
+    title: 'はじめての麻雀',
+    description: 'まずは麻雀の全体像をつかみましょう。全4レッスン、いつでも自分のペースで進められます。',
+    quizzes: [{
+      id: 'beginner-check',
+      title: 'はじめての麻雀 理解度チェック',
+      description: '牌の種類、アガリの形、1局の流れ、基本役を確認します。選択肢を選ぶと、答えと理由を確認できます。',
+      questions: [
+        {
+          id: 'tile-families',
+          prompt: [
+            { type: 'text', text: '次のうち、' },
+            { type: 'term', reference: { id: 'mahjong:term-081', label: '字牌', shortDefinition: '東南西北と白發中の牌です。' } },
+            { type: 'text', text: 'はどれですか？' },
+          ],
+          options: [
+            { id: 'east', segments: [{ type: 'text', text: '東' }] },
+            { id: 'five-dots', segments: [{ type: 'text', text: '五筒' }] },
+            { id: 'two-bamboo', segments: [{ type: 'text', text: '二索' }] },
+          ],
+          correctOptionId: 'east',
+          explanation: [
+            { type: 'text', text: '東は' },
+            { type: 'term', reference: { id: 'mahjong:term-081', label: '字牌', shortDefinition: '東南西北と白發中の牌です。' } },
+            { type: 'text', text: 'です。五筒と二索は、数字が書かれた' },
+            { type: 'term', reference: { id: 'mahjong:term-082', label: '数牌', shortDefinition: '萬子・筒子・索子の3種類がある、数字の牌です。' } },
+            { type: 'text', text: 'です。' },
+          ],
+          reviewLessonId: 'tiles-and-hand',
+          sources: [{
+            id: 'jannyumon-tile-types',
+            title: '雀入門 牌の種類と呼び方',
+            url: 'https://www.jannyumon.jp/rule/pai/',
+            accessedOn: '2026-11-12',
+          }],
+        },
+        {
+          id: 'winning-shape',
+          prompt: [
+            { type: 'text', text: '一般的な' },
+            { type: 'term', reference: { id: 'mahjong:term-155', label: '和了（アガリ）', shortDefinition: '決められた条件を満たして、局に勝つことです。' } },
+            { type: 'text', text: 'の基本形はどれですか？' },
+          ],
+          options: [
+            { id: 'seven-pairs', segments: [{ type: 'text', text: '同じ牌2枚の組を7つ' }] },
+            { id: 'three-groups-two-pairs', segments: [{ type: 'text', text: '3枚組を3つと、同じ牌2枚の組を2つ' }] },
+            { id: 'four-groups-pair', segments: [{ type: 'text', text: '3枚組を4つと、同じ牌2枚の組を1つ' }] },
+          ],
+          correctOptionId: 'four-groups-pair',
+          explanation: [
+            { type: 'text', text: '同じ牌2枚の組を7つそろえて役として' },
+            { type: 'term', reference: { id: 'mahjong:yaku-021', label: '七対子', shortDefinition: '同じ牌2枚の組を7つ集めると成立する役です。鳴くと成立しません。' } },
+            { type: 'text', text: 'がありますが、これは基本形ではなく例外形です。' },
+          ],
+          reviewLessonId: 'winning-shape',
+          sources: [{
+            id: 'jannyumon-hand-shape',
+            title: '雀入門 手牌の種類',
+            url: 'https://www.jannyumon.jp/rule/tehai/',
+            accessedOn: '2026-11-12',
+          }],
+        },
+        {
+          id: 'turn-actions',
+          prompt: [
+            { type: 'term', reference: { id: 'mahjong:term-067', label: '配牌', shortDefinition: '局の最初に各プレイヤーへ牌を配ることです。' } },
+            { type: 'text', text: 'のあと、通常の自分の番で繰り返すことは何ですか？' },
+          ],
+          options: [
+            { id: 'discard-draw', segments: [{ type: 'term', reference: { id: 'mahjong:term-068', label: '手牌', shortDefinition: '自分の手元でそろえていく牌の集まりです。' } }, { type: 'text', text: 'から1枚捨ててから、牌を2枚引く' }] },
+            { id: 'draw-discard', segments: [{ type: 'text', text: '牌を1枚引き、' }, { type: 'term', reference: { id: 'mahjong:term-068', label: '手牌', shortDefinition: '自分の手元でそろえていく牌の集まりです。' } }, { type: 'text', text: 'から1枚捨てる' }] },
+            { id: 'draw-two', segments: [{ type: 'text', text: '牌を2枚引いて、そのまま次の人に渡す' }] },
+          ],
+          correctOptionId: 'draw-discard',
+          explanation: [
+            { type: 'text', text: '通常は' },
+            { type: 'term', reference: { id: 'mahjong:term-070', label: '牌山', shortDefinition: '局の進行中に、順番に牌を引いていく山です。' } },
+            { type: 'text', text: 'から1枚引く' },
+            { type: 'term', reference: { id: 'mahjong:term-116', label: '自摸（ツモ）', shortDefinition: '自分の番に牌を1枚引くことです。' } },
+            { type: 'text', text: 'のあと、' },
+            { type: 'term', reference: { id: 'mahjong:term-068', label: '手牌', shortDefinition: '自分の手元でそろえていく牌の集まりです。' } },
+            { type: 'text', text: 'から1枚選んで' },
+            { type: 'term', reference: { id: 'mahjong:term-117', label: '打牌', shortDefinition: '手牌から1枚選んで場に出すことです。' } },
+            { type: 'text', text: 'します。親の最初の' },
+            { type: 'term', reference: { id: 'mahjong:term-117', label: '打牌', shortDefinition: '手牌から1枚選んで場に出すことです。' } },
+            { type: 'text', text: 'など、局の始まりには特別な順序があります。' },
+          ],
+          reviewLessonId: 'turns-and-discard',
+          sources: [{
+            id: 'jannyumon-game-flow',
+            title: '雀入門 麻雀の基本の流れ',
+            url: 'https://www.jannyumon.jp/howto/flow/',
+            accessedOn: '2026-11-12',
+          }],
+        },
+        {
+          id: 'tanyao-condition',
+          prompt: [
+            { type: 'term', reference: { id: 'mahjong:yaku-004', label: '断幺九（タンヤオ）', shortDefinition: '2〜8の数牌だけで手牌を作る役です。' } },
+            { type: 'text', text: 'の条件はどれですか？' },
+          ],
+          options: [
+            { id: 'terminals-and-honors', segments: [{ type: 'text', text: '1・9の' }, { type: 'term', reference: { id: 'mahjong:term-082', label: '数牌', shortDefinition: '萬子・筒子・索子の3種類がある、数字の牌です。' } }, { type: 'text', text: 'と' }, { type: 'term', reference: { id: 'mahjong:term-081', label: '字牌', shortDefinition: '東南西北と白發中の牌です。' } }, { type: 'text', text: 'だけで' }, { type: 'term', reference: { id: 'mahjong:term-068', label: '手牌', shortDefinition: '自分の手元でそろえていく牌の集まりです。' } }, { type: 'text', text: 'を作る' }] },
+            { id: 'honors-in-triplets', segments: [{ type: 'text', text: '東南西北をそれぞれ3枚ずつそろえる' }] },
+            { id: 'middle-number-tiles', segments: [{ type: 'text', text: '2〜8の' }, { type: 'term', reference: { id: 'mahjong:term-082', label: '数牌', shortDefinition: '萬子・筒子・索子の3種類がある、数字の牌です。' } }, { type: 'text', text: 'だけで' }, { type: 'term', reference: { id: 'mahjong:term-068', label: '手牌', shortDefinition: '自分の手元でそろえていく牌の集まりです。' } }, { type: 'text', text: 'を作る' }] },
+          ],
+          correctOptionId: 'middle-number-tiles',
+          explanation: [
+            { type: 'term', reference: { id: 'mahjong:yaku-004', label: '断幺九（タンヤオ）', shortDefinition: '2〜8の数牌だけで手牌を作る役です。' } },
+            { type: 'text', text: 'は、2〜8の' },
+            { type: 'term', reference: { id: 'mahjong:term-082', label: '数牌', shortDefinition: '萬子・筒子・索子の3種類がある、数字の牌です。' } },
+            { type: 'text', text: 'だけで' },
+            { type: 'term', reference: { id: 'mahjong:term-068', label: '手牌', shortDefinition: '自分の手元でそろえていく牌の集まりです。' } },
+            { type: 'text', text: 'を作る役です。1・9や' },
+            { type: 'term', reference: { id: 'mahjong:term-081', label: '字牌', shortDefinition: '東南西北と白發中の牌です。' } },
+            { type: 'text', text: 'が含まれると成立しません。' },
+          ],
+          reviewLessonId: 'first-yaku',
+          sources: [
+            {
+              id: 'jannyumon-basic-yaku',
+              title: '雀入門 一飜役一覧',
+              url: 'https://www.jannyumon.jp/yaku/1honyaku/',
+              accessedOn: '2026-11-12',
+            },
+          ],
+        },
+      ],
+    }],
+    lessons: [
+      {
+        id: 'tiles-and-hand',
+        title: '牌と手牌を知ろう',
+        summary: '麻雀で使う牌と、自分の前に並べる牌を知ります。',
+        sources: [{
+          id: 'jannyumon-tile-types',
+          title: '雀入門 牌の種類と呼び方',
+          url: 'https://www.jannyumon.jp/rule/pai/',
+          accessedOn: '2026-11-12',
+        }],
+        blocks: [
+          { type: 'paragraph', segments: [
+            { type: 'text', text: '麻雀では、絵柄のついた牌を組み合わせてアガリを目指します。数字の並ぶ' },
+            { type: 'term', reference: { id: 'mahjong:term-082', label: '数牌', shortDefinition: '萬子・筒子・索子の3種類がある、数字の牌です。' } },
+            { type: 'text', text: 'と、東や白のような' },
+            { type: 'term', reference: { id: 'mahjong:term-081', label: '字牌', shortDefinition: '東南西北の風牌と、白發中の三元牌です。' } },
+            { type: 'text', text: 'があります。自分が持っている牌のまとまりを' },
+            { type: 'term', reference: { id: 'mahjong:term-068', label: '手牌', shortDefinition: '自分の手元でそろえていく牌の集まりです。' } },
+            { type: 'text', text: 'といいます。' },
+          ] },
+          {
+            type: 'extension',
+            rendererId: 'mahjong.tile-families',
+            schemaVersion: 1,
+            altText: '数牌には萬子・筒子・索子があり、字牌には東南西北の風牌と白發中の三元牌があります。',
+            payload: { families: [
+              { category: '数牌', name: '萬子', reading: 'マンズ', examples: ['一萬', '五萬', '九萬'], description: '萬の字がついた1から9までの牌です。' },
+              { category: '数牌', name: '筒子', reading: 'ピンズ', examples: ['一筒', '五筒', '九筒'], description: '丸い模様の1から9までの牌です。' },
+              { category: '数牌', name: '索子', reading: 'ソーズ', examples: ['一索', '五索', '九索'], description: '竹の模様の1から9までの牌です。' },
+              { category: '字牌', name: '風牌', reading: 'かぜはい', examples: ['東', '南', '西', '北'], description: '東・南・西・北の4種類です。' },
+              { category: '字牌', name: '三元牌', reading: 'さんげんぱい', examples: ['白', '發', '中'], description: '白・發・中の3種類です。' },
+            ] },
+          },
+          { type: 'callout', title: 'このレッスンのポイント', segments: [
+            { type: 'text', text: '最初は牌の名前を全部覚えなくても大丈夫。まずは「牌を集めて形を作るゲーム」とつかめば十分です。' },
+          ] },
+        ],
+      },
+      {
+        id: 'turns-and-discard',
+        title: '局の始まりからアガリまで',
+        summary: '牌が配られてから、アガリまたは流局になるまでを順に追います。',
+        sources: [{
+          id: 'jannyumon-game-flow',
+          title: '雀入門 麻雀の基本の流れ',
+          url: 'https://www.jannyumon.jp/howto/flow/',
+          accessedOn: '2026-11-12',
+        }],
+        blocks: [
+          { type: 'paragraph', segments: [
+            { type: 'text', text: '麻雀は、短いまとまりの' },
+            { type: 'term', reference: { id: 'mahjong:term-001', label: '局', shortDefinition: '配牌からアガリまたは流局までのゲーム単位です。' } },
+            { type: 'text', text: 'を繰り返します。局の最初に牌を配ることを' },
+            { type: 'term', reference: { id: 'mahjong:term-067', label: '配牌', shortDefinition: '局の最初に各プレイヤーへ牌を配ることです。親は14枚、他の人は13枚です。' } },
+            { type: 'text', text: 'といいます。' },
+          ] },
+          { type: 'steps', steps: [
+            {
+              title: '牌が配られ、親から始まる',
+              segments: [
+                { type: 'text', text: '局が始まると、' },
+                { type: 'term', reference: { id: 'mahjong:term-031', label: '親', shortDefinition: 'その局で最初に打ち始めるプレイヤーです。' } },
+                { type: 'text', text: 'は14枚、他のプレイヤーは13枚を受け取ります。親は最初のツモをせず、1枚捨てて局を始めます。' },
+              ],
+            },
+            {
+              title: '順番に1枚引いて、1枚捨てる',
+              segments: [
+                { type: 'text', text: '通常は自分の番に牌を1枚' },
+                { type: 'term', reference: { id: 'mahjong:term-116', label: '自摸（ツモ）', shortDefinition: '順番に牌山から牌を1枚引くことです。' } },
+                { type: 'text', text: 'り、手牌から1枚' },
+                { type: 'term', reference: { id: 'mahjong:term-117', label: '打牌', shortDefinition: '手牌から1枚選んで場に出すことです。' } },
+                { type: 'text', text: 'します。' },
+              ],
+            },
+            {
+              title: '捨て牌を使って組み合わせることもある',
+              segments: [
+                { type: 'text', text: '他の人が捨てた牌を使って' },
+                { type: 'term', reference: { id: 'mahjong:term-121', label: 'チー', shortDefinition: '上家が捨てた牌を使い、数字の続く3枚組を作ることです。' } },
+                { type: 'text', text: 'や' },
+                { type: 'term', reference: { id: 'mahjong:term-120', label: 'ポン', shortDefinition: '他の人の捨て牌を使い、同じ牌3枚の組を作ることです。' } },
+                { type: 'text', text: 'をすることを鳴きといいます。鳴きの細かな順番や種類は、後で覚えれば大丈夫です。' },
+              ],
+            },
+            {
+              title: 'アガリまであと1枚になる',
+              segments: [
+                { type: 'text', text: '必要な牌があと1枚でそろう状態を' },
+                { type: 'term', reference: { id: 'mahjong:term-187', label: '聴牌（テンパイ）', shortDefinition: 'あと1枚必要な牌が加わればアガリになる状態です。' } },
+                { type: 'text', text: 'といいます。' },
+              ],
+            },
+            {
+              title: '形と役がそろったらアガリ',
+              segments: [
+                { type: 'text', text: '必要な形と' },
+                { type: 'term', reference: { id: 'mahjong:term-175', label: '手役', shortDefinition: '和了した手に成立している役のことです。ドラとは区別します。' } },
+                { type: 'text', text: 'がそろったらアガれます。自分で必要な牌を引く' },
+                { type: 'term', reference: { id: 'mahjong:term-116', label: '自摸（ツモ）', shortDefinition: '自分の番に牌を引くことです。' } },
+                { type: 'text', text: 'と、他の人の捨て牌でアガる' },
+                { type: 'term', reference: { id: 'mahjong:term-170', label: 'ロン', shortDefinition: '他の人の捨て牌でアガることです。' } },
+                { type: 'text', text: 'があります。' },
+              ],
+            },
+            {
+              title: '誰もアガらなければ流局',
+              segments: [
+                { type: 'text', text: '山の牌がなくなるまで誰もアガらなかった場合は' },
+                { type: 'term', reference: { id: 'mahjong:term-002', label: '流局', shortDefinition: 'その局で誰もアガらずに局が終わることです。' } },
+                { type: 'text', text: 'になり、次の局へ進みます。' },
+              ],
+            },
+          ] },
+          { type: 'callout', title: 'まずは大まかな流れをつかもう', segments: [
+            { type: 'text', text: '配牌のあと、順番にツモと打牌を繰り返し、アガリか流局で局が終わります。鳴きの優先順位、点数計算、親の交代などは別のレッスンで学びます。' },
+          ] },
+        ],
+      },
+      {
+        id: 'winning-shape',
+        title: 'アガリの基本形を作ろう',
+        summary: '3枚組4つと2枚組1つを目指す、基本の形を学びます。',
+        sources: [{
+          id: 'jannyumon-hand-shape',
+          title: '雀入門 手牌の種類',
+          url: 'https://www.jannyumon.jp/rule/tehai/',
+          accessedOn: '2026-11-12',
+        }],
+        blocks: [
+          { type: 'paragraph', segments: [
+            { type: 'text', text: '一般的なアガリの基本形は、3枚組を4つと、同じ牌2枚の組を1つ作る形です。数字が続く3枚組を' },
+            { type: 'term', reference: { id: 'mahjong:term-146', label: '順子', shortDefinition: '同じ種類の数牌で、数字が続く3枚の組です。' } },
+            { type: 'text', text: '、同じ牌3枚の組を' },
+            { type: 'term', reference: { id: 'mahjong:term-147', label: '刻子', shortDefinition: '同じ種類の牌を3枚そろえた組です。' } },
+            { type: 'text', text: 'と呼びます。2枚組は' },
+            { type: 'term', reference: { id: 'mahjong:term-141', label: '雀頭', shortDefinition: 'アガリの形に使う、同じ牌2枚の組です。' } },
+            { type: 'text', text: 'です。' },
+          ] },
+          {
+            type: 'extension',
+            rendererId: 'mahjong.winning-hand',
+            schemaVersion: 1,
+            altText: 'アガリの基本形の例です。順子の一萬・二萬・三萬、四筒・五筒・六筒、二索・三索・四索、白の刻子、東2枚の雀頭でできています。',
+            payload: {
+              groups: [
+                { name: '順子', tiles: ['一萬', '二萬', '三萬'], description: '萬子の数字が続く3枚' },
+                { name: '順子', tiles: ['四筒', '五筒', '六筒'], description: '筒子の数字が続く3枚' },
+                { name: '順子', tiles: ['二索', '三索', '四索'], description: '索子の数字が続く3枚' },
+                { name: '刻子', tiles: ['白', '白', '白'], description: '同じ牌を3枚' },
+              ],
+              pair: { name: '雀頭', tiles: ['東', '東'], description: '同じ牌を2枚' },
+            },
+          },
+          { type: 'paragraph', segments: [
+            { type: 'text', text: '必要な形と役がそろってアガることを' },
+            { type: 'term', reference: { id: 'mahjong:term-155', label: '和了（アガリ）', shortDefinition: '決められた条件を満たして、局に勝つことです。' } },
+            { type: 'text', text: 'といいます。まずはこの基本形を目標に、牌を集めていきましょう。' },
+          ] },
+        ],
+      },
+      {
+        id: 'first-yaku',
+        title: 'アガリには「役」が必要',
+        summary: '立直・断幺九・役牌を、成立する牌姿と注意例で学びます。',
+        sources: [{
+          id: 'jannyumon-basic-yaku',
+          title: '雀入門 一飜役一覧',
+          url: 'https://www.jannyumon.jp/yaku/1honyaku/',
+          accessedOn: '2026-11-12',
+        }],
+        blocks: [
+          { type: 'paragraph', segments: [
+            { type: 'text', text: '麻雀では、牌の形がそろっただけではアガれません。アガリには、決められた条件である' },
+            { type: 'term', reference: { id: 'mahjong:term-175', label: '役', shortDefinition: '手牌の組み合わせやアガリ方によって成立する、アガリの条件です。' } },
+            { type: 'text', text: 'が少なくとも1つ必要です。このレッスンでは、入門で覚えやすい3つを見ます。' },
+          ] },
+          { type: 'callout', title: '牌姿の読み方', segments: [
+            { type: 'text', text: '以下の例は、左から順子・刻子・雀頭などのまとまりを並べた完成形です。萬・筒・索は牌の種類を表し、同じ数字でも種類が違えば別の牌です。' },
+          ] },
+          { type: 'paragraph', segments: [
+            { type: 'term', reference: { id: 'mahjong:yaku-001', label: '立直（リーチ）', shortDefinition: '門前でテンパイし、立直を宣言して成立する役です。' } },
+            { type: 'text', text: 'は、' },
+            { type: 'term', reference: { id: 'mahjong:term-187', label: 'テンパイ', shortDefinition: 'あと1枚、必要な牌が加わればアガリになる状態です。' } },
+            { type: 'text', text: 'したときに、鳴いていない状態を保ち、リーチを宣言して成立する役です。宣言には通常1000点を出します。' },
+          ] },
+          {
+            type: 'extension',
+            rendererId: 'mahjong.yaku-hands',
+            schemaVersion: 1,
+            altText: '立直の成立例です。順子3組、白の刻子、二筒の雀頭でできた手牌です。',
+            payload: { examples: [{
+              title: '立直の成立例',
+              groups: [
+                { name: '順子', tiles: ['二萬', '三萬', '四萬'], description: '萬子の数字が続く3枚' },
+                { name: '順子', tiles: ['四筒', '五筒', '六筒'], description: '筒子の数字が続く3枚' },
+                { name: '順子', tiles: ['六索', '七索', '八索'], description: '索子の数字が続く3枚' },
+                { name: '刻子', tiles: ['白', '白', '白'], description: '同じ牌を3枚' },
+              ],
+              pair: { name: '雀頭', tiles: ['二筒', '二筒'], description: '同じ牌2枚' },
+              note: 'この完成形は例です。立直には、鳴かずにテンパイして宣言することも必要です。',
+            }] },
+          },
+          { type: 'callout', title: '立直の注意例', segments: [
+            { type: 'text', text: '他の人の捨て牌を使ってチーやポンをした手では、立直できません。牌姿が同じように見えても、鳴いているかどうかが条件になります。' },
+          ] },
+          { type: 'paragraph', segments: [
+            { type: 'term', reference: { id: 'mahjong:yaku-004', label: '断幺九（タンヤオ）', shortDefinition: '2〜8の数牌だけで手牌を作る役です。' } },
+            { type: 'text', text: 'は、' },
+            { type: 'term', reference: { id: 'mahjong:term-082', label: '数牌', shortDefinition: '萬子・筒子・索子の3種類がある数字の牌です。' } },
+            { type: 'text', text: 'の2から8だけで手牌を作る役です。1・9や' },
+            { type: 'term', reference: { id: 'mahjong:term-081', label: '字牌', shortDefinition: '東南西北と白發中の牌です。' } },
+            { type: 'text', text: 'を使いません。ここでは、鳴いても断幺九が認められる一般的なルールを前提にします。' },
+          ] },
+          {
+            type: 'extension',
+            rendererId: 'mahjong.yaku-hands',
+            schemaVersion: 1,
+            altText: '断幺九の成立例です。すべて2から8の数牌です。',
+            payload: { examples: [{
+              title: '断幺九の成立例',
+              groups: [
+                { name: '順子', tiles: ['二萬', '三萬', '四萬'], description: '2〜8の数牌' },
+                { name: '順子', tiles: ['五萬', '六萬', '七萬'], description: '2〜8の数牌' },
+                { name: '順子', tiles: ['三筒', '四筒', '五筒'], description: '2〜8の数牌' },
+                { name: '順子', tiles: ['六索', '七索', '八索'], description: '2〜8の数牌' },
+              ],
+              pair: { name: '雀頭', tiles: ['五筒', '五筒'], description: '同じ牌2枚' },
+              note: 'すべて2〜8の数牌なので、断幺九の条件に合います。',
+            }] },
+          },
+          {
+            type: 'extension',
+            rendererId: 'mahjong.yaku-hands',
+            schemaVersion: 1,
+            altText: '断幺九にならない注意例です。一萬が含まれています。',
+            payload: { examples: [{
+              title: '断幺九の注意例',
+              groups: [
+                { name: '順子', tiles: ['一萬', '二萬', '三萬'], description: '一萬を含む' },
+                { name: '順子', tiles: ['五萬', '六萬', '七萬'], description: '2〜8の数牌' },
+                { name: '順子', tiles: ['三筒', '四筒', '五筒'], description: '2〜8の数牌' },
+                { name: '順子', tiles: ['六索', '七索', '八索'], description: '2〜8の数牌' },
+              ],
+              pair: { name: '雀頭', tiles: ['五筒', '五筒'], description: '同じ牌2枚' },
+              note: '一萬が含まれるため、形がそろっていても断幺九にはなりません。',
+            }] },
+          },
+          { type: 'paragraph', segments: [
+            { type: 'text', text: '役牌（翻牌）は、白・發・中、またはその局で自分の風・場の風にあたる' },
+            { type: 'term', reference: { id: 'mahjong:term-080', label: '風牌', shortDefinition: '東・南・西・北の4種類の字牌です。' } },
+            { type: 'text', text: 'で刻子か槓子を作る役です。用語辞典では' },
+            { type: 'term', reference: { id: 'mahjong:term-105', label: '翻牌', shortDefinition: '三元牌や自風・場風を3枚そろえると役になる牌です。' } },
+            { type: 'text', text: 'として説明しています。' },
+          ] },
+          {
+            type: 'extension',
+            rendererId: 'mahjong.yaku-hands',
+            schemaVersion: 1,
+            altText: '役牌の成立例です。白を3枚そろえています。',
+            payload: { examples: [{
+              title: '役牌の成立例',
+              groups: [
+                { name: '刻子', tiles: ['白', '白', '白'], description: '三元牌の白' },
+                { name: '順子', tiles: ['二萬', '三萬', '四萬'], description: '萬子の数字が続く3枚' },
+                { name: '順子', tiles: ['三筒', '四筒', '五筒'], description: '筒子の数字が続く3枚' },
+                { name: '順子', tiles: ['六索', '七索', '八索'], description: '索子の数字が続く3枚' },
+              ],
+              pair: { name: '雀頭', tiles: ['二筒', '二筒'], description: '同じ牌2枚' },
+              note: '白・發・中は、どの局でも役牌です。役牌は鳴いて作っても成立します。',
+            }] },
+          },
+          {
+            type: 'extension',
+            rendererId: 'mahjong.yaku-hands',
+            schemaVersion: 1,
+            altText: '役牌にならない注意例です。南場の西家では東は自風・場風ではありません。',
+            payload: { examples: [{
+              title: '役牌の注意例',
+              groups: [
+                { name: '刻子', tiles: ['東', '東', '東'], description: '風牌の東' },
+                { name: '順子', tiles: ['二萬', '三萬', '四萬'], description: '萬子の数字が続く3枚' },
+                { name: '順子', tiles: ['三筒', '四筒', '五筒'], description: '筒子の数字が続く3枚' },
+                { name: '順子', tiles: ['六索', '七索', '八索'], description: '索子の数字が続く3枚' },
+              ],
+              pair: { name: '雀頭', tiles: ['二筒', '二筒'], description: '同じ牌2枚' },
+              note: '南場で自分が西家なら東は自風でも場風でもありません。東の刻子だけでは役になりません。',
+            }] },
+          },
+          { type: 'paragraph', segments: [
+            { type: 'text', text: '3つの役の詳しい項目は、' },
+            { type: 'term', reference: { id: 'mahjong:yaku-001', label: '立直（リーチ）', shortDefinition: '鳴かずにテンパイし、リーチを宣言して成立する役です。' } },
+            { type: 'text', text: '、' },
+            { type: 'term', reference: { id: 'mahjong:yaku-004', label: '断幺九（タンヤオ）', shortDefinition: '2〜8の数牌だけで手牌を作る役です。' } },
+            { type: 'text', text: '、' },
+            { type: 'term', reference: { id: 'mahjong:yaku-011', label: '白', shortDefinition: '白を3枚そろえると成立する役牌です。' } },
+            { type: 'text', text: 'から確認できます。ルールによって' },
+            { type: 'term', reference: { id: 'mahjong:term-140', label: '喰い断么九（喰いタン）', shortDefinition: '鳴いて断幺九を成立させることです。認められるかはルールによります。' } },
+            { type: 'text', text: 'などの扱いが異なることがあるので、遊ぶ場のルールも確認しましょう。' },
+          ] },
+        ],
+      },
+
+    ],
+  }],
+}

@@ -1,0 +1,185 @@
+import { useEffect, useMemo, useState, type ReactNode } from 'react'
+import { ArrowLeft, ArrowRight, BookOpen, Check, RotateCcw } from 'lucide-react'
+import type { LearningCourse, LearningLesson, LearningPack, LessonSegment, GlossaryReference, LessonExtension } from '../platform/contracts'
+import LearningQuizPlayer from './LearningQuizPlayer'
+import { readCourseProgress, writeCourseProgress } from './progressStorage'
+import { getPreferredScrollBehavior } from './accessibility'
+
+type CoursePlayerProps = {
+  pack: LearningPack
+  course: LearningCourse
+  onOpenTerm: (reference: GlossaryReference) => void
+  renderExtension?: (extension: LessonExtension) => ReactNode
+  initialLessonId?: string
+  onLessonChange?: (lessonId: string) => void
+}
+
+function LessonSegments({ segments, onOpenTerm }: { segments: LessonSegment[]; onOpenTerm: CoursePlayerProps['onOpenTerm'] }) {
+  return <>{segments.map((segment, index) => segment.type === 'text'
+    ? <span key={index}>{segment.text}</span>
+    : <a
+        aria-label={segment.reference.label + '。' + segment.reference.shortDefinition + '。クリックで図鑑の詳しい説明を開く'}
+        className="course-term-link"
+        data-tooltip={segment.reference.shortDefinition}
+        href="#glossary-entry"
+        key={segment.reference.id + '-' + index}
+        onClick={(event) => {
+          event.preventDefault()
+          onOpenTerm(segment.reference)
+        }}
+      >{segment.reference.label}</a>)}</>
+}
+
+export default function CoursePlayer({ pack, course, onOpenTerm, renderExtension, initialLessonId, onLessonChange }: CoursePlayerProps) {
+  const [progress, setProgress] = useState(() => readCourseProgress(pack.packId, course.id, course.lessons.map((lesson) => lesson.id), initialLessonId))
+  const [activeQuizId, setActiveQuizId] = useState<string | null>(null)
+  const lessons = course.lessons
+  const activeIndex = Math.max(0, lessons.findIndex((lesson) => lesson.id === progress.activeLessonId))
+  const activeLesson = lessons[activeIndex]
+  const completedCount = progress.completedLessonIds.length
+  const percentage = lessons.length ? Math.round(completedCount / lessons.length * 100) : 0
+
+  useEffect(() => {
+    if (initialLessonId && lessons.some((lesson) => lesson.id === initialLessonId)) {
+      setProgress((current) => ({ ...current, activeLessonId: initialLessonId }))
+    }
+  }, [initialLessonId, lessons])
+
+  useEffect(() => {
+    writeCourseProgress(pack.packId, course.id, progress)
+  }, [pack.packId, course.id, progress])
+
+  function selectLesson(lesson: LearningLesson) {
+    setActiveQuizId(null)
+    setProgress((current) => ({ ...current, activeLessonId: lesson.id }))
+    onLessonChange?.(lesson.id)
+    window.scrollTo({ top: 0, behavior: getPreferredScrollBehavior() })
+  }
+
+  function completeAndContinue() {
+    if (!activeLesson) return
+    const completedLessonIds = progress.completedLessonIds.includes(activeLesson.id)
+      ? progress.completedLessonIds
+      : [...progress.completedLessonIds, activeLesson.id]
+    const nextLesson = lessons[activeIndex + 1]
+    setProgress({
+      completedLessonIds,
+      activeLessonId: nextLesson?.id ?? activeLesson.id,
+    })
+    if (nextLesson) {
+      onLessonChange?.(nextLesson.id)
+      window.scrollTo({ top: 0, behavior: getPreferredScrollBehavior() })
+    }
+  }
+
+  function resetProgress() {
+    const firstLessonId = lessons[0]?.id ?? ''
+    setProgress({ completedLessonIds: [], activeLessonId: firstLessonId })
+    if (firstLessonId) onLessonChange?.(firstLessonId)
+  }
+
+  const lessonOutline = useMemo(() => lessons.map((lesson, index) => ({
+    lesson,
+    index,
+    completed: progress.completedLessonIds.includes(lesson.id),
+  })), [lessons, progress.completedLessonIds])
+
+  if (!activeLesson) return null
+
+  return <main id="main-content" className="course-layout" tabIndex={-1}>
+    <section className="course-hero">
+      <div className="course-eyebrow"><BookOpen size={15} /> LEARNING COURSE</div>
+      <p className="course-pack-title">{pack.title}</p>
+      <h1>{course.title}</h1>
+      <p className="course-description">{course.description}</p>
+      <div className="course-progress-row">
+        <span>{completedCount} / {lessons.length} レッスン完了</span>
+        <span>{percentage}%</span>
+      </div>
+      <div className="course-progress-track" role="progressbar" aria-label="コースの進捗" aria-valuenow={percentage} aria-valuemin={0} aria-valuemax={100}>
+        <span style={{ width: percentage + '%' }} />
+      </div>
+    </section>
+
+    <div className="course-columns">
+      <nav className="course-outline" aria-label="レッスン一覧">
+        <h2>レッスン</h2>
+        {lessonOutline.map(({ lesson, index, completed }) => <button
+          aria-current={lesson.id === activeLesson.id ? 'step' : undefined}
+          className={'course-outline-item' + (lesson.id === activeLesson.id ? ' is-active' : '')}
+          key={lesson.id}
+          onClick={() => selectLesson(lesson)}
+          type="button"
+        >
+          <span className="course-outline-number">{completed ? <Check size={15} /> : String(index + 1).padStart(2, '0')}</span>
+          <span><strong>{lesson.title}</strong><small>{lesson.summary}</small></span>
+        </button>)}
+        {completedCount > 0 && <button className="course-reset-button" onClick={resetProgress} type="button"><RotateCcw size={13} />進捗をリセット</button>}
+        {course.quizzes?.map((quiz) => <button
+          aria-current={activeQuizId === quiz.id ? 'step' : undefined}
+          className={'course-quiz-outline-item' + (activeQuizId === quiz.id ? ' is-active' : '')}
+          key={quiz.id}
+          onClick={() => { setActiveQuizId(quiz.id); window.scrollTo({ top: 0, behavior: getPreferredScrollBehavior() }) }}
+          type="button"
+        >
+          <span className="course-outline-number">?</span>
+          <span><strong>{quiz.title}</strong><small>レッスンの内容を確認</small></span>
+        </button>)}
+      </nav>
+
+      {!activeQuizId && <article className="course-lesson">
+        <div className="course-lesson-kicker">LESSON {String(activeIndex + 1).padStart(2, '0')} / {String(lessons.length).padStart(2, '0')}</div>
+        <h2>{activeLesson.title}</h2>
+        <p className="course-lesson-summary">{activeLesson.summary}</p>
+        <div className="course-lesson-body">
+          {activeLesson.blocks.map((block, index) => {
+            const key = activeLesson.id + '-block-' + index
+            if (block.type === 'paragraph') {
+              return <p key={key}><LessonSegments segments={block.segments} onOpenTerm={onOpenTerm} /></p>
+            }
+            if (block.type === 'callout') {
+              return <aside className="course-callout" key={key}>
+                <strong>{block.title}</strong>
+                <p><LessonSegments segments={block.segments} onOpenTerm={onOpenTerm} /></p>
+              </aside>
+            }
+            if (block.type === 'steps') {
+              return <ol className="course-steps-list" key={key}>
+                {block.steps.map((step, stepIndex) => <li className="course-flow-step" key={activeLesson.id + '-step-' + stepIndex}>
+                  <span className="course-flow-number">{String(stepIndex + 1).padStart(2, '0')}</span>
+                  <div className="course-flow-copy">
+                    <h3>{step.title}</h3>
+                    <p><LessonSegments segments={step.segments} onOpenTerm={onOpenTerm} /></p>
+                  </div>
+                </li>)}
+              </ol>
+            }
+            return <div className="course-extension" key={key}>
+              {renderExtension?.(block) ?? <aside className="course-extension-fallback">{block.altText}</aside>}
+            </div>
+          })}
+        </div>
+        <div className="course-lesson-actions">
+          <button className="course-previous-button" disabled={activeIndex === 0} onClick={() => selectLesson(lessons[activeIndex - 1])} type="button"><ArrowLeft size={16} />前のレッスン</button>
+          <button className="course-next-button" onClick={completeAndContinue} type="button">
+            {activeIndex === lessons.length - 1
+              ? (progress.completedLessonIds.includes(activeLesson.id) ? 'コースを完了しました' : 'コースを完了する')
+              : (progress.completedLessonIds.includes(activeLesson.id) ? '次のレッスンへ' : '完了して次へ')}
+            {activeIndex < lessons.length - 1 && <ArrowRight size={16} />}
+          </button>
+        </div>
+      </article>}
+      {course.quizzes?.map((quiz) => activeQuizId === quiz.id && <LearningQuizPlayer
+        key={quiz.id}
+        quiz={quiz}
+        onOpenTerm={onOpenTerm}
+        onOpenLesson={(lessonId) => {
+          const lesson = lessons.find((item) => item.id === lessonId)
+          if (lesson) selectLesson(lesson)
+        }}
+      />)}
+    </div>
+    <p className="course-term-hint">下線のある用語は、ポイントすると短い説明が見られます。選ぶと図鑑の詳しい説明を開きます。</p>
+  </main>
+}
+

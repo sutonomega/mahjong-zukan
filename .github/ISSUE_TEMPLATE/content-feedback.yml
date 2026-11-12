@@ -1,0 +1,45 @@
+name: 説明・教材へのフィードバック
+description: 用語や役の説明、学習コースの改善点を報告します
+title: "[教材フィードバック] "
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        用語・役の説明や学習内容について、分かりにくい点や修正案をお知らせください。Issueは公開されます。個人情報や非公開の情報は記載しないでください。
+  - type: input
+    id: target
+    attributes:
+      label: 対象の用語・役・コース・レッスン
+      description: 対象を特定できる名前を記入してください。
+      placeholder: 例）数牌／入門編「アガリの基本形を作ろう」
+    validations:
+      required: true
+  - type: input
+    id: url
+    attributes:
+      label: 対象ページのURL
+      description: 対象ページを特定するために役立ちます。個人情報を含むURLは記載しないでください。
+    validations:
+      required: false
+  - type: textarea
+    id: unclear
+    attributes:
+      label: 分かりにくい点・気づいたこと
+      description: どの文章や例が、どのように分かりにくかったか記入してください。
+    validations:
+      required: true
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: 修正案
+      description: 文章や例の修正案があれば記入してください。
+    validations:
+      required: false
+  - type: textarea
+    id: supporting-info
+    attributes:
+      label: 根拠・参考情報
+      description: ルールの根拠など、必要な場合に限り記入してください。参考情報は必要最小限にしてください。
+    validations:
+      required: false
