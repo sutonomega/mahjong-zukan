@@ -23,7 +23,7 @@
 ### 変更の確認
 
 - 型の検査と本番向けビルド: `npm run build`
-- ビルド成果物をローカルで表示: `npm run preview`
+- ビルド成果物をローカルで表示: `npm run build` の成功後に `npm run preview`
 
 GitHub Actionsの公開ワークフローは、Node.js 24で依存パッケージをインストールしてから、GitHub Pages用のパスを指定して `npm run build` を実行します。公開前の変更では、少なくともビルドが成功することを確認してください。画面や操作を変更した場合は、変更箇所に応じてPC・スマートフォン幅、キーボード操作、用語リンクを確認します。
 
@@ -43,7 +43,14 @@ GitHub Actionsの公開ワークフローは、Node.js 24で依存パッケー�
 
 ### Excelからの初期データ取り込み
 
-初期データの元ファイルはワークスペース上の `麻雀説明.xlsx` です。ファイルを用意したうえで、Pythonと `openpyxl` を利用して `python scripts/import_excel.py` を実行すると、`src/data/mahjongData.json` を生成できます。変換後は差分を確認し、画面に表示する値や補足説明の更新が必要な場合は対応するデータも確認します。取り込みスクリプトは元のExcelファイルを変更しません。
+Excelから初期データを再生成するときだけ、Python 3と `openpyxl` が必要です。リポジトリにExcelファイルは含まれません。元データ `麻雀説明.xlsx` を**プロジェクトフォルダーの1階層上**に用意してください（変換スクリプトはこの場所を読み込みます）。プロジェクトのルートで次を実行すると、`src/data/mahjongData.json` が生成されます。
+
+```bash
+python -m pip install openpyxl
+python scripts/import_excel.py
+```
+
+通常の開発・ビルドには、ExcelファイルやPythonは必要ありません。取り込み後はJSONの差分を確認し、必要な表示用データも更新します。取り込みスクリプトは元のExcelファイルを変更しません。
 
 ## GitHub Pagesへの公開
 

@@ -1,6 +1,6 @@
 # 麻雀図鑑
 
-初心者向けに、麻雀の役・用語をひとつにまとめる図鑑サイトです。初期データはワークスペース直下の `麻雀説明.xlsx` から取り込んでいます。
+初心者向けに、麻雀の役・用語をひとつにまとめる図鑑サイトです。初期データは、プロジェクトフォルダーの1階層上に置いた `麻雀説明.xlsx` から取り込んでいます。このExcelファイルはリポジトリには含まれません。
 
 ## 使い方
 
@@ -29,13 +29,14 @@ npm run build
 
 取り込んだ行は `src/data/mahjongData.json` に元の列名・値を保持しています。画面用の名前、読み方、説明などは `src/data/entries.ts` で元データから参照しています。Excelにない例、難易度、学習STEP、関連項目を初期データに追加していません。
 
-ExcelファイルからJSONを再生成する場合は、Pythonと `openpyxl` が必要です。
+通常の開発やビルドにExcelファイルは必要ありません。ExcelからJSONを再生成する場合のみ、Python 3と `openpyxl` が必要です。`麻雀説明.xlsx` をプロジェクトフォルダーの1階層上に置き、次のコマンドを実行します。
 
 ```bash
+python -m pip install openpyxl
 python scripts/import_excel.py
 ```
 
-`mahjongData.json` を更新するときは、ワークスペース直下の `麻雀説明.xlsx` を元にしてください。変換スクリプトは元ファイルを変更しません。
+生成先は `src/data/mahjongData.json` です。差分を確認してから取り込み結果を反映してください。変換スクリプトは元のExcelファイルを変更しません。
 
 ## GitHub Pages
 
