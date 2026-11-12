@@ -4,11 +4,11 @@
 
 ## 使い方
 
-学習コースの始め方、用語の調べ方、進捗の保存については[使い方ガイド](docs/user-guide.md)を確認してください。
+学習コースの始め方、用語の調べ方、進捗の保存については[使い方ガイド](docs/user-guide.md)を確認してください。環境構築、コンテンツ更新、公開の手順は[開発・公開手順](docs/development-and-release.md)を確認してください。
 
 ## 開発
 
-Node.js 20 以上を用意して、プロジェクトのフォルダーで実行します。
+Node.js 24 と npm を用意して、プロジェクトのフォルダーで実行します。
 
 ```bash
 npm install
@@ -39,7 +39,7 @@ python scripts/import_excel.py
 
 ## GitHub Pages
 
-`.github/workflows/deploy.yml` が `main` ブランチへのpushをビルドし、GitHub Pagesにデプロイします。GitHubリポジトリの **Settings → Pages → Build and deployment → Source** を **GitHub Actions** に設定してください。
+`.github/workflows/deploy.yml` が `main` ブランチへのpushをビルドし、GitHub Pagesにデプロイします。GitHubリポジトリの **Settings → Pages → Build and deployment → Source** を **GitHub Actions** に設定してください。詳しい公開確認手順は[開発・公開手順](docs/development-and-release.md)を参照してください。
 
 ## 現在の段階
 
