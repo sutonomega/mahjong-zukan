@@ -206,6 +206,7 @@ function App() {
   if (selected) {
     return (
       <div className="app-shell">
+      <a className="skip-link" href="#main-content">本文へスキップ</a>
         <header className="topbar">
           <button className="brand-button" onClick={() => { setSelectedId(null); setEntryHistory([]); setActiveView('glossary') }} aria-label="図鑑の一覧へ戻る">
             <span className="brand-mark"><BookOpen size={21} /></span>
@@ -213,7 +214,7 @@ function App() {
           </button>
           <span className="topbar-note">はじめての麻雀を、もっとわかりやすく。</span>
         </header>
-        <main className="detail-layout">
+        <main id="main-content" className="detail-layout" tabIndex={-1}>
           <button className="back-link" onClick={backFromEntry}><ArrowLeft size={16} /> {entryHistory.length > 0 ? '前の説明へ戻る' : '図鑑一覧へ戻る'}</button>
           <article className="detail-card">
             <div className="detail-kicker"><span className={`type-pill type-${selected.type}`}>{selected.type}</span></div>
@@ -279,6 +280,7 @@ function App() {
 
   if (activeView === 'course' && !selected) {
     return <div className="app-shell">
+      <a className="skip-link" href="#main-content">本文へスキップ</a>
       <header className="topbar">
         <button className="brand-button" onClick={() => { setActiveView('course'); setSelectedId(null); setEntryHistory([]) }} aria-label="学習コーストップ">
           <span className="brand-mark"><BookOpen size={21} /></span>
@@ -337,6 +339,7 @@ function App() {
 
   return (
     <div className="app-shell">
+      <a className="skip-link" href="#main-content">本文へスキップ</a>
       <header className="topbar">
         <button className="brand-button" onClick={resetFilters} aria-label="麻雀図鑑トップ">
           <span className="brand-mark"><BookOpen size={21} /></span>
@@ -346,7 +349,7 @@ function App() {
         
       </header>
 
-      <main>
+      <main id="main-content" tabIndex={-1}>
         <section className="hero">
           <div className="hero-content">
             <div className="eyebrow"><Sparkles size={14} /> BEGINNER'S FIELD GUIDE</div>
