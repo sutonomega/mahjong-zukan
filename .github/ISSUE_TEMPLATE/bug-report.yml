@@ -1,0 +1,56 @@
+name: 不具合の報告
+description: 表示や操作の問題を報告します
+title: "[不具合] "
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        再現できるよう、分かる範囲で記入してください。Issueは公開されます。個人情報や非公開の情報は記載しないでください。
+  - type: input
+    id: page
+    attributes:
+      label: 該当ページまたは用語
+      description: 学習コース名、レッスン名、用語・役名などを記入してください。
+      placeholder: 例）入門編「アガリには役が必要」／七対子
+    validations:
+      required: true
+  - type: input
+    id: url
+    attributes:
+      label: ページのURL
+      description: 表示されたURLを貼り付けてください。個人情報を含むURLは貼り付けないでください。
+    validations:
+      required: false
+  - type: textarea
+    id: steps
+    attributes:
+      label: 発生した操作
+      description: 問題が起きるまでの手順を記入してください。
+      placeholder: |
+        1. 図鑑を開く
+        2. 「字牌」を検索する
+        3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: 実際に起きたこと
+      description: 画面に表示されたことや操作結果を記入してください。
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 期待する結果
+      description: どのような表示・動作が正しいか記入してください。
+    validations:
+      required: false
+  - type: input
+    id: environment
+    attributes:
+      label: 端末・ブラウザー
+      placeholder: 例）iPhone / Safari、Windows / Chrome
+    validations:
+      required: false
