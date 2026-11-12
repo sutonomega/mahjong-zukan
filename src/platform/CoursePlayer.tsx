@@ -75,7 +75,7 @@ export default function CoursePlayer({ pack, course, onOpenTerm, renderExtension
 
   if (!activeLesson) return null
 
-  return <main className="course-layout">
+  return <main id="main-content" className="course-layout" tabIndex={-1}>
     <section className="course-hero">
       <div className="course-eyebrow"><BookOpen size={15} /> LEARNING COURSE</div>
       <p className="course-pack-title">{pack.title}</p>
