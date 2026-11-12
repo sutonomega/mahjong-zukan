@@ -503,7 +503,7 @@ main { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
 .glossary-runtime-item > span:first-child { display: grid; gap: 4px; }
 .glossary-runtime-item small, .glossary-runtime-reading { color: var(--muted, #666); }
 .glossary-runtime-tooltip { position: relative; color: var(--accent, #247a65); text-decoration: underline dotted; text-underline-offset: 3px; }
-.glossary-runtime-tooltip:hover::after, .glossary-runtime-tooltip:focus::after { position: absolute; z-index: 2; right: 0; bottom: calc(100% + 8px); width: min(280px, 70vw); padding: 10px 12px; border-radius: 10px; background: #172622; color: #fff; content: attr(data-tooltip); box-shadow: 0 6px 20px #0002; }
+.glossary-runtime-tooltip:hover::after, .glossary-runtime-tooltip:focus-visible::after { position: absolute; z-index: 2; right: 0; bottom: calc(100% + 8px); width: min(280px, 70vw); padding: 10px 12px; border-radius: 10px; background: #172622; color: #fff; content: attr(data-tooltip); box-shadow: 0 6px 20px #0002; }
 .glossary-runtime-back { display: inline-flex; align-items: center; gap: 8px; margin: 0 0 14px; border: 0; background: none; color: inherit; font: inherit; cursor: pointer; }
 .glossary-runtime-detail { padding: clamp(20px, 4vw, 36px); border: 1px solid var(--line, #ddd); border-radius: 18px; background: var(--surface, #fff); }
 .glossary-runtime-definition { font-size: 1.15rem; font-weight: 650; }
