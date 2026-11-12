@@ -76,10 +76,10 @@ function TileFamiliesDiagram({ families }: { families: TileFamily[] }) {
   return <figure aria-labelledby="mahjong-families-title" className="mahjong-diagram mahjong-families-diagram">
     <figcaption id="mahjong-families-title">麻雀の牌の種類</figcaption>
     {categories.map((category) => <section className="mahjong-family-category" key={category}>
-      <h4>{category}</h4>
+      <h3>{category}</h3>
       <div className="mahjong-family-grid">
         {families.filter((family) => family.category === category).map((family) => <article className="mahjong-family-card" key={family.name}>
-          <h5>{family.name}<span>{family.reading}</span></h5>
+          <h4>{family.name}<span>{family.reading}</span></h4>
           <TileFaces tiles={family.examples} />
           <p>{family.description}</p>
         </article>)}
@@ -145,7 +145,7 @@ function YakuHandExamplesDiagram({ examples }: { examples: YakuHandExample[] }) 
   return <figure className="mahjong-diagram mahjong-yaku-examples">
     <figcaption>役の牌姿例</figcaption>
     {examples.map((example) => <section className="mahjong-yaku-example" key={example.title}>
-      <h4>{example.title}</h4>
+      <h3>{example.title}</h3>
       <ol className="mahjong-hand-groups">
         {example.groups.map((group, index) => <li className="mahjong-hand-group" key={group.name + '-' + index}>
           <span className="mahjong-group-name">{group.name}</span>
