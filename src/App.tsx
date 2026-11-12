@@ -206,7 +206,7 @@ function App() {
   if (selected) {
     return (
       <div className="app-shell">
-      <a className="skip-link" href="#main-content">本文へスキップ</a>
+        <a className="skip-link" href="#main-content">本文へスキップ</a>
         <header className="topbar">
           <button className="brand-button" onClick={() => { setSelectedId(null); setEntryHistory([]); setActiveView('glossary') }} aria-label="図鑑の一覧へ戻る">
             <span className="brand-mark"><BookOpen size={21} /></span>
