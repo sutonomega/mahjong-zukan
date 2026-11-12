@@ -11,6 +11,7 @@ type CoursePlayerProps = {
   onOpenTerm: (reference: GlossaryReference) => void
   renderExtension?: (extension: LessonExtension) => ReactNode
   initialLessonId?: string
+  onLessonChange?: (lessonId: string) => void
 }
 
 function LessonSegments({ segments, onOpenTerm }: { segments: LessonSegment[]; onOpenTerm: CoursePlayerProps['onOpenTerm'] }) {
@@ -29,7 +30,7 @@ function LessonSegments({ segments, onOpenTerm }: { segments: LessonSegment[]; o
       >{segment.reference.label}</a>)}</>
 }
 
-export default function CoursePlayer({ pack, course, onOpenTerm, renderExtension, initialLessonId }: CoursePlayerProps) {
+export default function CoursePlayer({ pack, course, onOpenTerm, renderExtension, initialLessonId, onLessonChange }: CoursePlayerProps) {
   const [progress, setProgress] = useState(() => readCourseProgress(pack.packId, course.id, course.lessons.map((lesson) => lesson.id), initialLessonId))
   const [activeQuizId, setActiveQuizId] = useState<string | null>(null)
   const lessons = course.lessons
@@ -51,6 +52,7 @@ export default function CoursePlayer({ pack, course, onOpenTerm, renderExtension
   function selectLesson(lesson: LearningLesson) {
     setActiveQuizId(null)
     setProgress((current) => ({ ...current, activeLessonId: lesson.id }))
+    onLessonChange?.(lesson.id)
     window.scrollTo({ top: 0, behavior: getPreferredScrollBehavior() })
   }
 
@@ -64,11 +66,16 @@ export default function CoursePlayer({ pack, course, onOpenTerm, renderExtension
       completedLessonIds,
       activeLessonId: nextLesson?.id ?? activeLesson.id,
     })
-    if (nextLesson) window.scrollTo({ top: 0, behavior: getPreferredScrollBehavior() })
+    if (nextLesson) {
+      onLessonChange?.(nextLesson.id)
+      window.scrollTo({ top: 0, behavior: getPreferredScrollBehavior() })
+    }
   }
 
   function resetProgress() {
-    setProgress({ completedLessonIds: [], activeLessonId: lessons[0]?.id ?? '' })
+    const firstLessonId = lessons[0]?.id ?? ''
+    setProgress({ completedLessonIds: [], activeLessonId: firstLessonId })
+    if (firstLessonId) onLessonChange?.(firstLessonId)
   }
 
   const lessonOutline = useMemo(() => lessons.map((lesson, index) => ({

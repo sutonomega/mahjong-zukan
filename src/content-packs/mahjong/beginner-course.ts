@@ -155,8 +155,6 @@ export const mahjongBeginnerPack: LearningPack = {
             { type: 'text', text: 'と、東や白のような' },
             { type: 'term', reference: { id: 'mahjong:term-081', label: '字牌', shortDefinition: '東南西北の風牌と、白發中の三元牌です。' } },
             { type: 'text', text: 'があります。自分が持っている牌のまとまりを' },
-            { type: 'term', reference: { id: 'mahjong:term-066', label: '牌', shortDefinition: '麻雀で使う、絵柄や数字が描かれた道具です。' } },
-            { type: 'text', text: 'といい、自分の前にある牌を' },
             { type: 'term', reference: { id: 'mahjong:term-068', label: '手牌', shortDefinition: '自分の手元でそろえていく牌の集まりです。' } },
             { type: 'text', text: 'といいます。' },
           ] },
