@@ -84,3 +84,24 @@ export type LearningPack = {
   contentVersion: string
   courses: LearningCourse[]
 }
+
+export type GlossaryEntry = {
+  /** Stable ID including the content-pack namespace, such as "botany:leaf-vein". */
+  id: string
+  title: string
+  aliases?: string[]
+  reading?: string
+  shortDefinition: string
+  description: string
+  category?: string
+}
+
+export type GlossaryPack = {
+  packId: string
+  title: string
+  description: string
+  locale: string
+  schemaVersion: number
+  contentVersion: string
+  entries: GlossaryEntry[]
+}
