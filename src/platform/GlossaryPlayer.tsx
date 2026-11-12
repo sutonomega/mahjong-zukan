@@ -57,9 +57,15 @@ export default function GlossaryPlayer({ pack, initialEntryId }: GlossaryPlayerP
       ? <ul className="glossary-runtime-list">{results.map(({ item }) => {
           const entry = pack.entries.find((candidate) => candidate.id === item.id)
           if (!entry) return null
-          return <li key={entry.id}><button className="glossary-runtime-item" onClick={() => setSelectedId(entry.id)} type="button">
+          return <li key={entry.id}><button
+            aria-label={entry.title + '。' + (entry.reading ?? '') + '。' + entry.shortDefinition + ' 詳細を開く'}
+            className="glossary-runtime-item glossary-runtime-tooltip"
+            data-tooltip={entry.shortDefinition}
+            onClick={() => setSelectedId(entry.id)}
+            type="button"
+          >
             <span><strong>{entry.title}</strong>{entry.reading && <small>{entry.reading}</small>}</span>
-            <span className="glossary-runtime-tooltip" data-tooltip={entry.shortDefinition}>説明を見る</span>
+            <span>説明を見る</span>
           </button></li>
         })}</ul>
       : <p className="glossary-runtime-empty">一致する用語はありません。</p>}
