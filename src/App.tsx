@@ -12,7 +12,7 @@ import { resolveMahjongGlossaryEntryId } from './content-packs/mahjong/glossaryA
 import { mahjongExtensionRenderers } from './content-packs/mahjong/extensionRenderers'
 import { learningPackToSearchPack, searchContentPacks, type SearchResult, type SearchablePack } from './platform/search'
 import ContentPackDemo from './platform/ContentPackDemo'
-import { botanyGlossaryPack, botanyLearningPack } from './content-packs/botany/sample-pack'
+import { contentPackDemos } from './content-packs/demoPacks'
 
 const typeFilters = ['すべて', '役', '用語'] as const
 type TypeFilter = typeof typeFilters[number]
@@ -431,11 +431,9 @@ function MahjongApp() {
   )
 }
 
-export default App
-
-
 export default function App() {
-  const demoPack = typeof window === 'undefined' ? null : new URLSearchParams(window.location.search).get('demoPack')
-  if (demoPack === 'botany') return <ContentPackDemo learningPack={botanyLearningPack} glossaryPack={botanyGlossaryPack} />
+  const demoPackId = typeof window === 'undefined' ? null : new URLSearchParams(window.location.search).get('demoPack')
+  const demoPack = demoPackId ? contentPackDemos[demoPackId] : undefined
+  if (demoPack) return <ContentPackDemo {...demoPack} />
   return <MahjongApp />
 }

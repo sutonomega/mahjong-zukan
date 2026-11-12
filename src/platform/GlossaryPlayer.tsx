@@ -26,6 +26,11 @@ export default function GlossaryPlayer({ pack, initialEntryId }: GlossaryPlayerP
     })),
   }), [pack])
   const results = useMemo(() => searchContentPacks([searchablePack], query), [searchablePack, query])
+  const visibleEntries = useMemo(() => {
+    if (!query.trim()) return pack.entries
+    const matchingIds = new Set(results.map(({ item }) => item.id))
+    return pack.entries.filter((entry) => matchingIds.has(entry.id))
+  }, [pack.entries, query, results])
 
   useEffect(() => {
     if (initialEntryId && pack.entries.some((entry) => entry.id === initialEntryId)) {
@@ -53,11 +58,8 @@ export default function GlossaryPlayer({ pack, initialEntryId }: GlossaryPlayerP
     <label className="glossary-runtime-search"><Search size={17} /><span className="visually-hidden">用語を検索</span>
       <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="用語を検索" />
     </label>
-    {results.length
-      ? <ul className="glossary-runtime-list">{results.map(({ item }) => {
-          const entry = pack.entries.find((candidate) => candidate.id === item.id)
-          if (!entry) return null
-          return <li key={entry.id}><button
+    {visibleEntries.length
+      ? <ul className="glossary-runtime-list">{visibleEntries.map((entry) => <li key={entry.id}><button
             aria-label={entry.title + '。' + (entry.reading ?? '') + '。' + entry.shortDefinition + ' 詳細を開く'}
             className="glossary-runtime-item glossary-runtime-tooltip"
             data-tooltip={entry.shortDefinition}
@@ -66,8 +68,7 @@ export default function GlossaryPlayer({ pack, initialEntryId }: GlossaryPlayerP
           >
             <span><strong>{entry.title}</strong>{entry.reading && <small>{entry.reading}</small>}</span>
             <span>説明を見る</span>
-          </button></li>
-        })}</ul>
+          </button></li>)}</ul>
       : <p className="glossary-runtime-empty">一致する用語はありません。</p>}
   </section>
 }
