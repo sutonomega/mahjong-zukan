@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { BookOpen, Search, X, ChevronRight, Check, Sparkles, CircleHelp, ArrowLeft, BookmarkCheck } from 'lucide-react'
-import { entries, getCategory, getDisplayName, getEntryExplanation, references, getEntryReadingVariants, type Entry } from './data/entries'
+import { entries, getCategory, getDisplayName, getEntryExplanation, getEntryReadingVariants, type Entry } from './data/entries'
 import YakuArtwork from './components/YakuArtwork'
 import TermArtwork from './components/TermArtwork'
 import GlossaryLinkedText, { getGlossaryEntries } from './components/GlossaryLinkedText'
@@ -423,11 +423,6 @@ function App() {
           </> : <div className="entry-grid">{searchGroups.all.map(renderEntryCard)}</div>}
         </section>
 
-        <section className="reference-section">
-          <h2>参考リンク</h2>
-          <p>Excelのシート「図」に記載されていた参考URLです。参照先の画像は転載していません。</p>
-          <ul>{references.map((reference) => <li key={reference.url}><a href={reference.url} target="_blank" rel="noreferrer">{reference.label}</a></li>)}</ul>
-        </section>
       </main>
       <footer className="footer"><span>麻雀図鑑</span><span>少しずつ覚えていこう。</span></footer>
     </div>
