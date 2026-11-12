@@ -395,7 +395,7 @@ function App() {
         <section className="catalog-section" id="catalog">
           <div className="section-heading catalog-heading">
             <div><span className="section-eyebrow">THE ENCYCLOPEDIA</span><h2>図鑑をひらく</h2></div>
-            <span className="result-count">{query.trim() ? `${searchGroups.exact.length + searchGroups.suggested.length + searchGroups.related.length + lessonSearchResults.length} 件の検索結果` : `${searchGroups.all.length} 件の項目`}</span>
+            <span className="result-count" aria-live="polite" aria-atomic="true">{query.trim() ? `${searchGroups.exact.length + searchGroups.suggested.length + searchGroups.related.length + lessonSearchResults.length} 件の検索結果` : `${searchGroups.all.length} 件の項目`}</span>
           </div>
           <div className="search-box">
             <Search size={19} />
@@ -406,10 +406,10 @@ function App() {
             {hasFilters && <button className="reset-button" onClick={resetFilters}>条件をリセット</button>}
           </div>
           <div className="filter-row type-filter-row"><div className="filter-pills" role="group" aria-label="項目の種類">
-              {typeFilters.map((filter) => <button key={filter} className={`filter-pill ${typeFilter === filter ? 'selected' : ''}`} onClick={() => setTypeFilter(filter)}>{filter}</button>)}
+              {typeFilters.map((filter) => <button aria-pressed={typeFilter === filter} key={filter} className={`filter-pill ${typeFilter === filter ? 'selected' : ''}`} onClick={() => setTypeFilter(filter)} type="button">{filter}</button>)}
             </div></div>
           <div className="filter-pills category-pills" role="group" aria-label="学習カテゴリ">
-            {['すべて', ...categories].map((category) => <button key={category} className={`filter-pill ${categoryFilter === category ? 'selected' : ''}`} onClick={() => setCategoryFilter(category)}>{category}</button>)}
+            {['すべて', ...categories].map((category) => <button aria-pressed={categoryFilter === category} key={category} className={`filter-pill ${categoryFilter === category ? 'selected' : ''}`} onClick={() => setCategoryFilter(category)} type="button">{category}</button>)}
           </div>
           {query.trim() && lessonSearchResults.length > 0 && <section className="search-result-group lesson-search-group"><h3>学習記事</h3><div className="content-search-list">{lessonSearchResults.map(renderSearchResult)}</div></section>}
           {query.trim() ? <>
